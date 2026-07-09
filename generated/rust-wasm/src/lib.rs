@@ -2,10 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 use tsify::Tsify;
-use wasm_bindgen::prelude::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum HealthStatusStatus {
     #[serde(rename = "ok")]
     Ok,
@@ -14,7 +12,6 @@ pub enum HealthStatusStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum AuditEngagementFramework {
     #[serde(rename = "soc2")]
     Soc2,
@@ -31,7 +28,6 @@ pub enum AuditEngagementFramework {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub enum AuditEngagementStatus {
     #[serde(rename = "scoping")]
     Scoping,
@@ -45,7 +41,6 @@ pub enum AuditEngagementStatus {
 
 /// Response of GET /api/health.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct HealthStatus {
     /// Liveness of the service.
     pub status: HealthStatusStatus,
@@ -55,7 +50,6 @@ pub struct HealthStatus {
 
 /// Response of GET /api/info.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct ServiceInfo {
     /// Service name.
     pub service: String,
@@ -67,7 +61,6 @@ pub struct ServiceInfo {
 
 /// A single compliance-audit engagement for a customer company.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
 pub struct AuditEngagement {
     /// Opaque engagement identifier (UUID).
     pub id: String,
