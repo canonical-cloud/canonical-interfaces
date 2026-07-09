@@ -241,7 +241,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 wasm-bindgen = "0.2"
 serde-wasm-bindgen = "0.6"
-tsify = { version = "0.4", features = ["js"] }
+tsify = { version = "0.5", features = ["js"] }
 `;
   return { "rust-wasm/src/lib.rs": renderRustBody(types, { wasm: true }), "rust-wasm/Cargo.toml": cargo };
 }
