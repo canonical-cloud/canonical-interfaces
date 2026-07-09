@@ -36,11 +36,12 @@ test('rust and rust-wasm never diverge in data shape (same structs + fields)', (
   assert.deepEqual(pubLines(out['rust-wasm/src/lib.rs']), pubLines(out['rust/src/lib.rs']));
 });
 
-test('rust-wasm mirrors rust types with the tsify/wasm-bindgen boundary', () => {
+test('rust-wasm is declaration-only Tsify (no wasm ABI baked in)', () => {
   const files = build();
   const wasm = files['rust-wasm/src/lib.rs'];
   assert.match(wasm, /use tsify::Tsify;/);
-  assert.match(wasm, /#\[tsify\(into_wasm_abi, from_wasm_abi\)\]/);
+  assert.doesNotMatch(wasm, /into_wasm_abi|from_wasm_abi/);
+  assert.doesNotMatch(wasm, /use wasm_bindgen::prelude/);
   assert.match(wasm, /pub struct ServiceInfo/);
   assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
   assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
