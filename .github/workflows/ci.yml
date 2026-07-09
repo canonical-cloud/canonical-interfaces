@@ -38,6 +38,9 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
         with:
           targets: wasm32-unknown-unknown
@@ -64,3 +67,9 @@ jobs:
             exit 1
           fi
           echo "clean"
+      # Stronger guard: the generated .d.ts must be valid TypeScript (catches any
+      # unresolved type, e.g. an undefined `Value`, that the grep would miss).
+      - name: Type-check generated .d.ts (tsc)
+        run: |
+          dts=$(ls generated/rust-wasm/pkg/*.d.ts | grep -v _bg)
+          npx -y -p typescript@5 tsc --noEmit --lib esnext,dom "$dts"
