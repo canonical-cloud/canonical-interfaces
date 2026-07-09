@@ -20,12 +20,24 @@ test('build() emits one file per language', () => {
   for (const rel of [
     'rust/src/lib.rs',
     'rust/Cargo.toml',
+    'rust-wasm/src/lib.rs',
+    'rust-wasm/Cargo.toml',
     'typescript/index.ts',
     'python/canonical_interfaces.py',
     'go/interfaces.go',
   ]) {
     assert.ok(rel in files, `missing ${rel}`);
   }
+});
+
+test('rust-wasm mirrors rust types with the tsify/wasm-bindgen boundary', () => {
+  const files = build();
+  const wasm = files['rust-wasm/src/lib.rs'];
+  assert.match(wasm, /use tsify::Tsify;/);
+  assert.match(wasm, /#\[tsify\(into_wasm_abi, from_wasm_abi\)\]/);
+  assert.match(wasm, /pub struct ServiceInfo/);
+  assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
+  assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
 });
 
 test('generated types carry through to every language', () => {
