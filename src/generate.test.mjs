@@ -20,12 +20,38 @@ test('build() emits one file per language', () => {
   for (const rel of [
     'rust/src/lib.rs',
     'rust/Cargo.toml',
+    'rust-wasm/src/lib.rs',
+    'rust-wasm/Cargo.toml',
     'typescript/index.ts',
     'python/canonical_interfaces.py',
     'go/interfaces.go',
   ]) {
     assert.ok(rel in files, `missing ${rel}`);
   }
+});
+
+test('rust and rust-wasm never diverge in data shape (same structs + fields)', () => {
+  const out = build();
+  const pubLines = (s) => s.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('pub '));
+  assert.deepEqual(pubLines(out['rust-wasm/src/lib.rs']), pubLines(out['rust/src/lib.rs']));
+});
+
+test('rust-wasm mirrors rust types with the tsify/wasm-bindgen boundary', () => {
+  const files = build();
+  const wasm = files['rust-wasm/src/lib.rs'];
+  assert.match(wasm, /use tsify::Tsify;/);
+  assert.match(wasm, /#\[tsify\(into_wasm_abi, from_wasm_abi\)\]/);
+  assert.match(wasm, /pub struct ServiceInfo/);
+  assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
+  assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
+  // No serde_json::Value / BTreeMap field may reach tsify without a type override
+  // (which would emit an undefined `Value` or a wrong `Map` in the .d.ts).
+  const lines = wasm.split('\n');
+  lines.forEach((line, i) => {
+    if (/pub .*(serde_json::Value|BTreeMap)/.test(line)) {
+      assert.match(lines[i - 1] || '', /#\[tsify\(type = /, `unguarded field: ${line.trim()}`);
+    }
+  });
 });
 
 test('generated types carry through to every language', () => {

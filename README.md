@@ -15,8 +15,15 @@ hand-edit it; add a type as a `$def` and regenerate.
 | --- | --- |
 | TypeScript | `generated/typescript/index.ts` |
 | Rust (serde) | `generated/rust/src/lib.rs` |
+| Rust → WebAssembly (tsify) | `generated/rust-wasm/src/lib.rs` |
 | Python (dataclasses) | `generated/python/canonical_interfaces.py` |
 | Go | `generated/go/interfaces.go` |
+
+The `rust-wasm` target is the same serde types as `rust` plus
+[`tsify`](https://github.com/madonoharu/tsify) + `wasm-bindgen`, so payloads cross
+the JS/wasm boundary as real objects (with an emitted `.d.ts`). It is a separate
+crate so the plain `rust` crate stays dependency-free. Build it with
+`wasm-pack build generated/rust-wasm --target web`.
 
 ## Types
 
