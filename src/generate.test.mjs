@@ -30,6 +30,12 @@ test('build() emits one file per language', () => {
   }
 });
 
+test('rust and rust-wasm never diverge in data shape (same structs + fields)', () => {
+  const out = build();
+  const pubLines = (s) => s.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('pub '));
+  assert.deepEqual(pubLines(out['rust-wasm/src/lib.rs']), pubLines(out['rust/src/lib.rs']));
+});
+
 test('rust-wasm mirrors rust types with the tsify/wasm-bindgen boundary', () => {
   const files = build();
   const wasm = files['rust-wasm/src/lib.rs'];
