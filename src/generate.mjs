@@ -155,17 +155,32 @@ function goType(s) {
 
 // --- emitters: type[] -> { relpath: content } --------------------------------
 
-function emitRust(types) {
-  const out = [`// ${BANNER}`, "", "use serde::{Deserialize, Serialize};", ""];
+// Shared Rust body renderer for both the plain `rust` crate and the wasm crate.
+// `wasm` toggles the tsify/wasm-bindgen boundary derives; the type bodies are
+// otherwise identical, so the two crates never drift.
+function renderRustBody(types, { wasm }) {
+  const structDerive = wasm
+    ? "#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]"
+    : "#[derive(Debug, Clone, Serialize, Deserialize)]";
+  const enumDerive = wasm
+    ? "#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]"
+    : "#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]";
+  const header = [`// ${BANNER}`, "", "use serde::{Deserialize, Serialize};"];
+  if (wasm) header.push("use tsify::Tsify;", "use wasm_bindgen::prelude::*;");
+  const out = [...header, ""];
   // Enums first.
   for (const [enumName, values] of collectEnums(types)) {
-    out.push("#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]", `pub enum ${enumName} {`);
+    out.push(enumDerive);
+    if (wasm) out.push("#[tsify(into_wasm_abi, from_wasm_abi)]");
+    out.push(`pub enum ${enumName} {`);
     for (const v of values) out.push(`    #[serde(rename = "${v}")]`, `    ${pascal(v)},`);
     out.push("}", "");
   }
   for (const t of types) {
     if (t.description) out.push(`/// ${cLine(t.description)}`);
-    out.push("#[derive(Debug, Clone, Serialize, Deserialize)]", `pub struct ${t.name} {`);
+    out.push(structDerive);
+    if (wasm) out.push("#[tsify(into_wasm_abi, from_wasm_abi)]");
+    out.push(`pub struct ${t.name} {`);
     for (const p of t.props) {
       if (p.description) out.push(`    /// ${cLine(p.description)}`);
       const ty = isStringEnum(p.schema) ? enumTypeName(t.name, p.name) : rustType(p.schema);
@@ -180,6 +195,10 @@ function emitRust(types) {
     }
     out.push("}", "");
   }
+  return out.join("\n");
+}
+
+function emitRust(types) {
   const cargo = `[package]
 name = "canonical-interfaces"
 version = "0.1.0"
@@ -190,7 +209,31 @@ description = "Generated typed payloads for the canonical.cloud API (see canonic
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 `;
-  return { "rust/src/lib.rs": out.join("\n"), "rust/Cargo.toml": cargo };
+  return { "rust/src/lib.rs": renderRustBody(types, { wasm: false }), "rust/Cargo.toml": cargo };
+}
+
+// Wasm build of the Rust types: same serde structs, plus tsify + wasm-bindgen so
+// the payloads cross the JS/wasm boundary as real objects and a .d.ts is emitted.
+// Kept in a separate crate (generated/rust-wasm) so the plain `rust` crate stays
+// dependency-free. Build with: wasm-pack build generated/rust-wasm --target web
+function emitRustWasm(types) {
+  const cargo = `[package]
+name = "canonical-interfaces-wasm"
+version = "0.1.0"
+edition = "2021"
+description = "Generated typed payloads for the canonical.cloud API, compiled to WebAssembly (see canonical-interfaces)."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+tsify = { version = "0.4", features = ["js"] }
+`;
+  return { "rust-wasm/src/lib.rs": renderRustBody(types, { wasm: true }), "rust-wasm/Cargo.toml": cargo };
 }
 
 function emitTs(types) {
