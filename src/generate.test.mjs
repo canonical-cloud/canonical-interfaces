@@ -38,6 +38,14 @@ test('rust-wasm mirrors rust types with the tsify/wasm-bindgen boundary', () => 
   assert.match(wasm, /pub struct ServiceInfo/);
   assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
   assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
+  // No serde_json::Value / BTreeMap field may reach tsify without a type override
+  // (which would emit an undefined `Value` or a wrong `Map` in the .d.ts).
+  const lines = wasm.split('\n');
+  lines.forEach((line, i) => {
+    if (/pub .*(serde_json::Value|BTreeMap)/.test(line)) {
+      assert.match(lines[i - 1] || '', /#\[tsify\(type = /, `unguarded field: ${line.trim()}`);
+    }
+  });
 });
 
 test('generated types carry through to every language', () => {
