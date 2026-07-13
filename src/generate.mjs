@@ -9,8 +9,9 @@
 // EMITTERS; adding a type is one entry in a schema file + schema/index.json.
 //
 // Hardened: validates the index + every schema, rejects duplicate type names and
-// dangling $refs, enforces snake_case field names, sanitizes doc comments,
-// raw-escapes Rust keyword fields, and emits typed enums for string `enum`s.
+// dangling $refs, accepts snake_case domain fields and lowerCamelCase wire fields,
+// sanitizes doc comments, raw-escapes Rust keyword fields, and emits typed enums
+// for string `enum`s.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -30,6 +31,7 @@ const fail = (msg) => { throw new GenError(msg); };
 
 const oneLine = (s) => String(s || "").replace(/\s+/g, " ").trim();
 const pascal = (s) => s.split(/[_\-\s]+/).map((w) => (w ? w[0].toUpperCase() + w.slice(1) : "")).join("");
+const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 // Comment-escapers so a description can never break the generated file.
 const cLine = (s) => oneLine(s);                                  // // and /// and #
 const cBlock = (s) => oneLine(s).replace(/\*\//g, "*\\/");        // /** ... */
@@ -40,10 +42,19 @@ const RUST_KEYWORDS = new Set([
   "in","let","loop","match","mod","move","mut","pub","ref","return","self","static","struct","super",
   "trait","true","type","unsafe","use","where","while","async","await","box","union",
 ]);
-const FIELD_RE = /^[a-z][a-z0-9_]*$/;
+const FIELD_RE = /^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[a-z][A-Za-z0-9]*)$/;
 
 const refName = (s) => (s && s.$ref ? s.$ref.split("/").pop() : null);
-const isStringEnum = (s) => s && s.type === "string" && Array.isArray(s.enum) && s.enum.length > 0;
+const isNullable = (s) => s && Array.isArray(s.type) && s.type.includes("null");
+const nonNullSchema = (s) => {
+  if (!isNullable(s)) return s;
+  const types = s.type.filter((type) => type !== "null");
+  return { ...s, type: types.length === 1 ? types[0] : types };
+};
+const isStringEnum = (s) => {
+  const inner = nonNullSchema(s);
+  return inner && inner.type === "string" && Array.isArray(inner.enum) && inner.enum.length > 0;
+};
 const enumTypeName = (typeName, fieldName) => `${typeName}${pascal(fieldName)}`;
 
 // --- load + validate ----------------------------------------------------------
@@ -76,7 +87,15 @@ function loadTypes() {
       seen.set(name, file);
       const required = new Set(def.required || []);
       const props = Object.entries(def.properties || {}).map(([pname, pschema]) => {
-        if (!FIELD_RE.test(pname)) fail(`${file}:${name}: property "${pname}" must be snake_case (${FIELD_RE})`);
+        if (!FIELD_RE.test(pname)) {
+          fail(`${file}:${name}: property "${pname}" must be snake_case or lowerCamelCase (${FIELD_RE})`);
+        }
+        if (Array.isArray(pschema.type)) {
+          const nonNullTypes = pschema.type.filter((type) => type !== "null");
+          if (!pschema.type.includes("null") || nonNullTypes.length !== 1) {
+            fail(`${file}:${name}.${pname}: only one scalar type plus null is supported`);
+          }
+        }
         return { name: pname, schema: pschema, required: required.has(pname), description: pschema.description || "" };
       });
       types.push({ name, description: def.description || "", props, source: file });
@@ -110,6 +129,7 @@ function collectEnums(types) {
 // --- per-language scalar resolvers (non-enum) --------------------------------
 
 function rustType(s) {
+  s = nonNullSchema(s);
   const r = refName(s); if (r) return r;
   switch (s.type) {
     case "string": return "String";
@@ -121,6 +141,7 @@ function rustType(s) {
   }
 }
 function tsType(s) {
+  s = nonNullSchema(s);
   const r = refName(s); if (r) return r;
   switch (s.type) {
     case "string": return "string";
@@ -131,6 +152,7 @@ function tsType(s) {
   }
 }
 function pyType(s) {
+  s = nonNullSchema(s);
   const r = refName(s); if (r) return r;
   switch (s.type) {
     case "string": return "str";
@@ -142,6 +164,7 @@ function pyType(s) {
   }
 }
 function goType(s) {
+  s = nonNullSchema(s);
   const r = refName(s); if (r) return r;
   switch (s.type) {
     case "string": return "string";
@@ -187,9 +210,10 @@ function renderRustBody(types, { wasm }) {
     for (const p of t.props) {
       if (p.description) out.push(`    /// ${cLine(p.description)}`);
       const ty = isStringEnum(p.schema) ? enumTypeName(t.name, p.name) : rustType(p.schema);
-      const kw = RUST_KEYWORDS.has(p.name);
-      const ident = kw ? `r#${p.name}` : p.name;
-      if (kw) out.push(`    #[serde(rename = "${p.name}")]`);
+      const rustName = snake(p.name);
+      const kw = RUST_KEYWORDS.has(rustName);
+      const ident = kw ? `r#${rustName}` : rustName;
+      if (kw || rustName !== p.name) out.push(`    #[serde(rename = "${p.name}")]`);
       // tsify's default TS for `serde_json::Value` is a bare (undefined) `Value`,
       // and for maps it emits `Map<..>` (wrong for JSON). Pin those fields to the
       // exact type the `typescript` emitter uses so the two TS surfaces agree.
@@ -199,7 +223,7 @@ function renderRustBody(types, { wasm }) {
         : null;
       if (p.required) {
         if (tsifyOverride) out.push(tsifyOverride);
-        out.push(`    pub ${ident}: ${ty},`);
+        out.push(`    pub ${ident}: ${isNullable(p.schema) ? `Option<${ty}>` : ty},`);
       } else {
         out.push(`    #[serde(default, skip_serializing_if = "Option::is_none")]`);
         if (tsifyOverride) out.push(tsifyOverride);
@@ -252,7 +276,10 @@ tsify = { version = "0.5", features = ["js"] }
 // The canonical TypeScript type for a field — shared by the `typescript` emitter
 // and the `rust-wasm` tsify overrides so both TS surfaces stay identical.
 function tsFieldType(p) {
-  return isStringEnum(p.schema) ? p.schema.enum.map((v) => `"${v}"`).join(" | ") : tsType(p.schema);
+  const base = isStringEnum(p.schema)
+    ? nonNullSchema(p.schema).enum.map((v) => `"${v}"`).join(" | ")
+    : tsType(p.schema);
+  return isNullable(p.schema) ? `${base} | null` : base;
 }
 
 function emitTs(types) {
@@ -280,8 +307,11 @@ function emitPython(types) {
     const ordered = [...t.props].sort((a, b) => Number(b.required) - Number(a.required));
     if (ordered.length === 0) out.push("    pass");
     for (const p of ordered) {
-      const base = isStringEnum(p.schema) ? `Literal[${p.schema.enum.map((v) => `"${v}"`).join(", ")}]` : pyType(p.schema);
-      out.push(p.required ? `    ${p.name}: ${base}` : `    ${p.name}: Optional[${base}] = None`);
+      const base = isStringEnum(p.schema)
+        ? `Literal[${nonNullSchema(p.schema).enum.map((v) => `"${v}"`).join(", ")}]`
+        : pyType(p.schema);
+      const type = isNullable(p.schema) ? `Optional[${base}]` : base;
+      out.push(p.required ? `    ${p.name}: ${type}` : `    ${p.name}: Optional[${base}] = None`);
     }
     out.push("");
   }
@@ -299,7 +329,7 @@ function emitGo(types) {
       if (doc) out.push(`\t// ${doc}`);
       const ty = goType(p.schema); // enums are plain strings in Go
       const tag = p.required ? `json:"${p.name}"` : `json:"${p.name},omitempty"`;
-      out.push(`\t${pascal(p.name)} ${p.required ? "" : "*"}${ty} \`${tag}\``);
+      out.push(`\t${pascal(p.name)} ${p.required && !isNullable(p.schema) ? "" : "*"}${ty} \`${tag}\``);
     }
     out.push("}", "");
   }
@@ -323,7 +353,7 @@ export function build() {
   for (const emit of Object.values(EMITTERS)) Object.assign(files, emit(types));
   return files;
 }
-export { loadTypes, pascal, oneLine, refName, isStringEnum, enumTypeName, collectEnums };
+export { loadTypes, pascal, snake, oneLine, refName, isNullable, isStringEnum, enumTypeName, collectEnums };
 
 function main() {
   const check = process.argv.includes("--check");

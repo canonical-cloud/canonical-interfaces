@@ -14,7 +14,8 @@ Schema in `schema/` is generated into per-language adapters under `generated/`.
 ## Working here
 
 - Enter the dev shell: `direnv allow` (or `nix develop ./.nix`, or `./shell`).
-- Add a type: add a PascalCase `$def` with snake_case fields to a schema file
+- Add a type: add a PascalCase `$def` with exact lowerCamelCase fields for API
+  wire payloads or snake_case fields for the established compliance domain
   (new files must be listed in `schema/index.json`), then:
   ```sh
   npm run generate     # rewrite generated/<lang>

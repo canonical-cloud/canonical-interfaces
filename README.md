@@ -1,15 +1,17 @@
 # canonical-interfaces
 
 JSON Schema (typed-IO) source of truth for the **canonical.cloud** HTTP API
-(served by [`canonical-backend.rs`](https://github.com/canonical-cloud/canonical-backend.rs)),
-plus the canonical Postgres schema for its compliance store, with generated
-language adapters. Same spirit as
+(served by [`canonical-web-server.rs`](https://github.com/canonical-cloud/canonical-web-server.rs)),
+including its bounded offline-first `draft_note` sync protocol, plus a
+Supabase Postgres reference schema and generated language adapters. Same spirit as
 [`akrion-sim-interfaces`](https://github.com/akrion-sim/akrion-sim-interfaces)
 and [`sonus-auris-interfaces`](https://github.com/sonus-auris/sonus-auris-interfaces).
 
 JSON Schema (`schema/*.schema.json`, indexed by `schema/index.json`) is the
-single source of truth. Everything under `generated/` is an **adapter** — never
-hand-edit it; add a type as a `$def` and regenerate.
+single source of truth. API definitions use the exact camelCase JSON wire names;
+the compliance-domain schema retains its established snake_case names.
+Everything under `generated/` is an **adapter** — never hand-edit it; add a type
+as a `$def` and regenerate.
 
 | Language | Path |
 | --- | --- |
@@ -27,16 +29,49 @@ crate so the plain `rust` crate stays dependency-free. Build it with
 
 ## Types
 
-The backend's HTTP contract (`schema/api.schema.json`):
+The web server's HTTP contract (`schema/api.schema.json`):
 
-- **`HealthStatus`** — response of `GET /api/health` (`{ status, service }`).
-- **`ServiceInfo`** — response of `GET /api/info` (`{ service, version, domain }`).
+- **`HealthStatus`** — legacy-compatible response of `GET /api/health` and
+  `GET /api/v1/health` (`{ status, service }`).
+- **`ServiceInfo`** — response of `GET /api/info` and `GET /api/v1/info`,
+  including the reported sMASH `stack`.
+- **`DraftNoteValue`**, **`DraftNoteKey`**, and **`WireRecord`** — schema-v1
+  draft-note values, owner-scoped keys, authoritative snapshots, and tombstones.
+- **`MutationOperation`**, **`MutationRequest`**, **`MutationResult`**, and
+  **`MutationResponse`** — the idempotent compare-and-swap contract for
+  `POST /api/v1/sync/mutations`.
+- **`ChangesQuery`** and **`ChangesResponse`** — bounded incremental pulls from
+  `GET /api/v1/sync/changes` using an opaque owner-bound cursor.
+
+The v1 sync contract accepts only `draft_note`, only payload schema version 1,
+1–50 operations per mutation request, titles up to 200 characters, bodies up to
+100,000 characters, and pull pages up to 500 records. Record versions are JSON
+decimal strings, not JavaScript numbers. Mutation results are `applied`,
+`conflict`, `gone`, `invalid`, or `idempotency_key_reused`. REST pull is
+authoritative; WebSocket invalidations only wake the pull loop.
 
 The compliance domain (`schema/compliance.schema.json`, mirrored by
 `sql/schema.sql`):
 
 - **`AuditEngagement`** — a customer compliance-audit engagement (framework +
   lifecycle status).
+
+## Postgres safety contract
+
+`sql/schema.sql` documents the owner-aware `user_profile`, `sync_clock`,
+`sync_record`, `sync_change`, and `sync_receipt` shapes used by the web server,
+alongside the legacy compliance table, which is deny-by-default until it gains
+an owner policy. The executable SeaORM migration in the web-server repository
+remains the runtime migration.
+
+Owner-scoped tables enable and force RLS with `auth.uid()` policies. The web
+server must set verified `request.jwt.claims` locally inside every user
+transaction and lock the owner's `sync_clock` row while it mutates the record,
+advances the clock, appends the change, and writes the idempotency receipt. That
+single transaction gives pull cursors commit order without gaps. The browser
+receives neither database credentials nor Supabase token pairs; server session
+tokens live only in the web server's encrypted session storage and are
+deliberately absent from this shared SQL file.
 
 ## Use
 
@@ -52,7 +87,9 @@ Consume the generated adapters via the package `exports` map, e.g.
 
 ## Add a type
 
-1. Add a PascalCase `$def` (snake_case fields) to a `schema/*.schema.json` file
-   (or add a new file and list it in `schema/index.json`).
+1. Add a PascalCase `$def` to a `schema/*.schema.json` file. Use exact
+   lowerCamelCase properties for JSON API wire fields and snake_case for the
+   existing compliance domain (or add a new file and list it in
+   `schema/index.json`).
 2. `npm run generate` and commit the regenerated `generated/` output.
 3. If it's a stored entity, mirror it in `sql/schema.sql`.

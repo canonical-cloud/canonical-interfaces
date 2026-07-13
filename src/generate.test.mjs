@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { build, loadTypes } from './generate.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -12,7 +13,29 @@ const root = join(here, '..');
 
 test('schema declares the expected canonical.cloud types', () => {
   const names = loadTypes().map((t) => t.name);
-  assert.deepEqual(names, ['HealthStatus', 'ServiceInfo', 'AuditEngagement']);
+  assert.deepEqual(names, [
+    'HealthStatus',
+    'ServiceInfo',
+    'DraftNoteValue',
+    'DraftNoteKey',
+    'MutationOperation',
+    'MutationRequest',
+    'WireRecord',
+    'MutationResult',
+    'MutationResponse',
+    'ChangesQuery',
+    'ChangesResponse',
+    'AuditEngagement',
+  ]);
+});
+
+test('sync schema keeps server-enforced batch, page, and draft-note bounds', () => {
+  const schema = JSON.parse(readFileSync(join(root, 'schema/api.schema.json'), 'utf8'));
+  assert.equal(schema.$defs.MutationRequest.properties.operations.minItems, 1);
+  assert.equal(schema.$defs.MutationRequest.properties.operations.maxItems, 50);
+  assert.equal(schema.$defs.ChangesQuery.properties.limit.maximum, 500);
+  assert.equal(schema.$defs.DraftNoteValue.properties.title.maxLength, 200);
+  assert.equal(schema.$defs.DraftNoteValue.properties.body.maxLength, 100_000);
 });
 
 test('build() emits one file per language', () => {
@@ -70,6 +93,22 @@ test('string enums surface as typed unions/literals per language', () => {
   assert.match(files['typescript/index.ts'], /framework: "soc2" \| "fedramp" \| "hipaa" \| "iso_27001" \| "pci_dss" \| "gdpr";/);
   assert.match(files['python/canonical_interfaces.py'], /Literal\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"\]/);
   assert.match(files['rust/src/lib.rs'], /pub enum AuditEngagementFramework/);
+  assert.match(files['typescript/index.ts'], /status: "applied" \| "conflict" \| "gone" \| "invalid" \| "idempotency_key_reused";/);
+});
+
+test('camelCase JSON fields stay camelCase on the wire and idiomatic in Rust', () => {
+  const files = build();
+  assert.match(files['typescript/index.ts'], /protocolVersion: number;/);
+  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "protocolVersion"\)\]\n    pub protocol_version: i64,/);
+  assert.match(files['go/interfaces.go'], /ProtocolVersion int64 `json:"protocolVersion"`/);
+});
+
+test('required nullable decimal versions stay nullable in every adapter', () => {
+  const files = build();
+  assert.match(files['typescript/index.ts'], /baseVersion: string \| null;/);
+  assert.match(files['rust/src/lib.rs'], /pub base_version: Option<String>,/);
+  assert.match(files['python/canonical_interfaces.py'], /baseVersion: Optional\[str\]/);
+  assert.match(files['go/interfaces.go'], /BaseVersion \*string `json:"baseVersion"`/);
 });
 
 test('optional fields are nullable/omittable per language', () => {
