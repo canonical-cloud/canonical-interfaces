@@ -1,0 +1,65 @@
+name: Generate DEN-1362 dependency locks
+
+on:
+  push:
+    branches: [fix/den-1362-interface-wasm-browser-locks]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: den-1362-locks-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: "1.95"
+      - name: Generate exact dependency locks
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo generate-lockfile --manifest-path generated/rust-wasm/Cargo.toml
+          npm install \
+            --package-lock-only \
+            --ignore-scripts \
+            --no-audit \
+            --no-fund \
+            --prefix .ci
+      - name: Commit only the reviewed locks and remove this workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          workflow=.github/workflows/generate-den-1362-locks.yml
+          test -f generated/rust-wasm/Cargo.lock
+          test -f .ci/package-lock.json
+          git rm "$workflow"
+          git add generated/rust-wasm/Cargo.lock .ci/package-lock.json
+
+          actual=$(git diff --cached --name-only | LC_ALL=C sort)
+          expected=$(printf '%s\n' \
+            .ci/package-lock.json \
+            .github/workflows/generate-den-1362-locks.yml \
+            generated/rust-wasm/Cargo.lock | LC_ALL=C sort)
+          if [[ "$actual" != "$expected" ]]; then
+            echo "Unexpected staged paths:" >&2
+            printf '%s\n' "$actual" >&2
+            exit 1
+          fi
+          git diff --cached --check
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Commit locked interface build dependencies"
+          git push origin HEAD:fix/den-1362-interface-wasm-browser-locks
