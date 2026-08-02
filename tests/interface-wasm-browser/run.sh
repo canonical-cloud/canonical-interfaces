@@ -4,6 +4,7 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 contract_dir="$repo_root/tests/interface-wasm-browser"
 chrome_bin=${CHROME_BIN:-}
+artifact_dir=${CANONICAL_BROWSER_ARTIFACT_DIR:-}
 
 if [[ -z "$chrome_bin" ]]; then
   for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
@@ -34,9 +35,22 @@ done
 
 work_dir=$(mktemp -d)
 server_log="$work_dir/server.log"
+chrome_log="$work_dir/chrome.stderr"
 dom="$work_dir/result.html"
 port=${CANONICAL_INTERFACE_BROWSER_PORT:-4181}
 server_pid=
+
+preserve_failure_evidence() {
+  if [[ -z "$artifact_dir" ]]; then
+    return
+  fi
+  mkdir -p "$artifact_dir"
+  for evidence in "$dom" "$server_log" "$chrome_log"; do
+    if [[ -f "$evidence" ]]; then
+      cp "$evidence" "$artifact_dir/$(basename "$evidence")"
+    fi
+  done
+}
 
 cleanup() {
   if [[ -n "$server_pid" ]]; then
@@ -59,6 +73,7 @@ for _ in $(seq 1 100); do
     break
   fi
   if ! kill -0 "$server_pid" >/dev/null 2>&1; then
+    preserve_failure_evidence
     cat "$server_log" >&2
     exit 1
   fi
@@ -67,6 +82,7 @@ done
 
 if ! curl --fail --silent --show-error \
   "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" >/dev/null; then
+  preserve_failure_evidence
   cat "$server_log" >&2
   echo "Interface browser contract server did not become ready" >&2
   exit 1
@@ -90,12 +106,19 @@ if [[ $(id -u) -eq 0 ]]; then
   chrome_args+=(--no-sandbox)
 fi
 
+set +e
 "$chrome_bin" "${chrome_args[@]}" \
-  "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" >"$dom"
+  "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" \
+  >"$dom" 2>"$chrome_log"
+chrome_status=$?
+set -e
 
-if ! grep -q 'data-status="pass"' "$dom"; then
-  echo "Canonical interface Chromium contract failed" >&2
+if [[ "$chrome_status" -ne 0 ]] || ! grep -q 'data-status="pass"' "$dom"; then
+  preserve_failure_evidence
+  echo "Canonical interface Chromium contract failed (Chrome exit $chrome_status)" >&2
   sed -n '1,240p' "$dom" >&2
+  echo "--- Chromium stderr ---" >&2
+  sed -n '1,160p' "$chrome_log" >&2
   echo "--- local server log ---" >&2
   sed -n '1,160p' "$server_log" >&2
   exit 1
