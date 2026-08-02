@@ -11,12 +11,13 @@ const publisher = readFileSync(
   "utf8",
 );
 
-test("one-shot publisher has one owner-scoped local execution carrier", () => {
+test("one-shot publisher has one trusted-login local execution carrier", () => {
   const requiredWorkflowTokens = [
     "github.event.issue.number == 15",
     "github.event.issue.pull_request != null",
     "github.event.comment.user.login == 'ORESoftware'",
     "github.event.comment.author_association == 'OWNER'",
+    "github.event.comment.author_association == 'MEMBER'",
     "github.event.comment.body == 'ops-create-meta-agent-repo-selfhosted:2026-08-01'",
     "cancel-in-progress: false",
     "runs-on: canonical-browser",
