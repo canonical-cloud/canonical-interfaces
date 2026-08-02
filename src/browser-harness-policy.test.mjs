@@ -20,7 +20,7 @@ test("Chromium is supervised by bounded wall clock rather than virtual time", ()
     "CANONICAL_INTERFACE_BROWSER_TIMEOUT_SECONDS",
     "command -v timeout",
     'timeout --signal=TERM --kill-after=5s "${wall_timeout}s"',
-    "chrome_status == 124",
+    '"$chrome_status" -eq 124',
     "wall-clock limit",
   ]) {
     assert.ok(runner.includes(token), `browser runner must retain ${token}`);
