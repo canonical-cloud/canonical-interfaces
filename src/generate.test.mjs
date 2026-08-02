@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { build, loadTypes } from './generate.mjs';
+import { build, loadTypes } from './generate-output.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
@@ -59,12 +59,13 @@ test('rust and rust-wasm never diverge in data shape (same structs + fields)', (
   assert.deepEqual(pubLines(out['rust-wasm/src/lib.rs']), pubLines(out['rust/src/lib.rs']));
 });
 
-test('rust-wasm is declaration-only Tsify (no wasm ABI baked in)', () => {
+test('rust-wasm generated types remain declaration-only Tsify', () => {
   const files = build();
   const wasm = files['rust-wasm/src/lib.rs'];
   assert.match(wasm, /use tsify::Tsify;/);
   assert.doesNotMatch(wasm, /into_wasm_abi|from_wasm_abi/);
   assert.doesNotMatch(wasm, /use wasm_bindgen::prelude/);
+  assert.doesNotMatch(wasm, /wasm_bindgen\(start\)/);
   assert.match(wasm, /pub struct ServiceInfo/);
   assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
   assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
@@ -76,6 +77,28 @@ test('rust-wasm is declaration-only Tsify (no wasm ABI baked in)', () => {
       assert.match(lines[i - 1] || '', /#\[tsify\(type = /, `unguarded field: ${line.trim()}`);
     }
   });
+});
+
+test('rust-wasm package entrypoint owns only a no-op lifecycle hook', () => {
+  const files = build();
+  assert.match(
+    files['rust-wasm/Cargo.toml'],
+    /path = "\.\.\/\.\.\/src\/rust-wasm-entry\.rs"/,
+  );
+
+  const entry = readFileSync(join(root, 'src/rust-wasm-entry.rs'), 'utf8');
+  assert.match(entry, /use wasm_bindgen::prelude::wasm_bindgen;/);
+  assert.match(
+    entry,
+    /#\[wasm_bindgen\(start\)\]\npub fn initialize_wasm_module\(\) \{\}/,
+  );
+  assert.match(entry, /include!\("\.\.\/generated\/rust-wasm\/src\/lib\.rs"\);/);
+
+  const executableText = entry.replace(/^\s*\/\/.*$/gm, '');
+  assert.doesNotMatch(
+    executableText,
+    /\b(?:fetch|request|submit|write|delete|storage|cookie|websocket|beacon|probe|execute)\b/i,
+  );
 });
 
 test('generated types carry through to every language', () => {
@@ -119,6 +142,6 @@ test('optional fields are nullable/omittable per language', () => {
   assert.match(files['go/interfaces.go'], /json:"target_report_date,omitempty"/);
 });
 
-test('generated files on disk are up to date (run: node src/generate.mjs)', () => {
-  execFileSync('node', ['src/generate.mjs', '--check'], { cwd: root });
+test('generated files on disk are up to date (run: npm run generate)', () => {
+  execFileSync('node', ['src/generate-output.mjs', '--check'], { cwd: root });
 });

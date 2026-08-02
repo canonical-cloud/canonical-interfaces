@@ -5,9 +5,9 @@
   "type": "module",
   "description": "JSON Schema (typed-IO) for the canonical.cloud HTTP API + canonical Postgres schema for its compliance store. Generated language adapters live under generated/<lang>.",
   "scripts": {
-    "generate": "node src/generate.mjs",
-    "check": "node src/generate.mjs --check",
-    "test": "node --test src/*.test.mjs && node src/generate.mjs --check"
+    "generate": "node src/generate-output.mjs",
+    "check": "node src/generate-output.mjs --check",
+    "test": "node --test src/*.test.mjs && node src/generate-output.mjs --check"
   },
   "exports": {
     "./schema": "./schema/index.json",

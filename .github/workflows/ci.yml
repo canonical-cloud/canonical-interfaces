@@ -51,9 +51,11 @@ jobs:
           for (const token of [
             'toolchain: "1.95"',
             "sha256sum --check .ci/locks.sha256",
-            "cargo install wasm-pack --locked --version 0.13.1",
+            "cargo install wasm-pack --locked --version 0.15.0",
             "wasm-pack build generated/rust-wasm --target web --dev -- --locked",
             "npm ci --ignore-scripts --prefix .ci",
+            "CANONICAL_BROWSER_ARTIFACT_DIR",
+            "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
             "bash tests/interface-wasm-browser/run.sh",
           ]) {
             if (!workflow.includes(token)) throw new Error(`missing CI invariant: ${token}`);
@@ -98,7 +100,7 @@ jobs:
       - name: Compile locked Rust/WASM graph
         run: cargo build --locked --manifest-path generated/rust-wasm/Cargo.toml --target wasm32-unknown-unknown
       - name: Install exact locked wasm-pack
-        run: cargo install wasm-pack --locked --version 0.13.1
+        run: cargo install wasm-pack --locked --version 0.15.0
       - name: Build reviewed web package
         run: wasm-pack build generated/rust-wasm --target web --dev -- --locked
       - name: Prove package build did not rewrite the dependency graph
@@ -140,4 +142,18 @@ jobs:
           chrome=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium)
           test -n "$chrome"
           "$chrome" --version
-          CHROME_BIN="$chrome" bash tests/interface-wasm-browser/run.sh
+          CANONICAL_BROWSER_ARTIFACT_DIR="${RUNNER_TEMP}/canonical-interface-browser" \
+            CHROME_BIN="$chrome" \
+            bash tests/interface-wasm-browser/run.sh
+      - name: Upload bounded browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: interface-wasm-browser-failure-${{ github.run_id }}
+          path: |
+            generated/rust-wasm/pkg/canonical_interfaces_wasm.js
+            generated/rust-wasm/pkg/canonical_interfaces_wasm_bg.wasm
+            generated/rust-wasm/pkg/canonical_interfaces_wasm.d.ts
+            ${{ runner.temp }}/canonical-interface-browser
+          if-no-files-found: warn
+          retention-days: 3
