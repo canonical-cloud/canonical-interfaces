@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: "22"
+      - name: Verify reviewed lock artifacts
+        run: sha256sum --check .ci/locks.sha256
       - name: Validate locked browser policy
         shell: bash
         run: |
@@ -35,20 +37,20 @@ jobs:
           if (packageLock.packages["node_modules/typescript"].version !== "5.9.3") {
             throw new Error("CI TypeScript compiler is not locked to 5.9.3");
           }
-          if (!fs.existsSync("generated/rust-wasm/Cargo.lock")) {
-            throw new Error("generated Rust/WASM Cargo.lock is missing");
-          }
           for (const path of [
+            ".ci/locks.sha256",
+            "generated/rust-wasm/Cargo.lock",
             "tests/interface-wasm-browser/index.html",
             "tests/interface-wasm-browser/contract.mjs",
             "tests/interface-wasm-browser/run.sh",
           ]) {
-            if (!fs.existsSync(path)) throw new Error(`missing browser contract input ${path}`);
+            if (!fs.existsSync(path)) throw new Error(`missing locked browser input ${path}`);
           }
 
           const workflow = fs.readFileSync(".github/workflows/ci.yml", "utf8");
           for (const token of [
             'toolchain: "1.95"',
+            "sha256sum --check .ci/locks.sha256",
             "cargo install wasm-pack --locked --version 0.13.1",
             "wasm-pack build generated/rust-wasm --target web --dev -- --locked",
             "npm ci --ignore-scripts --prefix .ci",
@@ -85,6 +87,8 @@ jobs:
       - uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
         with:
           workspaces: generated/rust-wasm
+      - name: Verify reviewed lock artifacts
+        run: sha256sum --check .ci/locks.sha256
       - name: Install locked TypeScript compiler
         run: npm ci --ignore-scripts --prefix .ci
       - name: Format generated Rust/WASM source
@@ -106,10 +110,19 @@ jobs:
           dts=$(find generated/rust-wasm/pkg -maxdepth 1 -type f -name '*.d.ts' ! -name '*_bg*' -print -quit)
           test -n "$dts"
           echo "checking $dts"
-          if grep -nE ':[[:space:]]*(bigint|Map<)|:[[:space:]]*Value([;[]|$)' "$dts"; then
-            echo "::error::generated declarations contain an undefined Value, bigint, or Map<>"
-            exit 1
-          fi
+          DTS="$dts" node --input-type=module <<'NODE'
+          import fs from "node:fs";
+
+          const source = fs.readFileSync(process.env.DTS, "utf8");
+          for (const [name, pattern] of [
+            ["bigint or Map", /:\s*(?:bigint|Map<)/],
+            ["unresolved Value", /:\s*Value\b/],
+          ]) {
+            if (pattern.test(source)) {
+              throw new Error(`generated declarations contain ${name}`);
+            }
+          }
+          NODE
       - name: Type-check generated declarations with the locked compiler
         shell: bash
         run: |
