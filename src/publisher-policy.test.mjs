@@ -68,7 +68,7 @@ test("publisher fails closed around identity, immutable refs, and bounded execut
     'allowed_error_statuses=frozenset({404})',
     'metadata.get("visibility") != "public"',
     'metadata.get("default_branch") != "main"',
-    'environment["GITHUB_REPOSITORY_ADMIN_TOKEN"] = token',
+    '"GITHUB_REPOSITORY_ADMIN_TOKEN": token',
     '"GIT_CONFIG_NOSYSTEM": "1"',
     '"GIT_CONFIG_GLOBAL": os.devnull',
     '"http.followRedirects=false"',
