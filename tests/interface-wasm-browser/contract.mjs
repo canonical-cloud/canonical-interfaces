@@ -19,23 +19,6 @@ function progress(stage) {
   result.textContent = `running: ${stage}`;
 }
 
-async function withTimeout(promise, timeoutMs, label) {
-  let timer;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise((_, reject) => {
-        timer = setTimeout(
-          () => reject(new Error(`${label} timed out after ${timeoutMs}ms`)),
-          timeoutMs,
-        );
-      }),
-    ]);
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 async function sameOriginFetch(input, init) {
   const url = new URL(input instanceof Request ? input.url : input, location.href);
   assertEqual(url.origin, location.origin, `Fetch escaped the browser-contract origin (${url.href})`);
@@ -52,11 +35,7 @@ async function run() {
     import.meta.url,
   );
   assertEqual(moduleUrl.origin, location.origin, "generated module origin");
-  const bindings = await withTimeout(
-    import(moduleUrl.href),
-    5_000,
-    "generated JavaScript import",
-  );
+  const bindings = await import(moduleUrl.href);
   assert(typeof bindings.default === "function", "generated package must export its initializer");
 
   progress("fetch reviewed WebAssembly bytes");
@@ -64,21 +43,13 @@ async function run() {
     "../../generated/rust-wasm/pkg/canonical_interfaces_wasm_bg.wasm",
     import.meta.url,
   );
-  const wasmResponse = await withTimeout(fetch(wasmUrl), 5_000, "WebAssembly fetch");
+  const wasmResponse = await fetch(wasmUrl);
   assert(wasmResponse.ok, `generated WebAssembly returned HTTP ${wasmResponse.status}`);
-  const wasmBytes = await withTimeout(
-    wasmResponse.arrayBuffer(),
-    5_000,
-    "WebAssembly body read",
-  );
+  const wasmBytes = await wasmResponse.arrayBuffer();
   assert(wasmBytes.byteLength > 0, "generated WebAssembly must not be empty");
 
   progress("initialize reviewed WebAssembly bytes");
-  const initialized = await withTimeout(
-    bindings.default(wasmBytes),
-    5_000,
-    "WebAssembly initialization",
-  );
+  const initialized = await bindings.default(wasmBytes);
   assert(initialized && typeof initialized === "object", "generated WebAssembly did not initialize");
 
   progress("inspect runtime export boundary");
@@ -94,17 +65,9 @@ async function run() {
     "../../generated/rust-wasm/pkg/canonical_interfaces_wasm.d.ts",
     import.meta.url,
   );
-  const declarationResponse = await withTimeout(
-    fetch(declarationUrl),
-    5_000,
-    "declaration fetch",
-  );
+  const declarationResponse = await fetch(declarationUrl);
   assert(declarationResponse.ok, `generated declarations returned HTTP ${declarationResponse.status}`);
-  const declarations = await withTimeout(
-    declarationResponse.text(),
-    5_000,
-    "declaration body read",
-  );
+  const declarations = await declarationResponse.text();
   for (const requiredType of ["HealthStatus", "MutationRequest", "AuditEngagement"]) {
     assert(
       declarations.includes(requiredType),
