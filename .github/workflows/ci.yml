@@ -51,7 +51,7 @@ jobs:
           for (const token of [
             'toolchain: "1.95"',
             "sha256sum --check .ci/locks.sha256",
-            "cargo install wasm-pack --locked --version 0.13.1",
+            "cargo install wasm-pack --locked --version 0.15.0",
             "wasm-pack build generated/rust-wasm --target web --dev -- --locked",
             "npm ci --ignore-scripts --prefix .ci",
             "bash tests/interface-wasm-browser/run.sh",
@@ -98,7 +98,7 @@ jobs:
       - name: Compile locked Rust/WASM graph
         run: cargo build --locked --manifest-path generated/rust-wasm/Cargo.toml --target wasm32-unknown-unknown
       - name: Install exact locked wasm-pack
-        run: cargo install wasm-pack --locked --version 0.13.1
+        run: cargo install wasm-pack --locked --version 0.15.0
       - name: Build reviewed web package
         run: wasm-pack build generated/rust-wasm --target web --dev -- --locked
       - name: Prove package build did not rewrite the dependency graph
