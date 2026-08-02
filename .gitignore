@@ -1,6 +1,7 @@
 node_modules/
 target/
 Cargo.lock
+!generated/rust-wasm/Cargo.lock
 # wasm-pack output for generated/rust-wasm
 pkg/
 .env
