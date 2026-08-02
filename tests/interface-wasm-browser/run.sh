@@ -5,6 +5,12 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 contract_dir="$repo_root/tests/interface-wasm-browser"
 chrome_bin=${CHROME_BIN:-}
 artifact_dir=${CANONICAL_BROWSER_ARTIFACT_DIR:-}
+wall_timeout=${CANONICAL_INTERFACE_BROWSER_TIMEOUT_SECONDS:-45}
+
+if [[ ! "$wall_timeout" =~ ^[1-9][0-9]*$ ]] || (( wall_timeout > 120 )); then
+  echo "CANONICAL_INTERFACE_BROWSER_TIMEOUT_SECONDS must be an integer from 1 to 120" >&2
+  exit 1
+fi
 
 if [[ -z "$chrome_bin" ]]; then
   for candidate in google-chrome google-chrome-stable chromium chromium-browser; do
@@ -17,6 +23,11 @@ fi
 
 if [[ -z "$chrome_bin" || ! -x "$chrome_bin" ]]; then
   echo "A Chromium-family browser is required for the interface WASM contract" >&2
+  exit 1
+fi
+
+if ! command -v timeout >/dev/null 2>&1; then
+  echo "GNU timeout is required for wall-clock browser supervision" >&2
   exit 1
 fi
 
@@ -99,7 +110,6 @@ chrome_args=(
   --no-first-run
   --no-default-browser-check
   --host-resolver-rules="MAP * ~NOTFOUND, EXCLUDE 127.0.0.1"
-  --virtual-time-budget=20000
   --dump-dom
 )
 if [[ $(id -u) -eq 0 ]]; then
@@ -107,11 +117,23 @@ if [[ $(id -u) -eq 0 ]]; then
 fi
 
 set +e
-"$chrome_bin" "${chrome_args[@]}" \
+timeout --signal=TERM --kill-after=5s "${wall_timeout}s" \
+  "$chrome_bin" "${chrome_args[@]}" \
   "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" \
   >"$dom" 2>"$chrome_log"
 chrome_status=$?
 set -e
+
+if [[ "$chrome_status" -eq 124 || "$chrome_status" -eq 137 ]]; then
+  preserve_failure_evidence
+  echo "Canonical interface Chromium contract exceeded ${wall_timeout}s wall-clock limit" >&2
+  sed -n '1,240p' "$dom" >&2
+  echo "--- Chromium stderr ---" >&2
+  sed -n '1,160p' "$chrome_log" >&2
+  echo "--- local server log ---" >&2
+  sed -n '1,160p' "$server_log" >&2
+  exit 1
+fi
 
 if [[ "$chrome_status" -ne 0 ]] || ! grep -q 'data-status="pass"' "$dom"; then
   preserve_failure_evidence
