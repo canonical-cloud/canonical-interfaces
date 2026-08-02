@@ -38,12 +38,14 @@ jobs:
           path: runner
           persist-credentials: false
 
-      - name: Check out immutable recovered publication source
+      - name: Check out immutable recovered bundle assets
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ORESoftware/k8s-cluster
           ref: 55ee15c190b7cfa4e075f6984c7cb551acd4b9d3
           path: source
+          sparse-checkout: |
+            scripts/critical-org-fleet/assets
           persist-credentials: false
 
       - name: Validate the local reviewed publisher
