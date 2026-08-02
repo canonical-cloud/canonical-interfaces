@@ -38,9 +38,12 @@ Schema in `schema/` is generated into per-language adapters under `generated/`.
   mutable `npm install` in CI.
 - `.ci/locks.sha256` records the reviewed lock artifacts. Any intentional lock
   refresh must update both lockfiles and their hashes in one reviewed change.
-- CI pins Rust 1.95 and `wasm-pack 0.13.1`, builds with Cargo's committed lock,
-  proves packaging did not rewrite that lock, and type-checks declarations with
-  exact TypeScript 5.9.3.
+- CI pins Rust 1.95 and exact locked `wasm-pack 0.15.0`, builds with Cargo's
+  committed lock, proves packaging did not rewrite that lock, and type-checks
+  declarations with exact TypeScript 5.9.3.
+- Never downgrade or float the WASM package builder merely to bypass an upstream
+  install warning. Change the exact version only with the full declaration and
+  Chromium contracts on the same reviewed head.
 - The generated browser package is declaration-oriented. Do not add runtime
   network, mutation, storage, cookie, WebSocket, beacon, or probe-execution
   APIs merely to make a browser test interesting.
