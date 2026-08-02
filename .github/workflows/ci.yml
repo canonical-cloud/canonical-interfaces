@@ -44,6 +44,7 @@ jobs:
             "tests/interface-wasm-browser/contract.mjs",
             "tests/interface-wasm-browser/run.sh",
             "tests/publisher/test_security.py",
+            "src/browser-harness-policy.test.mjs",
           ]) {
             if (!fs.existsSync(path)) throw new Error(`missing locked browser input ${path}`);
           }
@@ -56,6 +57,7 @@ jobs:
             "wasm-pack build generated/rust-wasm --target web --dev -- --locked",
             "npm ci --ignore-scripts --prefix .ci",
             "python3 -m unittest discover -s tests/publisher -p 'test_*.py'",
+            "for attempt in 1 2",
             "CANONICAL_BROWSER_ARTIFACT_DIR",
             "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
             "bash tests/interface-wasm-browser/run.sh",
@@ -139,16 +141,20 @@ jobs:
             --noEmit \
             --lib esnext,dom \
             "$dts"
-      - name: Initialize the generated package in Chromium
+      - name: Initialize the generated package twice in Chromium
         shell: bash
         run: |
           set -euo pipefail
           chrome=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium)
           test -n "$chrome"
           "$chrome" --version
-          CANONICAL_BROWSER_ARTIFACT_DIR="${RUNNER_TEMP}/canonical-interface-browser" \
-            CHROME_BIN="$chrome" \
-            bash tests/interface-wasm-browser/run.sh
+          for attempt in 1 2; do
+            attempt_dir="${RUNNER_TEMP}/canonical-interface-browser/attempt-${attempt}"
+            echo "Chromium certification attempt ${attempt}"
+            CANONICAL_BROWSER_ARTIFACT_DIR="$attempt_dir" \
+              CHROME_BIN="$chrome" \
+              bash tests/interface-wasm-browser/run.sh
+          done
       - name: Upload bounded browser failure evidence
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
