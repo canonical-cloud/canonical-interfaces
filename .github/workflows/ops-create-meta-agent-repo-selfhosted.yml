@@ -9,26 +9,34 @@ permissions:
 
 concurrency:
   group: create-exact-meta-agent-repository-selfhosted
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   publish:
     if: >-
+      github.event.issue.number == 15 &&
+      github.event.issue.pull_request != null &&
       github.event.comment.user.login == 'ORESoftware' &&
+      github.event.comment.author_association == 'OWNER' &&
       github.event.comment.body == 'ops-create-meta-agent-repo-selfhosted:2026-08-01'
     permissions:
       contents: read
       issues: write
-      pull-requests: write
     runs-on: canonical-browser
     timeout-minutes: 30
     env:
       COMMENT_TOKEN: ${{ github.token }}
       TRACKING_ISSUE: ${{ github.event.issue.number }}
       SOURCE_ROOT: ${{ github.workspace }}/source
-      PUBLISHER_SCRIPT_URL: https://raw.githubusercontent.com/canonical-cloud/canonical-web-server.rs/b0411abd672b0a92125794e0dcc3753691b90fc0/scripts/ops-create-meta-agent-repo-selfhosted.py
 
     steps:
+      - name: Check out exact trusted orchestration revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: runner
+          persist-credentials: false
+
       - name: Check out immutable recovered publication source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,27 +45,14 @@ jobs:
           path: source
           persist-credentials: false
 
-      - name: Fetch immutable reviewed publisher script
+      - name: Validate the local reviewed publisher
         shell: bash
         run: |
-          set -Eeuo pipefail
-          python3 - <<'PY'
-          import os
-          import pathlib
-          import urllib.request
-
-          target = pathlib.Path(os.environ['RUNNER_TEMP']) / 'ops-create-meta-agent-repo-selfhosted.py'
-          request = urllib.request.Request(
-              os.environ['PUBLISHER_SCRIPT_URL'],
-              headers={'User-Agent': 'canonical-interfaces-meta-agent-publisher'},
-          )
-          with urllib.request.urlopen(request, timeout=30) as response:
-              target.write_bytes(response.read())
-          if not target.read_bytes().startswith(b'#!/usr/bin/env python3\n'):
-              raise SystemExit('immutable publisher script preamble mismatch')
-          print(f'PUBLISHER_SCRIPT={target}', file=open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8'))
-          PY
+          set -euo pipefail
+          test -f runner/scripts/ops-create-meta-agent-repo-selfhosted.py
+          test ! -L runner/scripts/ops-create-meta-agent-repo-selfhosted.py
+          python3 -m py_compile runner/scripts/ops-create-meta-agent-repo-selfhosted.py
 
       - name: Authorize owner, create repository, and verify exact refs
         shell: bash
-        run: python3 "$PUBLISHER_SCRIPT"
+        run: python3 runner/scripts/ops-create-meta-agent-repo-selfhosted.py
