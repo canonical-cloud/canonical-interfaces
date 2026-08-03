@@ -28,6 +28,11 @@ test("Chromium is supervised by bounded wall clock rather than virtual time", ()
     "wall-clock limit",
     "--remote-debugging-address=127.0.0.1",
     "--host-resolver-rules=\"MAP * ~NOTFOUND, EXCLUDE 127.0.0.1\"",
+    'setsid "$chrome_bin"',
+    'kill -TERM -- "-$chrome_pid"',
+    'kill -KILL -- "-$chrome_pid"',
+    "local status=$?",
+    'exit "$status"',
   ]) {
     assert.ok(runner.includes(token), `browser runner must retain ${token}`);
   }
@@ -44,10 +49,10 @@ test("DevTools waits for the explicit asynchronous contract sentinel", () => {
     "MAX_DISCOVERY_BYTES",
     'redirect: "error"',
     "assertLoopbackHttp",
-    'client.send("Target.createTarget"',
-    'client.send("Target.attachToTarget"',
-    'client.send("Page.navigate"',
-    'client.send(\n      "Runtime.evaluate"',
+    "Target.createTarget",
+    "Target.attachToTarget",
+    "Page.navigate",
+    "Runtime.evaluate",
     "MutationObserver",
     "awaitPromise: true",
     "document.documentElement.outerHTML",
