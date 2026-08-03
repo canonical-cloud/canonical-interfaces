@@ -40,7 +40,7 @@ if [[ -z "$chrome_bin" || ! -x "$chrome_bin" ]]; then
   exit 1
 fi
 
-for command in timeout node python3 curl; do
+for command in timeout setsid node python3 curl; do
   if ! command -v "$command" >/dev/null 2>&1; then
     echo "$command is required for the wall-clock Chromium contract" >&2
     exit 1
@@ -91,15 +91,38 @@ preserve_failure_evidence() {
 }
 
 cleanup() {
+  local status=$?
+  trap - EXIT
+  set +e
+
   if [[ -n "$chrome_pid" ]]; then
-    kill "$chrome_pid" >/dev/null 2>&1 || true
+    # Chromium owns several descendants that can keep mutating the profile
+    # after the browser leader exits. Launching it under setsid lets cleanup
+    # terminate the complete isolated process group instead of racing those
+    # descendants or leaking them into the next certification attempt.
+    kill -TERM -- "-$chrome_pid" >/dev/null 2>&1 || true
+    for _ in $(seq 1 50); do
+      if ! kill -0 -- "-$chrome_pid" >/dev/null 2>&1; then
+        break
+      fi
+      sleep 0.1
+    done
+    kill -KILL -- "-$chrome_pid" >/dev/null 2>&1 || true
     wait "$chrome_pid" >/dev/null 2>&1 || true
   fi
   if [[ -n "$server_pid" ]]; then
     kill "$server_pid" >/dev/null 2>&1 || true
     wait "$server_pid" >/dev/null 2>&1 || true
   fi
-  rm -rf "$work_dir"
+
+  for _ in $(seq 1 10); do
+    if rm -rf -- "$work_dir" >/dev/null 2>&1; then
+      exit "$status"
+    fi
+    sleep 0.1
+  done
+  echo "warning: browser work directory could not be removed: $work_dir" >&2
+  exit "$status"
 }
 trap cleanup EXIT
 
@@ -123,8 +146,9 @@ python3 -m http.server "$port" \
 server_pid=$!
 
 for _ in $(seq 1 100); do
-  if curl --fail --silent --show-error \
-    "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" >/dev/null; then
+  if curl --fail --silent \
+    "http://127.0.0.1:${port}/tests/interface-wasm-browser/index.html" \
+    >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "$server_pid" >/dev/null 2>&1; then
@@ -163,13 +187,13 @@ if [[ $(id -u) -eq 0 ]]; then
   chrome_args+=(--no-sandbox)
 fi
 
-"$chrome_bin" "${chrome_args[@]}" about:blank \
+setsid "$chrome_bin" "${chrome_args[@]}" about:blank \
   >"$chrome_stdout" 2>"$chrome_log" &
 chrome_pid=$!
 
 for _ in $(seq 1 100); do
-  if curl --fail --silent --show-error \
-    "http://127.0.0.1:${debug_port}/json/version" >/dev/null; then
+  if curl --fail --silent \
+    "http://127.0.0.1:${debug_port}/json/version" >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "$chrome_pid" >/dev/null 2>&1; then
