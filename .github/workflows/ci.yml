@@ -42,6 +42,7 @@ jobs:
             "generated/rust-wasm/Cargo.lock",
             "tests/interface-wasm-browser/index.html",
             "tests/interface-wasm-browser/contract.mjs",
+            "tests/interface-wasm-browser/driver.mjs",
             "tests/interface-wasm-browser/run.sh",
             "tests/publisher/test_security.py",
             "src/browser-harness-policy.test.mjs",
