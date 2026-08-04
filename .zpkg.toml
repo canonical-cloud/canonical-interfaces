@@ -16,6 +16,10 @@ tag_format = "v{version}"
 smoke_test = "test -f \"$ZED_PKG_TEST_TARGET/schema/index.json\" && test -f \"$ZED_PKG_TEST_TARGET/sql/schema.sql\""
 exclude = [".env", ".env.*", ".direnv/**", ".zed/**", ".zed-pack/**", "tmp/**", "**/*.log", ".DS_Store", "**/target/**", "**/node_modules/**"]
 
+[targets.repository]
+dir = "."
+name = "canonical-interfaces-repository"
+
 [targets.typescript]
 dir = "generated/typescript"
 adapter = "node"
