@@ -118,7 +118,7 @@ class QuoteRequest:
 class QuoteSubmissionResponse:
     """Accepted response from POST /api/v1/quotes."""
     quoteId: str
-    status: str
+    status: Literal["queued", "analyzing", "ready", "failed"]
     streamUrl: str
     createdAt: str
 
@@ -147,10 +147,12 @@ class QuoteStatusEvent:
     """Authenticated WebSocket progress message for one quote."""
     quoteId: str
     sequence: str
-    stage: str
+    stage: Literal["queued", "loading_context", "analyzing", "validating", "ready", "failed"]
     message: str
     terminal: bool
+    occurredAt: str
     estimate: Optional[QuoteEstimate] = None
+    problem: Optional[QuoteProblem] = None
 
 @dataclass
 class QuoteProblem:
@@ -158,3 +160,46 @@ class QuoteProblem:
     code: str
     message: str
     requestId: str
+
+@dataclass
+class QuoteSummary:
+    """Owner-scoped list item for a compliance quote."""
+    quoteId: str
+    status: Literal["queued", "analyzing", "ready", "failed"]
+    organizationName: str
+    frameworks: List[str]
+    createdAt: str
+    updatedAt: str
+    estimate: Optional[QuoteEstimate] = None
+
+@dataclass
+class QuoteDetail:
+    """Owner-scoped authoritative REST representation of one quote."""
+    quoteId: str
+    status: Literal["queued", "analyzing", "ready", "failed"]
+    request: QuoteRequest
+    eventsUrl: str
+    createdAt: str
+    updatedAt: str
+    estimate: Optional[QuoteEstimate] = None
+    problem: Optional[QuoteProblem] = None
+
+@dataclass
+class QuoteListQuery:
+    """Bounded owner-scoped list query for GET /api/v1/quotes."""
+    cursor: Optional[str] = None
+    limit: Optional[int] = None
+
+@dataclass
+class QuoteListResponse:
+    """Owner-scoped quote list response."""
+    quotes: List[QuoteSummary]
+    nextCursor: Optional[str] = None
+
+@dataclass
+class QuoteRetryResponse:
+    """Accepted response after retrying a failed quote."""
+    quoteId: str
+    status: Literal["queued"]
+    streamUrl: str
+    updatedAt: str
