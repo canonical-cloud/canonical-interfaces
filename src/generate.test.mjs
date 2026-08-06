@@ -26,6 +26,11 @@ test('schema declares the expected canonical.cloud types', () => {
     'ChangesQuery',
     'ChangesResponse',
     'AuditEngagement',
+    'QuoteRequest',
+    'QuoteSubmissionResponse',
+    'QuoteEstimate',
+    'QuoteStatusEvent',
+    'QuoteProblem',
   ]);
 });
 
@@ -36,6 +41,26 @@ test('sync schema keeps server-enforced batch, page, and draft-note bounds', () 
   assert.equal(schema.$defs.ChangesQuery.properties.limit.maximum, 500);
   assert.equal(schema.$defs.DraftNoteValue.properties.title.maxLength, 200);
   assert.equal(schema.$defs.DraftNoteValue.properties.body.maxLength, 100_000);
+});
+
+test('quote schema keeps request, context, and estimate payloads bounded', () => {
+  const schema = JSON.parse(readFileSync(join(root, 'schema/quote.schema.json'), 'utf8'));
+  const request = schema.$defs.QuoteRequest;
+  const estimate = schema.$defs.QuoteEstimate;
+
+  assert.equal(request.additionalProperties, false);
+  assert.equal(request.properties.frameworks.minItems, 1);
+  assert.equal(request.properties.frameworks.maxItems, 12);
+  assert.ok(request.properties.frameworks.items.enum.includes('soc2_type_2'));
+  assert.ok(request.properties.frameworks.items.enum.includes('nist_csf_2'));
+  assert.ok(request.properties.frameworks.items.enum.includes('nist_800_53'));
+  assert.ok(request.properties.frameworks.items.enum.includes('hipaa'));
+  assert.equal(request.properties.notes.maxLength, 5_000);
+  assert.equal(request.properties.contextKey.maxLength, undefined);
+  assert.equal(request.properties.answersVersion.const, 1);
+  assert.equal(estimate.properties.summary.maxLength, 4_000);
+  assert.equal(estimate.properties.assumptions.maxItems, 50);
+  assert.equal(estimate.properties.nextSteps.maxItems, 25);
 });
 
 test('build() emits one file per language', () => {
@@ -104,10 +129,14 @@ test('rust-wasm package entrypoint owns only a no-op lifecycle hook', () => {
 test('generated types carry through to every language', () => {
   const files = build();
   assert.match(files['rust/src/lib.rs'], /pub struct ServiceInfo/);
+  assert.match(files['rust/src/lib.rs'], /pub struct QuoteRequest/);
   assert.match(files['rust/Cargo.toml'], /name = "canonical-interfaces"/);
   assert.match(files['typescript/index.ts'], /export type ServiceInfo = \{/);
+  assert.match(files['typescript/index.ts'], /export type QuoteEstimate = \{/);
   assert.match(files['python/canonical_interfaces.py'], /class AuditEngagement:/);
+  assert.match(files['python/canonical_interfaces.py'], /class QuoteStatusEvent:/);
   assert.match(files['go/interfaces.go'], /package canonicalinterfaces/);
+  assert.match(files['go/interfaces.go'], /type QuoteProblem struct/);
 });
 
 test('string enums surface as typed unions/literals per language', () => {
@@ -122,8 +151,11 @@ test('string enums surface as typed unions/literals per language', () => {
 test('camelCase JSON fields stay camelCase on the wire and idiomatic in Rust', () => {
   const files = build();
   assert.match(files['typescript/index.ts'], /protocolVersion: number;/);
+  assert.match(files['typescript/index.ts'], /organizationName: string;/);
   assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "protocolVersion"\)\]\n    pub protocol_version: i64,/);
+  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "organizationName"\)\]\n    pub organization_name: String,/);
   assert.match(files['go/interfaces.go'], /ProtocolVersion int64 `json:"protocolVersion"`/);
+  assert.match(files['go/interfaces.go'], /OrganizationName string `json:"organizationName"`/);
 });
 
 test('required nullable decimal versions stay nullable in every adapter', () => {
@@ -136,10 +168,13 @@ test('required nullable decimal versions stay nullable in every adapter', () => 
 
 test('optional fields are nullable/omittable per language', () => {
   const files = build();
-  // AuditEngagement.target_report_date is optional.
+  // AuditEngagement.target_report_date and QuoteRequest.contextKey are optional.
   assert.match(files['typescript/index.ts'], /target_report_date\?: string;/);
+  assert.match(files['typescript/index.ts'], /contextKey\?: string;/);
   assert.match(files['rust/src/lib.rs'], /pub target_report_date: Option<String>,/);
+  assert.match(files['rust/src/lib.rs'], /pub context_key: Option<String>,/);
   assert.match(files['go/interfaces.go'], /json:"target_report_date,omitempty"/);
+  assert.match(files['go/interfaces.go'], /json:"contextKey,omitempty"/);
 });
 
 test('generated files on disk are up to date (run: npm run generate)', () => {
