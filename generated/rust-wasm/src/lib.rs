@@ -67,6 +67,64 @@ pub enum AuditEngagementStatus {
     Complete,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum QuoteSubmissionResponseStatus {
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "analyzing")]
+    Analyzing,
+    #[serde(rename = "ready")]
+    Ready,
+    #[serde(rename = "failed")]
+    Failed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum QuoteStatusEventStage {
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "loading_context")]
+    LoadingContext,
+    #[serde(rename = "analyzing")]
+    Analyzing,
+    #[serde(rename = "validating")]
+    Validating,
+    #[serde(rename = "ready")]
+    Ready,
+    #[serde(rename = "failed")]
+    Failed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum QuoteSummaryStatus {
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "analyzing")]
+    Analyzing,
+    #[serde(rename = "ready")]
+    Ready,
+    #[serde(rename = "failed")]
+    Failed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum QuoteDetailStatus {
+    #[serde(rename = "queued")]
+    Queued,
+    #[serde(rename = "analyzing")]
+    Analyzing,
+    #[serde(rename = "ready")]
+    Ready,
+    #[serde(rename = "failed")]
+    Failed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum QuoteRetryResponseStatus {
+    #[serde(rename = "queued")]
+    Queued,
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
 pub struct HealthStatus {
@@ -232,7 +290,7 @@ pub struct QuoteRequest {
     /// Primary contact for the quote.
     #[serde(rename = "contactName")]
     pub contact_name: String,
-    /// Verified account email used for quote follow-up.
+    /// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
     #[serde(rename = "contactEmail")]
     pub contact_email: String,
     /// Optional public organization website.
@@ -277,7 +335,7 @@ pub struct QuoteRequest {
     /// Optional additional scoping details; secrets and regulated records must not be submitted.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub notes: Option<String>,
-    /// Optional allow-listed canonical_context key selected by the server.
+    /// Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis.
     #[serde(rename = "contextKey")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub context_key: Option<String>,
@@ -293,7 +351,7 @@ pub struct QuoteSubmissionResponse {
     #[serde(rename = "quoteId")]
     pub quote_id: String,
     /// Current asynchronous quote state.
-    pub status: String,
+    pub status: QuoteSubmissionResponseStatus,
     /// Authenticated WebSocket URL or relative path for quote progress.
     #[serde(rename = "streamUrl")]
     pub stream_url: String,
@@ -356,7 +414,7 @@ pub struct QuoteStatusEvent {
     /// Monotonic decimal-string event sequence.
     pub sequence: String,
     /// Bounded processing stage.
-    pub stage: String,
+    pub stage: QuoteStatusEventStage,
     /// Human-readable progress summary without sensitive prompt content.
     pub message: String,
     /// True when no later state is expected.
@@ -364,6 +422,12 @@ pub struct QuoteStatusEvent {
     /// Present only for a successful ready event.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub estimate: Option<QuoteEstimate>,
+    /// RFC 3339 timestamp for the persisted event.
+    #[serde(rename = "occurredAt")]
+    pub occurred_at: String,
+    /// Present only when the event reports a safe public failure.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub problem: Option<QuoteProblem>,
 }
 
 /// Bounded public error payload for quote endpoints.
@@ -376,4 +440,93 @@ pub struct QuoteProblem {
     /// Request correlation identifier.
     #[serde(rename = "requestId")]
     pub request_id: String,
+}
+
+/// Owner-scoped list item for a compliance quote.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct QuoteSummary {
+    /// Server-generated quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// Current asynchronous quote state.
+    pub status: QuoteSummaryStatus,
+    /// Organization name from the accepted request.
+    #[serde(rename = "organizationName")]
+    pub organization_name: String,
+    /// Frameworks included in the request.
+    pub frameworks: Vec<String>,
+    /// RFC 3339 creation timestamp.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    /// RFC 3339 last-status timestamp.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+    /// Present only when the quote is ready.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub estimate: Option<QuoteEstimate>,
+}
+
+/// Owner-scoped authoritative REST representation of one quote.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct QuoteDetail {
+    /// Server-generated quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// Current asynchronous quote state.
+    pub status: QuoteDetailStatus,
+    /// Normalized accepted questionnaire.
+    pub request: QuoteRequest,
+    /// Authenticated WebSocket URL or relative path for persisted status events.
+    #[serde(rename = "eventsUrl")]
+    pub events_url: String,
+    /// RFC 3339 creation timestamp.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+    /// RFC 3339 last-status timestamp.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+    /// Present only when the quote is ready.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub estimate: Option<QuoteEstimate>,
+    /// Present only when the quote is failed.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub problem: Option<QuoteProblem>,
+}
+
+/// Bounded owner-scoped list query for GET /api/v1/quotes.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct QuoteListQuery {
+    /// Opaque owner-bound pagination cursor.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+    /// Requested page size; the server clamps to 1 through 100.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+/// Owner-scoped quote list response.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct QuoteListResponse {
+    /// Quotes in descending creation order.
+    pub quotes: Vec<QuoteSummary>,
+    /// Opaque cursor for the next page when more results exist.
+    #[serde(rename = "nextCursor")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_cursor: Option<String>,
+}
+
+/// Accepted response after retrying a failed quote.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct QuoteRetryResponse {
+    /// Quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// A successful retry requeues the quote.
+    pub status: QuoteRetryResponseStatus,
+    /// Authenticated WebSocket URL or relative path for quote progress.
+    #[serde(rename = "streamUrl")]
+    pub stream_url: String,
+    /// RFC 3339 retry acceptance timestamp.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
 }

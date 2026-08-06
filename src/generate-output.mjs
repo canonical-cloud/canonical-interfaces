@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-// Compose the pure schema generator with the hand-written Rust/WASM lifecycle
-// entrypoint required by current wasm-bindgen/wasm-pack web packages.
+// Compose the pure schema generator with package-owned adapters that require
+// lifecycle or language-specific glue outside the generic emitter.
 
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { build as buildAdapters, loadTypes } from "./generate.mjs";
+import { emitQuoteDart } from "./generate-quote-dart.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -24,6 +25,7 @@ export function build() {
     throw new Error("generated Rust/WASM manifest already owns the package entrypoint");
   }
   files[wasmManifest] = manifest.replace(generatedLibBlock, packagedLibBlock);
+  Object.assign(files, emitQuoteDart(loadTypes()));
   return files;
 }
 
@@ -48,6 +50,9 @@ function main() {
         : null;
       if (current !== content) {
         console.error(`drift: ${relativePath}`);
+        if (process.env.GITHUB_ACTIONS === "true") {
+          console.error(`::error file=generated/${relativePath}::generated adapter is out of date; run npm run generate`);
+        }
         drift += 1;
       }
     } else {
@@ -61,12 +66,8 @@ function main() {
     console.error(`${drift} file(s) out of date — run: npm run generate`);
     process.exit(1);
   }
-  if (check) {
-    console.log("generated files up to date");
-  }
+  if (check) console.log("generated files up to date");
 }
 
 const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isMain) {
-  main();
-}
+if (isMain) main();

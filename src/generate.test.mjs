@@ -31,6 +31,11 @@ test('schema declares the expected canonical.cloud types', () => {
     'QuoteEstimate',
     'QuoteStatusEvent',
     'QuoteProblem',
+    'QuoteSummary',
+    'QuoteDetail',
+    'QuoteListQuery',
+    'QuoteListResponse',
+    'QuoteRetryResponse',
   ]);
 });
 
@@ -57,6 +62,7 @@ test('quote schema keeps request, context, and estimate payloads bounded', () =>
   assert.ok(request.properties.frameworks.items.enum.includes('hipaa'));
   assert.equal(request.properties.notes.maxLength, 5_000);
   assert.equal(request.properties.contextKey.maxLength, 128);
+  assert.equal(request.properties.contextKey.default, 'quote-analysis');
   assert.equal(request.properties.answersVersion.const, 1);
   assert.equal(estimate.properties.summary.maxLength, 4_000);
   assert.equal(estimate.properties.assumptions.maxItems, 50);
@@ -73,6 +79,8 @@ test('build() emits one file per language', () => {
     'typescript/index.ts',
     'python/canonical_interfaces.py',
     'go/interfaces.go',
+    'dart/lib/quote_v1.dart',
+    'dart/pubspec.yaml',
   ]) {
     assert.ok(rel in files, `missing ${rel}`);
   }
@@ -92,10 +100,9 @@ test('rust-wasm generated types remain declaration-only Tsify', () => {
   assert.doesNotMatch(wasm, /use wasm_bindgen::prelude/);
   assert.doesNotMatch(wasm, /wasm_bindgen\(start\)/);
   assert.match(wasm, /pub struct ServiceInfo/);
+  assert.match(wasm, /pub struct QuoteDetail/);
   assert.match(files['rust-wasm/Cargo.toml'], /crate-type = \["cdylib", "rlib"\]/);
   assert.match(files['rust-wasm/Cargo.toml'], /tsify = /);
-  // No serde_json::Value / BTreeMap field may reach tsify without a type override
-  // (which would emit an undefined `Value` or a wrong `Map` in the .d.ts).
   const lines = wasm.split('\n');
   lines.forEach((line, i) => {
     if (/pub .*(serde_json::Value|BTreeMap)/.test(line)) {
@@ -130,32 +137,41 @@ test('generated types carry through to every language', () => {
   const files = build();
   assert.match(files['rust/src/lib.rs'], /pub struct ServiceInfo/);
   assert.match(files['rust/src/lib.rs'], /pub struct QuoteRequest/);
+  assert.match(files['rust/src/lib.rs'], /pub struct QuoteListResponse/);
   assert.match(files['rust/Cargo.toml'], /name = "canonical-interfaces"/);
   assert.match(files['typescript/index.ts'], /export type ServiceInfo = \{/);
   assert.match(files['typescript/index.ts'], /export type QuoteEstimate = \{/);
+  assert.match(files['typescript/index.ts'], /export type QuoteDetail = \{/);
   assert.match(files['python/canonical_interfaces.py'], /class AuditEngagement:/);
   assert.match(files['python/canonical_interfaces.py'], /class QuoteStatusEvent:/);
+  assert.match(files['python/canonical_interfaces.py'], /class QuoteRetryResponse:/);
   assert.match(files['go/interfaces.go'], /package canonicalinterfaces/);
   assert.match(files['go/interfaces.go'], /type QuoteProblem struct/);
+  assert.match(files['go/interfaces.go'], /type QuoteListResponse struct/);
+  assert.match(files['dart/lib/quote_v1.dart'], /final class QuoteRequest/);
+  assert.match(files['dart/lib/quote_v1.dart'], /final class QuoteDetail/);
 });
 
 test('string enums surface as typed unions/literals per language', () => {
   const files = build();
-  // AuditEngagement.framework is a string enum.
   assert.match(files['typescript/index.ts'], /framework: "soc2" \| "fedramp" \| "hipaa" \| "iso_27001" \| "pci_dss" \| "gdpr";/);
   assert.match(files['python/canonical_interfaces.py'], /Literal\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"\]/);
   assert.match(files['rust/src/lib.rs'], /pub enum AuditEngagementFramework/);
   assert.match(files['typescript/index.ts'], /status: "applied" \| "conflict" \| "gone" \| "invalid" \| "idempotency_key_reused";/);
+  assert.match(files['typescript/index.ts'], /status: "queued" \| "analyzing" \| "ready" \| "failed";/);
 });
 
 test('camelCase JSON fields stay camelCase on the wire and idiomatic in Rust', () => {
   const files = build();
   assert.match(files['typescript/index.ts'], /protocolVersion: number;/);
   assert.match(files['typescript/index.ts'], /organizationName: string;/);
+  assert.match(files['typescript/index.ts'], /quoteId: string;/);
   assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "protocolVersion"\)\]\n    pub protocol_version: i64,/);
   assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "organizationName"\)\]\n    pub organization_name: String,/);
+  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "quoteId"\)\]\n    pub quote_id: String,/);
   assert.match(files['go/interfaces.go'], /ProtocolVersion int64 `json:"protocolVersion"`/);
   assert.match(files['go/interfaces.go'], /OrganizationName string `json:"organizationName"`/);
+  assert.match(files['go/interfaces.go'], /QuoteId string `json:"quoteId"`/);
 });
 
 test('required nullable decimal versions stay nullable in every adapter', () => {
@@ -168,13 +184,13 @@ test('required nullable decimal versions stay nullable in every adapter', () => 
 
 test('optional fields are nullable/omittable per language', () => {
   const files = build();
-  // AuditEngagement.target_report_date and QuoteRequest.contextKey are optional.
   assert.match(files['typescript/index.ts'], /target_report_date\?: string;/);
   assert.match(files['typescript/index.ts'], /contextKey\?: string;/);
   assert.match(files['rust/src/lib.rs'], /pub target_report_date: Option<String>,/);
   assert.match(files['rust/src/lib.rs'], /pub context_key: Option<String>,/);
   assert.match(files['go/interfaces.go'], /json:"target_report_date,omitempty"/);
   assert.match(files['go/interfaces.go'], /json:"contextKey,omitempty"/);
+  assert.match(files['dart/lib/quote_v1.dart'], /final String\? contextKey;/);
 });
 
 test('generated files on disk are up to date (run: npm run generate)', () => {

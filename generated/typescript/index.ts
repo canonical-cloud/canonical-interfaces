@@ -134,7 +134,7 @@ export type QuoteRequest = {
   organizationName: string;
   /** Primary contact for the quote. */
   contactName: string;
-  /** Verified account email used for quote follow-up. */
+  /** Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field. */
   contactEmail: string;
   /** Optional public organization website. */
   website?: string;
@@ -164,7 +164,7 @@ export type QuoteRequest = {
   hasVendorManagement: boolean;
   /** Optional additional scoping details; secrets and regulated records must not be submitted. */
   notes?: string;
-  /** Optional allow-listed canonical_context key selected by the server. */
+  /** Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis. */
   contextKey?: string;
   /** Questionnaire schema version; only version 1 is accepted. */
   answersVersion: number;
@@ -175,7 +175,7 @@ export type QuoteSubmissionResponse = {
   /** Server-generated quote identifier. */
   quoteId: string;
   /** Current asynchronous quote state. */
-  status: string;
+  status: "queued" | "analyzing" | "ready" | "failed";
   /** Authenticated WebSocket URL or relative path for quote progress. */
   streamUrl: string;
   /** RFC 3339 creation timestamp. */
@@ -225,13 +225,17 @@ export type QuoteStatusEvent = {
   /** Monotonic decimal-string event sequence. */
   sequence: string;
   /** Bounded processing stage. */
-  stage: string;
+  stage: "queued" | "loading_context" | "analyzing" | "validating" | "ready" | "failed";
   /** Human-readable progress summary without sensitive prompt content. */
   message: string;
   /** True when no later state is expected. */
   terminal: boolean;
   /** Present only for a successful ready event. */
   estimate?: QuoteEstimate;
+  /** RFC 3339 timestamp for the persisted event. */
+  occurredAt: string;
+  /** Present only when the event reports a safe public failure. */
+  problem?: QuoteProblem;
 };
 
 /** Bounded public error payload for quote endpoints. */
@@ -242,4 +246,70 @@ export type QuoteProblem = {
   message: string;
   /** Request correlation identifier. */
   requestId: string;
+};
+
+/** Owner-scoped list item for a compliance quote. */
+export type QuoteSummary = {
+  /** Server-generated quote identifier. */
+  quoteId: string;
+  /** Current asynchronous quote state. */
+  status: "queued" | "analyzing" | "ready" | "failed";
+  /** Organization name from the accepted request. */
+  organizationName: string;
+  /** Frameworks included in the request. */
+  frameworks: string[];
+  /** RFC 3339 creation timestamp. */
+  createdAt: string;
+  /** RFC 3339 last-status timestamp. */
+  updatedAt: string;
+  /** Present only when the quote is ready. */
+  estimate?: QuoteEstimate;
+};
+
+/** Owner-scoped authoritative REST representation of one quote. */
+export type QuoteDetail = {
+  /** Server-generated quote identifier. */
+  quoteId: string;
+  /** Current asynchronous quote state. */
+  status: "queued" | "analyzing" | "ready" | "failed";
+  /** Normalized accepted questionnaire. */
+  request: QuoteRequest;
+  /** Authenticated WebSocket URL or relative path for persisted status events. */
+  eventsUrl: string;
+  /** RFC 3339 creation timestamp. */
+  createdAt: string;
+  /** RFC 3339 last-status timestamp. */
+  updatedAt: string;
+  /** Present only when the quote is ready. */
+  estimate?: QuoteEstimate;
+  /** Present only when the quote is failed. */
+  problem?: QuoteProblem;
+};
+
+/** Bounded owner-scoped list query for GET /api/v1/quotes. */
+export type QuoteListQuery = {
+  /** Opaque owner-bound pagination cursor. */
+  cursor?: string;
+  /** Requested page size; the server clamps to 1 through 100. */
+  limit?: number;
+};
+
+/** Owner-scoped quote list response. */
+export type QuoteListResponse = {
+  /** Quotes in descending creation order. */
+  quotes: QuoteSummary[];
+  /** Opaque cursor for the next page when more results exist. */
+  nextCursor?: string;
+};
+
+/** Accepted response after retrying a failed quote. */
+export type QuoteRetryResponse = {
+  /** Quote identifier. */
+  quoteId: string;
+  /** A successful retry requeues the quote. */
+  status: "queued";
+  /** Authenticated WebSocket URL or relative path for quote progress. */
+  streamUrl: string;
+  /** RFC 3339 retry acceptance timestamp. */
+  updatedAt: string;
 };

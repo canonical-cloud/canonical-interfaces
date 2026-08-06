@@ -136,7 +136,7 @@ type QuoteRequest struct {
 	OrganizationName string `json:"organizationName"`
 	// Primary contact for the quote.
 	ContactName string `json:"contactName"`
-	// Verified account email used for quote follow-up.
+	// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
 	ContactEmail string `json:"contactEmail"`
 	// Optional public organization website.
 	Website *string `json:"website,omitempty"`
@@ -166,7 +166,7 @@ type QuoteRequest struct {
 	HasVendorManagement bool `json:"hasVendorManagement"`
 	// Optional additional scoping details; secrets and regulated records must not be submitted.
 	Notes *string `json:"notes,omitempty"`
-	// Optional allow-listed canonical_context key selected by the server.
+	// Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis.
 	ContextKey *string `json:"contextKey,omitempty"`
 	// Questionnaire schema version; only version 1 is accepted.
 	AnswersVersion int64 `json:"answersVersion"`
@@ -176,7 +176,7 @@ type QuoteRequest struct {
 type QuoteSubmissionResponse struct {
 	// Server-generated quote identifier.
 	QuoteId string `json:"quoteId"`
-	// Current asynchronous quote state.
+	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
 	Status string `json:"status"`
 	// Authenticated WebSocket URL or relative path for quote progress.
 	StreamUrl string `json:"streamUrl"`
@@ -226,7 +226,7 @@ type QuoteStatusEvent struct {
 	QuoteId string `json:"quoteId"`
 	// Monotonic decimal-string event sequence.
 	Sequence string `json:"sequence"`
-	// Bounded processing stage.
+	// Bounded processing stage. (one of: queued, loading_context, analyzing, validating, ready, failed)
 	Stage string `json:"stage"`
 	// Human-readable progress summary without sensitive prompt content.
 	Message string `json:"message"`
@@ -234,6 +234,10 @@ type QuoteStatusEvent struct {
 	Terminal bool `json:"terminal"`
 	// Present only for a successful ready event.
 	Estimate *QuoteEstimate `json:"estimate,omitempty"`
+	// RFC 3339 timestamp for the persisted event.
+	OccurredAt string `json:"occurredAt"`
+	// Present only when the event reports a safe public failure.
+	Problem *QuoteProblem `json:"problem,omitempty"`
 }
 
 // QuoteProblem: Bounded public error payload for quote endpoints.
@@ -244,4 +248,70 @@ type QuoteProblem struct {
 	Message string `json:"message"`
 	// Request correlation identifier.
 	RequestId string `json:"requestId"`
+}
+
+// QuoteSummary: Owner-scoped list item for a compliance quote.
+type QuoteSummary struct {
+	// Server-generated quote identifier.
+	QuoteId string `json:"quoteId"`
+	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
+	Status string `json:"status"`
+	// Organization name from the accepted request.
+	OrganizationName string `json:"organizationName"`
+	// Frameworks included in the request.
+	Frameworks []string `json:"frameworks"`
+	// RFC 3339 creation timestamp.
+	CreatedAt string `json:"createdAt"`
+	// RFC 3339 last-status timestamp.
+	UpdatedAt string `json:"updatedAt"`
+	// Present only when the quote is ready.
+	Estimate *QuoteEstimate `json:"estimate,omitempty"`
+}
+
+// QuoteDetail: Owner-scoped authoritative REST representation of one quote.
+type QuoteDetail struct {
+	// Server-generated quote identifier.
+	QuoteId string `json:"quoteId"`
+	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
+	Status string `json:"status"`
+	// Normalized accepted questionnaire.
+	Request QuoteRequest `json:"request"`
+	// Authenticated WebSocket URL or relative path for persisted status events.
+	EventsUrl string `json:"eventsUrl"`
+	// RFC 3339 creation timestamp.
+	CreatedAt string `json:"createdAt"`
+	// RFC 3339 last-status timestamp.
+	UpdatedAt string `json:"updatedAt"`
+	// Present only when the quote is ready.
+	Estimate *QuoteEstimate `json:"estimate,omitempty"`
+	// Present only when the quote is failed.
+	Problem *QuoteProblem `json:"problem,omitempty"`
+}
+
+// QuoteListQuery: Bounded owner-scoped list query for GET /api/v1/quotes.
+type QuoteListQuery struct {
+	// Opaque owner-bound pagination cursor.
+	Cursor *string `json:"cursor,omitempty"`
+	// Requested page size; the server clamps to 1 through 100.
+	Limit *int64 `json:"limit,omitempty"`
+}
+
+// QuoteListResponse: Owner-scoped quote list response.
+type QuoteListResponse struct {
+	// Quotes in descending creation order.
+	Quotes []QuoteSummary `json:"quotes"`
+	// Opaque cursor for the next page when more results exist.
+	NextCursor *string `json:"nextCursor,omitempty"`
+}
+
+// QuoteRetryResponse: Accepted response after retrying a failed quote.
+type QuoteRetryResponse struct {
+	// Quote identifier.
+	QuoteId string `json:"quoteId"`
+	// A successful retry requeues the quote. (one of: queued)
+	Status string `json:"status"`
+	// Authenticated WebSocket URL or relative path for quote progress.
+	StreamUrl string `json:"streamUrl"`
+	// RFC 3339 retry acceptance timestamp.
+	UpdatedAt string `json:"updatedAt"`
 }
