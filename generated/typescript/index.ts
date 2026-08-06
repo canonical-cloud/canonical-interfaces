@@ -10,54 +10,306 @@ export type HealthStatus = {
 
 /** Response of GET /api/info and GET /api/v1/info. */
 export type ServiceInfo = {
+  /** Stable service name. */
   service: string;
+  /** Semantic version of the running build (CARGO_PKG_VERSION). */
   version: string;
+  /** Public domain served (e.g. "canonical.cloud"). */
   domain: string;
+  /** Runtime sMASH components reported by the service. */
   stack: string[];
 };
 
-export type DraftNoteValue = { title: string; body: string; };
-export type DraftNoteKey = { kind: "draft_note"; id: string; };
-export type MutationOperation = { mutationId: string; key: DraftNoteKey; action: "put" | "delete"; baseVersion: string | null; schemaVersion: number; value?: DraftNoteValue; };
-export type MutationRequest = { protocolVersion: number; clientId: string; operations: MutationOperation[]; };
-export type WireRecord = { key: DraftNoteKey; version: string; schemaVersion: number; deleted: boolean; value?: DraftNoteValue; };
-export type MutationResult = { mutationId: string; status: "applied" | "conflict" | "gone" | "invalid" | "idempotency_key_reused"; record?: WireRecord; message?: string; };
-export type MutationResponse = { results: MutationResult[]; };
-export type ChangesQuery = { cursor?: string; limit?: number; };
-export type ChangesResponse = { changes: WireRecord[]; nextCursor: string; caughtUp: boolean; };
-export type AuditEngagement = { id: string; company: string; framework: "soc2" | "fedramp" | "hipaa" | "iso_27001" | "pci_dss" | "gdpr"; status: "scoping" | "remediation" | "in_audit" | "complete"; opened_at: string; target_report_date?: string; };
+/** Schema-version-1 value for the only record kind accepted by the initial sync protocol. */
+export type DraftNoteValue = {
+  /** Draft-note title, limited to 200 characters. */
+  title: string;
+  /** Draft-note body, limited to 100,000 characters. */
+  body: string;
+};
+
+/** Owner-scoped key for a draft-note sync record. */
+export type DraftNoteKey = {
+  /** Bounded record-kind discriminator. */
+  kind: "draft_note";
+  /** Client-generated UUID for the record. */
+  id: string;
+};
+
+/** One idempotent compare-and-swap operation in a draft-note mutation batch. */
+export type MutationOperation = {
+  /** UUID idempotency key, unique per client and logical mutation. */
+  mutationId: string;
+  /** Record targeted by the operation. */
+  key: DraftNoteKey;
+  /** Mutation action. */
+  action: "put" | "delete";
+  /** Unsigned decimal-string version used for compare-and-swap, or null for a create. */
+  baseVersion: string | null;
+  /** Draft-note payload schema version; only version 1 is accepted. */
+  schemaVersion: number;
+  /** Required for put and omitted for delete. */
+  value?: DraftNoteValue;
+};
+
+/** Body of POST /api/v1/sync/mutations. */
+export type MutationRequest = {
+  /** Sync protocol version; only version 1 is accepted. */
+  protocolVersion: number;
+  /** Stable UUID for this browser installation or API client. */
+  clientId: string;
+  /** Bounded mutation batch containing between 1 and 50 operations. */
+  operations: MutationOperation[];
+};
+
+/** Authoritative server snapshot of a draft-note record or tombstone. */
+export type WireRecord = {
+  /** Owner-scoped record key. */
+  key: DraftNoteKey;
+  /** Authoritative record version encoded as an unsigned decimal string. */
+  version: string;
+  /** Draft-note payload schema version. */
+  schemaVersion: number;
+  /** True when the snapshot is a permanent tombstone. */
+  deleted: boolean;
+  /** Present for live records and omitted for tombstones. */
+  value?: DraftNoteValue;
+};
+
+/** Per-operation result returned in the same order as the mutation request. */
+export type MutationResult = {
+  /** Idempotency key copied from the operation. */
+  mutationId: string;
+  /** Outcome of the compare-and-swap operation. */
+  status: "applied" | "conflict" | "gone" | "invalid" | "idempotency_key_reused";
+  /** Applied or authoritative conflicting snapshot when available. */
+  record?: WireRecord;
+  /** Optional human-readable failure detail; clients must branch on status. */
+  message?: string;
+};
+
+/** Response of POST /api/v1/sync/mutations. */
+export type MutationResponse = {
+  /** One result for every submitted operation, in request order. */
+  results: MutationResult[];
+};
+
+/** Query parameters accepted by GET /api/v1/sync/changes. */
+export type ChangesQuery = {
+  /** Opaque, encrypted, owner-bound cursor returned by the previous pull. */
+  cursor?: string;
+  /** Requested page size; the server clamps values to 1 through 500. */
+  limit?: number;
+};
+
+/** Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints. */
+export type ChangesResponse = {
+  /** Commit-ordered authoritative snapshots and tombstones. */
+  changes: WireRecord[];
+  /** Opaque cursor to persist and send on the next pull. */
+  nextCursor: string;
+  /** True when the response reached the pull's stable high-water mark. */
+  caughtUp: boolean;
+};
+
+/** A single compliance-audit engagement for a customer company. */
+export type AuditEngagement = {
+  /** Opaque engagement identifier (UUID). */
+  id: string;
+  /** Customer company name. */
+  company: string;
+  /** Compliance framework being audited. */
+  framework: "soc2" | "fedramp" | "hipaa" | "iso_27001" | "pci_dss" | "gdpr";
+  /** Lifecycle stage of the engagement. */
+  status: "scoping" | "remediation" | "in_audit" | "complete";
+  /** RFC 3339 timestamp the engagement was opened. */
+  opened_at: string;
+  /** Optional RFC 3339 date the attestation report is targeted for. */
+  target_report_date?: string;
+};
 
 /** Authenticated request to generate a bounded compliance-services quote. */
 export type QuoteRequest = {
+  /** Legal or commonly used organization name. */
   organizationName: string;
+  /** Primary contact for the quote. */
   contactName: string;
-  /** Follow-up metadata, not authentication authority. */
+  /** Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field. */
   contactEmail: string;
+  /** Optional public organization website. */
   website?: string;
+  /** Approximate number of employees and long-term contractors. */
   employeeCount: number;
+  /** Optional bounded annual-revenue band used only for scoping. */
   annualRevenueBand?: string;
+  /** Compliance frameworks requested for the engagement. */
   frameworks: string[];
+  /** Current compliance-program stage. */
   currentStage: string;
+  /** Primary hosting and application infrastructure. */
   infrastructure: string[];
+  /** Highest-sensitivity data categories in scope. */
   dataSensitivity: string[];
+  /** Optional target date for readiness, attestation, or authorization. */
   targetDate?: string;
+  /** Whether a named security owner and operating security program exist. */
   hasSecurityProgram: boolean;
+  /** Whether reviewed security and privacy policies currently exist. */
   hasPolicies: boolean;
+  /** Whether a current documented risk assessment exists. */
   hasRiskAssessment: boolean;
+  /** Whether an incident-response plan exists and has been exercised. */
   hasIncidentResponsePlan: boolean;
+  /** Whether third-party risk and vendor review processes exist. */
   hasVendorManagement: boolean;
+  /** Optional additional scoping details; secrets and regulated records must not be submitted. */
   notes?: string;
-  /** Defaults to quote-analysis. */
+  /** Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis. */
   contextKey?: string;
+  /** Questionnaire schema version; only version 1 is accepted. */
   answersVersion: number;
 };
 
-export type QuoteSubmissionResponse = { quoteId: string; status: "queued" | "analyzing" | "ready" | "failed"; streamUrl: string; createdAt: string; };
-export type QuoteEstimate = { quoteId: string; status: string; currency: string; lowerBoundCents: number; upperBoundCents: number; durationWeeksLow: number; durationWeeksHigh: number; confidence: string; summary: string; assumptions: string[]; gaps: string[]; nextSteps: string[]; frameworks: string[]; model: string; contextVersion: string; createdAt: string; };
-export type QuoteStatusEvent = { quoteId: string; sequence: string; stage: "queued" | "loading_context" | "analyzing" | "validating" | "ready" | "failed"; message: string; terminal: boolean; estimate?: QuoteEstimate; occurredAt: string; problem?: QuoteProblem; };
-export type QuoteProblem = { code: string; message: string; requestId: string; };
-export type QuoteSummary = { quoteId: string; status: "queued" | "analyzing" | "ready" | "failed"; organizationName: string; frameworks: string[]; createdAt: string; updatedAt: string; estimate?: QuoteEstimate; };
-export type QuoteDetail = { quoteId: string; status: "queued" | "analyzing" | "ready" | "failed"; request: QuoteRequest; eventsUrl: string; createdAt: string; updatedAt: string; estimate?: QuoteEstimate; problem?: QuoteProblem; };
-export type QuoteListQuery = { cursor?: string; limit?: number; };
-export type QuoteListResponse = { quotes: QuoteSummary[]; nextCursor?: string; };
-export type QuoteRetryResponse = { quoteId: string; status: "queued"; streamUrl: string; updatedAt: string; };
+/** Accepted response from POST /api/v1/quotes. */
+export type QuoteSubmissionResponse = {
+  /** Server-generated quote identifier. */
+  quoteId: string;
+  /** Current asynchronous quote state. */
+  status: "queued" | "analyzing" | "ready" | "failed";
+  /** Authenticated WebSocket URL or relative path for quote progress. */
+  streamUrl: string;
+  /** RFC 3339 creation timestamp. */
+  createdAt: string;
+};
+
+/** Structured Gemini-assisted estimate persisted after server-side validation. */
+export type QuoteEstimate = {
+  /** Quote identifier. */
+  quoteId: string;
+  /** Terminal estimate status. */
+  status: string;
+  /** ISO 4217 currency code, initially USD. */
+  currency: string;
+  /** Inclusive lower estimate bound in minor currency units. */
+  lowerBoundCents: number;
+  /** Inclusive upper estimate bound in minor currency units. */
+  upperBoundCents: number;
+  /** Optimistic delivery duration in weeks. */
+  durationWeeksLow: number;
+  /** Conservative delivery duration in weeks. */
+  durationWeeksHigh: number;
+  /** Confidence after context and questionnaire completeness checks. */
+  confidence: string;
+  /** Customer-facing estimate summary. */
+  summary: string;
+  /** Material assumptions used to construct the range. */
+  assumptions: string[];
+  /** Likely readiness gaps that affect cost or schedule. */
+  gaps: string[];
+  /** Recommended next actions in priority order. */
+  nextSteps: string[];
+  /** Frameworks included in this estimate. */
+  frameworks: string[];
+  /** Configured Gemini model identifier used for analysis. */
+  model: string;
+  /** Immutable combined-context version or digest. */
+  contextVersion: string;
+  /** RFC 3339 estimate timestamp. */
+  createdAt: string;
+};
+
+/** Authenticated WebSocket progress message for one quote. */
+export type QuoteStatusEvent = {
+  /** Quote identifier. */
+  quoteId: string;
+  /** Monotonic decimal-string event sequence. */
+  sequence: string;
+  /** Bounded processing stage. */
+  stage: "queued" | "loading_context" | "analyzing" | "validating" | "ready" | "failed";
+  /** Human-readable progress summary without sensitive prompt content. */
+  message: string;
+  /** True when no later state is expected. */
+  terminal: boolean;
+  /** Present only for a successful ready event. */
+  estimate?: QuoteEstimate;
+  /** RFC 3339 timestamp for the persisted event. */
+  occurredAt: string;
+  /** Present only when the event reports a safe public failure. */
+  problem?: QuoteProblem;
+};
+
+/** Bounded public error payload for quote endpoints. */
+export type QuoteProblem = {
+  /** Stable machine-readable error code. */
+  code: string;
+  /** Safe human-readable error detail. */
+  message: string;
+  /** Request correlation identifier. */
+  requestId: string;
+};
+
+/** Owner-scoped list item for a compliance quote. */
+export type QuoteSummary = {
+  /** Server-generated quote identifier. */
+  quoteId: string;
+  /** Current asynchronous quote state. */
+  status: "queued" | "analyzing" | "ready" | "failed";
+  /** Organization name from the accepted request. */
+  organizationName: string;
+  /** Frameworks included in the request. */
+  frameworks: string[];
+  /** RFC 3339 creation timestamp. */
+  createdAt: string;
+  /** RFC 3339 last-status timestamp. */
+  updatedAt: string;
+  /** Present only when the quote is ready. */
+  estimate?: QuoteEstimate;
+};
+
+/** Owner-scoped authoritative REST representation of one quote. */
+export type QuoteDetail = {
+  /** Server-generated quote identifier. */
+  quoteId: string;
+  /** Current asynchronous quote state. */
+  status: "queued" | "analyzing" | "ready" | "failed";
+  /** Normalized accepted questionnaire. */
+  request: QuoteRequest;
+  /** Authenticated WebSocket URL or relative path for persisted status events. */
+  eventsUrl: string;
+  /** RFC 3339 creation timestamp. */
+  createdAt: string;
+  /** RFC 3339 last-status timestamp. */
+  updatedAt: string;
+  /** Present only when the quote is ready. */
+  estimate?: QuoteEstimate;
+  /** Present only when the quote is failed. */
+  problem?: QuoteProblem;
+};
+
+/** Bounded owner-scoped list query for GET /api/v1/quotes. */
+export type QuoteListQuery = {
+  /** Opaque owner-bound pagination cursor. */
+  cursor?: string;
+  /** Requested page size; the server clamps to 1 through 100. */
+  limit?: number;
+};
+
+/** Owner-scoped quote list response. */
+export type QuoteListResponse = {
+  /** Quotes in descending creation order. */
+  quotes: QuoteSummary[];
+  /** Opaque cursor for the next page when more results exist. */
+  nextCursor?: string;
+};
+
+/** Accepted response after retrying a failed quote. */
+export type QuoteRetryResponse = {
+  /** Quote identifier. */
+  quoteId: string;
+  /** A successful retry requeues the quote. */
+  status: "queued";
+  /** Authenticated WebSocket URL or relative path for quote progress. */
+  streamUrl: string;
+  /** RFC 3339 retry acceptance timestamp. */
+  updatedAt: string;
+};
