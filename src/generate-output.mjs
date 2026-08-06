@@ -50,6 +50,9 @@ function main() {
         : null;
       if (current !== content) {
         console.error(`drift: ${relativePath}`);
+        if (process.env.GITHUB_ACTIONS === "true") {
+          console.error(`::error file=generated/${relativePath}::generated adapter is out of date; run npm run generate`);
+        }
         drift += 1;
       }
     } else {
