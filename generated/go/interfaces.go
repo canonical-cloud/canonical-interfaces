@@ -129,3 +129,119 @@ type AuditEngagement struct {
 	// Optional RFC 3339 date the attestation report is targeted for.
 	TargetReportDate *string `json:"target_report_date,omitempty"`
 }
+
+// QuoteRequest: Authenticated request to generate a bounded compliance-services quote.
+type QuoteRequest struct {
+	// Legal or commonly used organization name.
+	OrganizationName string `json:"organizationName"`
+	// Primary contact for the quote.
+	ContactName string `json:"contactName"`
+	// Verified account email used for quote follow-up.
+	ContactEmail string `json:"contactEmail"`
+	// Optional public organization website.
+	Website *string `json:"website,omitempty"`
+	// Approximate number of employees and long-term contractors.
+	EmployeeCount int64 `json:"employeeCount"`
+	// Optional bounded annual-revenue band used only for scoping.
+	AnnualRevenueBand *string `json:"annualRevenueBand,omitempty"`
+	// Compliance frameworks requested for the engagement.
+	Frameworks []string `json:"frameworks"`
+	// Current compliance-program stage.
+	CurrentStage string `json:"currentStage"`
+	// Primary hosting and application infrastructure.
+	Infrastructure []string `json:"infrastructure"`
+	// Highest-sensitivity data categories in scope.
+	DataSensitivity []string `json:"dataSensitivity"`
+	// Optional target date for readiness, attestation, or authorization.
+	TargetDate *string `json:"targetDate,omitempty"`
+	// Whether a named security owner and operating security program exist.
+	HasSecurityProgram bool `json:"hasSecurityProgram"`
+	// Whether reviewed security and privacy policies currently exist.
+	HasPolicies bool `json:"hasPolicies"`
+	// Whether a current documented risk assessment exists.
+	HasRiskAssessment bool `json:"hasRiskAssessment"`
+	// Whether an incident-response plan exists and has been exercised.
+	HasIncidentResponsePlan bool `json:"hasIncidentResponsePlan"`
+	// Whether third-party risk and vendor review processes exist.
+	HasVendorManagement bool `json:"hasVendorManagement"`
+	// Optional additional scoping details; secrets and regulated records must not be submitted.
+	Notes *string `json:"notes,omitempty"`
+	// Optional allow-listed canonical_context key selected by the server.
+	ContextKey *string `json:"contextKey,omitempty"`
+	// Questionnaire schema version; only version 1 is accepted.
+	AnswersVersion int64 `json:"answersVersion"`
+}
+
+// QuoteSubmissionResponse: Accepted response from POST /api/v1/quotes.
+type QuoteSubmissionResponse struct {
+	// Server-generated quote identifier.
+	QuoteId string `json:"quoteId"`
+	// Current asynchronous quote state.
+	Status string `json:"status"`
+	// Authenticated WebSocket URL or relative path for quote progress.
+	StreamUrl string `json:"streamUrl"`
+	// RFC 3339 creation timestamp.
+	CreatedAt string `json:"createdAt"`
+}
+
+// QuoteEstimate: Structured Gemini-assisted estimate persisted after server-side validation.
+type QuoteEstimate struct {
+	// Quote identifier.
+	QuoteId string `json:"quoteId"`
+	// Terminal estimate status.
+	Status string `json:"status"`
+	// ISO 4217 currency code, initially USD.
+	Currency string `json:"currency"`
+	// Inclusive lower estimate bound in minor currency units.
+	LowerBoundCents int64 `json:"lowerBoundCents"`
+	// Inclusive upper estimate bound in minor currency units.
+	UpperBoundCents int64 `json:"upperBoundCents"`
+	// Optimistic delivery duration in weeks.
+	DurationWeeksLow int64 `json:"durationWeeksLow"`
+	// Conservative delivery duration in weeks.
+	DurationWeeksHigh int64 `json:"durationWeeksHigh"`
+	// Confidence after context and questionnaire completeness checks.
+	Confidence string `json:"confidence"`
+	// Customer-facing estimate summary.
+	Summary string `json:"summary"`
+	// Material assumptions used to construct the range.
+	Assumptions []string `json:"assumptions"`
+	// Likely readiness gaps that affect cost or schedule.
+	Gaps []string `json:"gaps"`
+	// Recommended next actions in priority order.
+	NextSteps []string `json:"nextSteps"`
+	// Frameworks included in this estimate.
+	Frameworks []string `json:"frameworks"`
+	// Configured Gemini model identifier used for analysis.
+	Model string `json:"model"`
+	// Immutable combined-context version or digest.
+	ContextVersion string `json:"contextVersion"`
+	// RFC 3339 estimate timestamp.
+	CreatedAt string `json:"createdAt"`
+}
+
+// QuoteStatusEvent: Authenticated WebSocket progress message for one quote.
+type QuoteStatusEvent struct {
+	// Quote identifier.
+	QuoteId string `json:"quoteId"`
+	// Monotonic decimal-string event sequence.
+	Sequence string `json:"sequence"`
+	// Bounded processing stage.
+	Stage string `json:"stage"`
+	// Human-readable progress summary without sensitive prompt content.
+	Message string `json:"message"`
+	// True when no later state is expected.
+	Terminal bool `json:"terminal"`
+	// Present only for a successful ready event.
+	Estimate *QuoteEstimate `json:"estimate,omitempty"`
+}
+
+// QuoteProblem: Bounded public error payload for quote endpoints.
+type QuoteProblem struct {
+	// Stable machine-readable error code.
+	Code string `json:"code"`
+	// Safe human-readable error detail.
+	Message string `json:"message"`
+	// Request correlation identifier.
+	RequestId string `json:"requestId"`
+}
