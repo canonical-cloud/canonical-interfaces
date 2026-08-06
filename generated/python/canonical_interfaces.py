@@ -90,3 +90,71 @@ class AuditEngagement:
     status: Literal["scoping", "remediation", "in_audit", "complete"]
     opened_at: str
     target_report_date: Optional[str] = None
+
+@dataclass
+class QuoteRequest:
+    """Authenticated request to generate a bounded compliance-services quote."""
+    organizationName: str
+    contactName: str
+    contactEmail: str
+    employeeCount: int
+    frameworks: List[str]
+    currentStage: str
+    infrastructure: List[str]
+    dataSensitivity: List[str]
+    hasSecurityProgram: bool
+    hasPolicies: bool
+    hasRiskAssessment: bool
+    hasIncidentResponsePlan: bool
+    hasVendorManagement: bool
+    answersVersion: int
+    website: Optional[str] = None
+    annualRevenueBand: Optional[str] = None
+    targetDate: Optional[str] = None
+    notes: Optional[str] = None
+    contextKey: Optional[str] = None
+
+@dataclass
+class QuoteSubmissionResponse:
+    """Accepted response from POST /api/v1/quotes."""
+    quoteId: str
+    status: str
+    streamUrl: str
+    createdAt: str
+
+@dataclass
+class QuoteEstimate:
+    """Structured Gemini-assisted estimate persisted after server-side validation."""
+    quoteId: str
+    status: str
+    currency: str
+    lowerBoundCents: int
+    upperBoundCents: int
+    durationWeeksLow: int
+    durationWeeksHigh: int
+    confidence: str
+    summary: str
+    assumptions: List[str]
+    gaps: List[str]
+    nextSteps: List[str]
+    frameworks: List[str]
+    model: str
+    contextVersion: str
+    createdAt: str
+
+@dataclass
+class QuoteStatusEvent:
+    """Authenticated WebSocket progress message for one quote."""
+    quoteId: str
+    sequence: str
+    stage: str
+    message: str
+    terminal: bool
+    estimate: Optional[QuoteEstimate] = None
+
+@dataclass
+class QuoteProblem:
+    """Bounded public error payload for quote endpoints."""
+    code: str
+    message: str
+    requestId: str

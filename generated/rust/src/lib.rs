@@ -221,3 +221,158 @@ pub struct AuditEngagement {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_report_date: Option<String>,
 }
+
+/// Authenticated request to generate a bounded compliance-services quote.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteRequest {
+    /// Legal or commonly used organization name.
+    #[serde(rename = "organizationName")]
+    pub organization_name: String,
+    /// Primary contact for the quote.
+    #[serde(rename = "contactName")]
+    pub contact_name: String,
+    /// Verified account email used for quote follow-up.
+    #[serde(rename = "contactEmail")]
+    pub contact_email: String,
+    /// Optional public organization website.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
+    /// Approximate number of employees and long-term contractors.
+    #[serde(rename = "employeeCount")]
+    pub employee_count: i64,
+    /// Optional bounded annual-revenue band used only for scoping.
+    #[serde(rename = "annualRevenueBand")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub annual_revenue_band: Option<String>,
+    /// Compliance frameworks requested for the engagement.
+    pub frameworks: Vec<String>,
+    /// Current compliance-program stage.
+    #[serde(rename = "currentStage")]
+    pub current_stage: String,
+    /// Primary hosting and application infrastructure.
+    pub infrastructure: Vec<String>,
+    /// Highest-sensitivity data categories in scope.
+    #[serde(rename = "dataSensitivity")]
+    pub data_sensitivity: Vec<String>,
+    /// Optional target date for readiness, attestation, or authorization.
+    #[serde(rename = "targetDate")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub target_date: Option<String>,
+    /// Whether a named security owner and operating security program exist.
+    #[serde(rename = "hasSecurityProgram")]
+    pub has_security_program: bool,
+    /// Whether reviewed security and privacy policies currently exist.
+    #[serde(rename = "hasPolicies")]
+    pub has_policies: bool,
+    /// Whether a current documented risk assessment exists.
+    #[serde(rename = "hasRiskAssessment")]
+    pub has_risk_assessment: bool,
+    /// Whether an incident-response plan exists and has been exercised.
+    #[serde(rename = "hasIncidentResponsePlan")]
+    pub has_incident_response_plan: bool,
+    /// Whether third-party risk and vendor review processes exist.
+    #[serde(rename = "hasVendorManagement")]
+    pub has_vendor_management: bool,
+    /// Optional additional scoping details; secrets and regulated records must not be submitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    /// Optional allow-listed canonical_context key selected by the server.
+    #[serde(rename = "contextKey")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub context_key: Option<String>,
+    /// Questionnaire schema version; only version 1 is accepted.
+    #[serde(rename = "answersVersion")]
+    pub answers_version: i64,
+}
+
+/// Accepted response from POST /api/v1/quotes.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteSubmissionResponse {
+    /// Server-generated quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// Current asynchronous quote state.
+    pub status: String,
+    /// Authenticated WebSocket URL or relative path for quote progress.
+    #[serde(rename = "streamUrl")]
+    pub stream_url: String,
+    /// RFC 3339 creation timestamp.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+}
+
+/// Structured Gemini-assisted estimate persisted after server-side validation.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteEstimate {
+    /// Quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// Terminal estimate status.
+    pub status: String,
+    /// ISO 4217 currency code, initially USD.
+    pub currency: String,
+    /// Inclusive lower estimate bound in minor currency units.
+    #[serde(rename = "lowerBoundCents")]
+    pub lower_bound_cents: i64,
+    /// Inclusive upper estimate bound in minor currency units.
+    #[serde(rename = "upperBoundCents")]
+    pub upper_bound_cents: i64,
+    /// Optimistic delivery duration in weeks.
+    #[serde(rename = "durationWeeksLow")]
+    pub duration_weeks_low: i64,
+    /// Conservative delivery duration in weeks.
+    #[serde(rename = "durationWeeksHigh")]
+    pub duration_weeks_high: i64,
+    /// Confidence after context and questionnaire completeness checks.
+    pub confidence: String,
+    /// Customer-facing estimate summary.
+    pub summary: String,
+    /// Material assumptions used to construct the range.
+    pub assumptions: Vec<String>,
+    /// Likely readiness gaps that affect cost or schedule.
+    pub gaps: Vec<String>,
+    /// Recommended next actions in priority order.
+    #[serde(rename = "nextSteps")]
+    pub next_steps: Vec<String>,
+    /// Frameworks included in this estimate.
+    pub frameworks: Vec<String>,
+    /// Configured Gemini model identifier used for analysis.
+    pub model: String,
+    /// Immutable combined-context version or digest.
+    #[serde(rename = "contextVersion")]
+    pub context_version: String,
+    /// RFC 3339 estimate timestamp.
+    #[serde(rename = "createdAt")]
+    pub created_at: String,
+}
+
+/// Authenticated WebSocket progress message for one quote.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteStatusEvent {
+    /// Quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// Monotonic decimal-string event sequence.
+    pub sequence: String,
+    /// Bounded processing stage.
+    pub stage: String,
+    /// Human-readable progress summary without sensitive prompt content.
+    pub message: String,
+    /// True when no later state is expected.
+    pub terminal: bool,
+    /// Present only for a successful ready event.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub estimate: Option<QuoteEstimate>,
+}
+
+/// Bounded public error payload for quote endpoints.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteProblem {
+    /// Stable machine-readable error code.
+    pub code: String,
+    /// Safe human-readable error detail.
+    pub message: String,
+    /// Request correlation identifier.
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+}
