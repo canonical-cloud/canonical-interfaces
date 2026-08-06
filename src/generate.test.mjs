@@ -56,7 +56,7 @@ test('quote schema keeps request, context, and estimate payloads bounded', () =>
   assert.ok(request.properties.frameworks.items.enum.includes('nist_800_53'));
   assert.ok(request.properties.frameworks.items.enum.includes('hipaa'));
   assert.equal(request.properties.notes.maxLength, 5_000);
-  assert.equal(request.properties.contextKey.maxLength, undefined);
+  assert.equal(request.properties.contextKey.maxLength, 128);
   assert.equal(request.properties.answersVersion.const, 1);
   assert.equal(estimate.properties.summary.maxLength, 4_000);
   assert.equal(estimate.properties.assumptions.maxItems, 50);
