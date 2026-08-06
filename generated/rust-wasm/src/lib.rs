@@ -499,7 +499,7 @@ pub struct QuoteListQuery {
     /// Opaque owner-bound pagination cursor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
-    /// Requested page size; the server clamps values to 1 through 100.
+    /// Requested page size; the server clamps to 1 through 100.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
