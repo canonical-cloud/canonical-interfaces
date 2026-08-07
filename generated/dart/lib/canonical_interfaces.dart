@@ -50,35 +50,6 @@ abstract final class AuditEngagementStatus {
   static const List<String> values = <String>["scoping", "remediation", "in_audit", "complete"];
 }
 
-/// Permitted wire values for the fields typed as `QuoteSubmissionResponseStatus`.
-abstract final class QuoteSubmissionResponseStatus {
-  static const String queued = "queued";
-  static const String analyzing = "analyzing";
-  static const String ready = "ready";
-  static const String failed = "failed";
-  static const List<String> values = <String>["queued", "analyzing", "ready", "failed"];
-}
-
-/// Permitted wire values for the fields typed as `QuoteStatusEventStage`.
-abstract final class QuoteStatusEventStage {
-  static const String queued = "queued";
-  static const String loadingContext = "loading_context";
-  static const String analyzing = "analyzing";
-  static const String validating = "validating";
-  static const String ready = "ready";
-  static const String failed = "failed";
-  static const List<String> values = <String>["queued", "loading_context", "analyzing", "validating", "ready", "failed"];
-}
-
-/// Permitted wire values for the fields typed as `QuoteSummaryStatus`.
-abstract final class QuoteSummaryStatus {
-  static const String queued = "queued";
-  static const String analyzing = "analyzing";
-  static const String ready = "ready";
-  static const String failed = "failed";
-  static const List<String> values = <String>["queued", "analyzing", "ready", "failed"];
-}
-
 /// Permitted wire values for the fields typed as `QuoteDetailStatus`.
 abstract final class QuoteDetailStatus {
   static const String queued = "queued";
@@ -92,6 +63,35 @@ abstract final class QuoteDetailStatus {
 abstract final class QuoteRetryResponseStatus {
   static const String queued = "queued";
   static const List<String> values = <String>["queued"];
+}
+
+/// Permitted wire values for the fields typed as `QuoteStatusEventStage`.
+abstract final class QuoteStatusEventStage {
+  static const String queued = "queued";
+  static const String loadingContext = "loading_context";
+  static const String analyzing = "analyzing";
+  static const String validating = "validating";
+  static const String ready = "ready";
+  static const String failed = "failed";
+  static const List<String> values = <String>["queued", "loading_context", "analyzing", "validating", "ready", "failed"];
+}
+
+/// Permitted wire values for the fields typed as `QuoteSubmissionResponseStatus`.
+abstract final class QuoteSubmissionResponseStatus {
+  static const String queued = "queued";
+  static const String analyzing = "analyzing";
+  static const String ready = "ready";
+  static const String failed = "failed";
+  static const List<String> values = <String>["queued", "analyzing", "ready", "failed"];
+}
+
+/// Permitted wire values for the fields typed as `QuoteSummaryStatus`.
+abstract final class QuoteSummaryStatus {
+  static const String queued = "queued";
+  static const String analyzing = "analyzing";
+  static const String ready = "ready";
+  static const String failed = "failed";
+  static const List<String> values = <String>["queued", "analyzing", "ready", "failed"];
 }
 
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
@@ -398,306 +398,6 @@ final class AuditEngagement {
   };
 }
 
-/// Authenticated request to generate a bounded compliance-services quote.
-final class QuoteRequest {
-  const QuoteRequest({required this.organizationName, required this.contactName, required this.contactEmail, this.website, required this.employeeCount, this.annualRevenueBand, required this.frameworks, required this.currentStage, required this.infrastructure, required this.dataSensitivity, this.targetDate, required this.hasSecurityProgram, required this.hasPolicies, required this.hasRiskAssessment, required this.hasIncidentResponsePlan, required this.hasVendorManagement, this.notes, this.contextKey, required this.answersVersion});
-
-  /// Legal or commonly used organization name.
-  final String organizationName;
-  /// Primary contact for the quote.
-  final String contactName;
-  /// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
-  final String contactEmail;
-  /// Optional public organization website.
-  final String? website;
-  /// Approximate number of employees and long-term contractors.
-  final int employeeCount;
-  /// Optional bounded annual-revenue band used only for scoping.
-  final String? annualRevenueBand;
-  /// Compliance frameworks requested for the engagement.
-  final List<String> frameworks;
-  /// Current compliance-program stage.
-  final String currentStage;
-  /// Primary hosting and application infrastructure.
-  final List<String> infrastructure;
-  /// Highest-sensitivity data categories in scope.
-  final List<String> dataSensitivity;
-  /// Optional target date for readiness, attestation, or authorization.
-  final String? targetDate;
-  /// Whether a named security owner and operating security program exist.
-  final bool hasSecurityProgram;
-  /// Whether reviewed security and privacy policies currently exist.
-  final bool hasPolicies;
-  /// Whether a current documented risk assessment exists.
-  final bool hasRiskAssessment;
-  /// Whether an incident-response plan exists and has been exercised.
-  final bool hasIncidentResponsePlan;
-  /// Whether third-party risk and vendor review processes exist.
-  final bool hasVendorManagement;
-  /// Optional additional scoping details; secrets and regulated records must not be submitted.
-  final String? notes;
-  /// Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis.
-  final String? contextKey;
-  /// Questionnaire schema version; only version 1 is accepted.
-  final int answersVersion;
-
-  factory QuoteRequest.fromJson(Map<String, Object?> json) => QuoteRequest(
-    organizationName: json["organizationName"] as String,
-    contactName: json["contactName"] as String,
-    contactEmail: json["contactEmail"] as String,
-    website: json["website"] == null ? null : json["website"] as String,
-    employeeCount: json["employeeCount"] as int,
-    annualRevenueBand: json["annualRevenueBand"] == null ? null : json["annualRevenueBand"] as String,
-    frameworks: (json["frameworks"] as List).cast<String>(),
-    currentStage: json["currentStage"] as String,
-    infrastructure: (json["infrastructure"] as List).cast<String>(),
-    dataSensitivity: (json["dataSensitivity"] as List).cast<String>(),
-    targetDate: json["targetDate"] == null ? null : json["targetDate"] as String,
-    hasSecurityProgram: json["hasSecurityProgram"] as bool,
-    hasPolicies: json["hasPolicies"] as bool,
-    hasRiskAssessment: json["hasRiskAssessment"] as bool,
-    hasIncidentResponsePlan: json["hasIncidentResponsePlan"] as bool,
-    hasVendorManagement: json["hasVendorManagement"] as bool,
-    notes: json["notes"] == null ? null : json["notes"] as String,
-    contextKey: json["contextKey"] == null ? null : json["contextKey"] as String,
-    answersVersion: json["answersVersion"] as int,
-  );
-
-  Map<String, Object?> toJson() => {
-    "organizationName": organizationName,
-    "contactName": contactName,
-    "contactEmail": contactEmail,
-    if (website != null) "website": website,
-    "employeeCount": employeeCount,
-    if (annualRevenueBand != null) "annualRevenueBand": annualRevenueBand,
-    "frameworks": frameworks,
-    "currentStage": currentStage,
-    "infrastructure": infrastructure,
-    "dataSensitivity": dataSensitivity,
-    if (targetDate != null) "targetDate": targetDate,
-    "hasSecurityProgram": hasSecurityProgram,
-    "hasPolicies": hasPolicies,
-    "hasRiskAssessment": hasRiskAssessment,
-    "hasIncidentResponsePlan": hasIncidentResponsePlan,
-    "hasVendorManagement": hasVendorManagement,
-    if (notes != null) "notes": notes,
-    if (contextKey != null) "contextKey": contextKey,
-    "answersVersion": answersVersion,
-  };
-}
-
-/// Accepted response from POST /api/v1/quotes.
-final class QuoteSubmissionResponse {
-  const QuoteSubmissionResponse({required this.quoteId, required this.status, required this.streamUrl, required this.createdAt});
-
-  /// Server-generated quote identifier.
-  final String quoteId;
-  /// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
-  final String status;
-  /// Authenticated WebSocket URL or relative path for quote progress.
-  final String streamUrl;
-  /// RFC 3339 creation timestamp.
-  final String createdAt;
-
-  factory QuoteSubmissionResponse.fromJson(Map<String, Object?> json) => QuoteSubmissionResponse(
-    quoteId: json["quoteId"] as String,
-    status: json["status"] as String,
-    streamUrl: json["streamUrl"] as String,
-    createdAt: json["createdAt"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "quoteId": quoteId,
-    "status": status,
-    "streamUrl": streamUrl,
-    "createdAt": createdAt,
-  };
-}
-
-/// Structured Gemini-assisted estimate persisted after server-side validation.
-final class QuoteEstimate {
-  const QuoteEstimate({required this.quoteId, required this.status, required this.currency, required this.lowerBoundCents, required this.upperBoundCents, required this.durationWeeksLow, required this.durationWeeksHigh, required this.confidence, required this.summary, required this.assumptions, required this.gaps, required this.nextSteps, required this.frameworks, required this.model, required this.contextVersion, required this.createdAt});
-
-  /// Quote identifier.
-  final String quoteId;
-  /// Terminal estimate status.
-  final String status;
-  /// ISO 4217 currency code, initially USD.
-  final String currency;
-  /// Inclusive lower estimate bound in minor currency units.
-  final int lowerBoundCents;
-  /// Inclusive upper estimate bound in minor currency units.
-  final int upperBoundCents;
-  /// Optimistic delivery duration in weeks.
-  final int durationWeeksLow;
-  /// Conservative delivery duration in weeks.
-  final int durationWeeksHigh;
-  /// Confidence after context and questionnaire completeness checks.
-  final String confidence;
-  /// Customer-facing estimate summary.
-  final String summary;
-  /// Material assumptions used to construct the range.
-  final List<String> assumptions;
-  /// Likely readiness gaps that affect cost or schedule.
-  final List<String> gaps;
-  /// Recommended next actions in priority order.
-  final List<String> nextSteps;
-  /// Frameworks included in this estimate.
-  final List<String> frameworks;
-  /// Configured Gemini model identifier used for analysis.
-  final String model;
-  /// Immutable combined-context version or digest.
-  final String contextVersion;
-  /// RFC 3339 estimate timestamp.
-  final String createdAt;
-
-  factory QuoteEstimate.fromJson(Map<String, Object?> json) => QuoteEstimate(
-    quoteId: json["quoteId"] as String,
-    status: json["status"] as String,
-    currency: json["currency"] as String,
-    lowerBoundCents: json["lowerBoundCents"] as int,
-    upperBoundCents: json["upperBoundCents"] as int,
-    durationWeeksLow: json["durationWeeksLow"] as int,
-    durationWeeksHigh: json["durationWeeksHigh"] as int,
-    confidence: json["confidence"] as String,
-    summary: json["summary"] as String,
-    assumptions: (json["assumptions"] as List).cast<String>(),
-    gaps: (json["gaps"] as List).cast<String>(),
-    nextSteps: (json["nextSteps"] as List).cast<String>(),
-    frameworks: (json["frameworks"] as List).cast<String>(),
-    model: json["model"] as String,
-    contextVersion: json["contextVersion"] as String,
-    createdAt: json["createdAt"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "quoteId": quoteId,
-    "status": status,
-    "currency": currency,
-    "lowerBoundCents": lowerBoundCents,
-    "upperBoundCents": upperBoundCents,
-    "durationWeeksLow": durationWeeksLow,
-    "durationWeeksHigh": durationWeeksHigh,
-    "confidence": confidence,
-    "summary": summary,
-    "assumptions": assumptions,
-    "gaps": gaps,
-    "nextSteps": nextSteps,
-    "frameworks": frameworks,
-    "model": model,
-    "contextVersion": contextVersion,
-    "createdAt": createdAt,
-  };
-}
-
-/// Authenticated WebSocket progress message for one quote.
-final class QuoteStatusEvent {
-  const QuoteStatusEvent({required this.quoteId, required this.sequence, required this.stage, required this.message, required this.terminal, this.estimate, required this.occurredAt, this.problem});
-
-  /// Quote identifier.
-  final String quoteId;
-  /// Monotonic decimal-string event sequence.
-  final String sequence;
-  /// Bounded processing stage. (one of: queued, loading_context, analyzing, validating, ready, failed)
-  final String stage;
-  /// Human-readable progress summary without sensitive prompt content.
-  final String message;
-  /// True when no later state is expected.
-  final bool terminal;
-  /// Present only for a successful ready event.
-  final QuoteEstimate? estimate;
-  /// RFC 3339 timestamp for the persisted event.
-  final String occurredAt;
-  /// Present only when the event reports a safe public failure.
-  final QuoteProblem? problem;
-
-  factory QuoteStatusEvent.fromJson(Map<String, Object?> json) => QuoteStatusEvent(
-    quoteId: json["quoteId"] as String,
-    sequence: json["sequence"] as String,
-    stage: json["stage"] as String,
-    message: json["message"] as String,
-    terminal: json["terminal"] as bool,
-    estimate: json["estimate"] == null ? null : QuoteEstimate.fromJson((json["estimate"] as Map).cast<String, Object?>()),
-    occurredAt: json["occurredAt"] as String,
-    problem: json["problem"] == null ? null : QuoteProblem.fromJson((json["problem"] as Map).cast<String, Object?>()),
-  );
-
-  Map<String, Object?> toJson() => {
-    "quoteId": quoteId,
-    "sequence": sequence,
-    "stage": stage,
-    "message": message,
-    "terminal": terminal,
-    if (estimate != null) "estimate": estimate?.toJson(),
-    "occurredAt": occurredAt,
-    if (problem != null) "problem": problem?.toJson(),
-  };
-}
-
-/// Bounded public error payload for quote endpoints.
-final class QuoteProblem {
-  const QuoteProblem({required this.code, required this.message, required this.requestId});
-
-  /// Stable machine-readable error code.
-  final String code;
-  /// Safe human-readable error detail.
-  final String message;
-  /// Request correlation identifier.
-  final String requestId;
-
-  factory QuoteProblem.fromJson(Map<String, Object?> json) => QuoteProblem(
-    code: json["code"] as String,
-    message: json["message"] as String,
-    requestId: json["requestId"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "code": code,
-    "message": message,
-    "requestId": requestId,
-  };
-}
-
-/// Owner-scoped list item for a compliance quote.
-final class QuoteSummary {
-  const QuoteSummary({required this.quoteId, required this.status, required this.organizationName, required this.frameworks, required this.createdAt, required this.updatedAt, this.estimate});
-
-  /// Server-generated quote identifier.
-  final String quoteId;
-  /// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
-  final String status;
-  /// Organization name from the accepted request.
-  final String organizationName;
-  /// Frameworks included in the request.
-  final List<String> frameworks;
-  /// RFC 3339 creation timestamp.
-  final String createdAt;
-  /// RFC 3339 last-status timestamp.
-  final String updatedAt;
-  /// Present only when the quote is ready.
-  final QuoteEstimate? estimate;
-
-  factory QuoteSummary.fromJson(Map<String, Object?> json) => QuoteSummary(
-    quoteId: json["quoteId"] as String,
-    status: json["status"] as String,
-    organizationName: json["organizationName"] as String,
-    frameworks: (json["frameworks"] as List).cast<String>(),
-    createdAt: json["createdAt"] as String,
-    updatedAt: json["updatedAt"] as String,
-    estimate: json["estimate"] == null ? null : QuoteEstimate.fromJson((json["estimate"] as Map).cast<String, Object?>()),
-  );
-
-  Map<String, Object?> toJson() => {
-    "quoteId": quoteId,
-    "status": status,
-    "organizationName": organizationName,
-    "frameworks": frameworks,
-    "createdAt": createdAt,
-    "updatedAt": updatedAt,
-    if (estimate != null) "estimate": estimate?.toJson(),
-  };
-}
-
 /// Owner-scoped authoritative REST representation of one quote.
 final class QuoteDetail {
   const QuoteDetail({required this.quoteId, required this.status, required this.request, required this.eventsUrl, required this.createdAt, required this.updatedAt, this.estimate, this.problem});
@@ -742,6 +442,82 @@ final class QuoteDetail {
   };
 }
 
+/// Structured Gemini-assisted estimate persisted after server-side validation.
+final class QuoteEstimate {
+  const QuoteEstimate({required this.assumptions, required this.confidence, required this.contextVersion, required this.createdAt, required this.currency, required this.durationWeeksHigh, required this.durationWeeksLow, required this.frameworks, required this.gaps, required this.lowerBoundCents, required this.model, required this.nextSteps, required this.quoteId, required this.status, required this.summary, required this.upperBoundCents});
+
+  /// Material assumptions used to construct the range.
+  final List<String> assumptions;
+  /// Confidence after context and questionnaire completeness checks.
+  final String confidence;
+  /// Immutable combined-context version or digest.
+  final String contextVersion;
+  /// RFC 3339 estimate timestamp.
+  final String createdAt;
+  /// ISO 4217 currency code, initially USD.
+  final String currency;
+  /// Conservative delivery duration in weeks.
+  final int durationWeeksHigh;
+  /// Optimistic delivery duration in weeks.
+  final int durationWeeksLow;
+  /// Frameworks included in this estimate.
+  final List<String> frameworks;
+  /// Likely readiness gaps that affect cost or schedule.
+  final List<String> gaps;
+  /// Inclusive lower estimate bound in minor currency units.
+  final int lowerBoundCents;
+  /// Configured Gemini model identifier used for analysis.
+  final String model;
+  /// Recommended next actions in priority order.
+  final List<String> nextSteps;
+  /// Quote identifier.
+  final String quoteId;
+  /// Terminal estimate status.
+  final String status;
+  /// Customer-facing estimate summary.
+  final String summary;
+  /// Inclusive upper estimate bound in minor currency units.
+  final int upperBoundCents;
+
+  factory QuoteEstimate.fromJson(Map<String, Object?> json) => QuoteEstimate(
+    assumptions: (json["assumptions"] as List).cast<String>(),
+    confidence: json["confidence"] as String,
+    contextVersion: json["contextVersion"] as String,
+    createdAt: json["createdAt"] as String,
+    currency: json["currency"] as String,
+    durationWeeksHigh: json["durationWeeksHigh"] as int,
+    durationWeeksLow: json["durationWeeksLow"] as int,
+    frameworks: (json["frameworks"] as List).cast<String>(),
+    gaps: (json["gaps"] as List).cast<String>(),
+    lowerBoundCents: json["lowerBoundCents"] as int,
+    model: json["model"] as String,
+    nextSteps: (json["nextSteps"] as List).cast<String>(),
+    quoteId: json["quoteId"] as String,
+    status: json["status"] as String,
+    summary: json["summary"] as String,
+    upperBoundCents: json["upperBoundCents"] as int,
+  );
+
+  Map<String, Object?> toJson() => {
+    "assumptions": assumptions,
+    "confidence": confidence,
+    "contextVersion": contextVersion,
+    "createdAt": createdAt,
+    "currency": currency,
+    "durationWeeksHigh": durationWeeksHigh,
+    "durationWeeksLow": durationWeeksLow,
+    "frameworks": frameworks,
+    "gaps": gaps,
+    "lowerBoundCents": lowerBoundCents,
+    "model": model,
+    "nextSteps": nextSteps,
+    "quoteId": quoteId,
+    "status": status,
+    "summary": summary,
+    "upperBoundCents": upperBoundCents,
+  };
+}
+
 /// Bounded owner-scoped list query for GET /api/v1/quotes.
 final class QuoteListQuery {
   const QuoteListQuery({this.cursor, this.limit});
@@ -782,6 +558,118 @@ final class QuoteListResponse {
   };
 }
 
+/// Bounded public error payload for quote endpoints.
+final class QuoteProblem {
+  const QuoteProblem({required this.code, required this.message, required this.requestId});
+
+  /// Stable machine-readable error code.
+  final String code;
+  /// Safe human-readable error detail.
+  final String message;
+  /// Request correlation identifier.
+  final String requestId;
+
+  factory QuoteProblem.fromJson(Map<String, Object?> json) => QuoteProblem(
+    code: json["code"] as String,
+    message: json["message"] as String,
+    requestId: json["requestId"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "code": code,
+    "message": message,
+    "requestId": requestId,
+  };
+}
+
+/// Authenticated request to generate a bounded compliance-services quote.
+final class QuoteRequest {
+  const QuoteRequest({this.annualRevenueBand, required this.answersVersion, required this.contactEmail, required this.contactName, this.contextKey, required this.currentStage, required this.dataSensitivity, required this.employeeCount, required this.frameworks, required this.hasIncidentResponsePlan, required this.hasPolicies, required this.hasRiskAssessment, required this.hasSecurityProgram, required this.hasVendorManagement, required this.infrastructure, this.notes, required this.organizationName, this.targetDate, this.website});
+
+  /// Optional bounded annual-revenue band used only for scoping.
+  final String? annualRevenueBand;
+  /// Questionnaire schema version; only version 1 is accepted.
+  final int answersVersion;
+  /// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
+  final String contactEmail;
+  /// Primary contact for the quote.
+  final String contactName;
+  /// Optional allow-listed canonical_context key selected by the server; defaults to quote-analysis.
+  final String? contextKey;
+  /// Current compliance-program stage.
+  final String currentStage;
+  /// Highest-sensitivity data categories in scope.
+  final List<String> dataSensitivity;
+  /// Approximate number of employees and long-term contractors.
+  final int employeeCount;
+  /// Compliance frameworks requested for the engagement.
+  final List<String> frameworks;
+  /// Whether an incident-response plan exists and has been exercised.
+  final bool hasIncidentResponsePlan;
+  /// Whether reviewed security and privacy policies currently exist.
+  final bool hasPolicies;
+  /// Whether a current documented risk assessment exists.
+  final bool hasRiskAssessment;
+  /// Whether a named security owner and operating security program exist.
+  final bool hasSecurityProgram;
+  /// Whether third-party risk and vendor review processes exist.
+  final bool hasVendorManagement;
+  /// Primary hosting and application infrastructure.
+  final List<String> infrastructure;
+  /// Optional additional scoping details; secrets and regulated records must not be submitted.
+  final String? notes;
+  /// Legal or commonly used organization name.
+  final String organizationName;
+  /// Optional target date for readiness, attestation, or authorization.
+  final String? targetDate;
+  /// Optional public organization website.
+  final String? website;
+
+  factory QuoteRequest.fromJson(Map<String, Object?> json) => QuoteRequest(
+    annualRevenueBand: json["annualRevenueBand"] == null ? null : json["annualRevenueBand"] as String,
+    answersVersion: json["answersVersion"] as int,
+    contactEmail: json["contactEmail"] as String,
+    contactName: json["contactName"] as String,
+    contextKey: json["contextKey"] == null ? null : json["contextKey"] as String,
+    currentStage: json["currentStage"] as String,
+    dataSensitivity: (json["dataSensitivity"] as List).cast<String>(),
+    employeeCount: json["employeeCount"] as int,
+    frameworks: (json["frameworks"] as List).cast<String>(),
+    hasIncidentResponsePlan: json["hasIncidentResponsePlan"] as bool,
+    hasPolicies: json["hasPolicies"] as bool,
+    hasRiskAssessment: json["hasRiskAssessment"] as bool,
+    hasSecurityProgram: json["hasSecurityProgram"] as bool,
+    hasVendorManagement: json["hasVendorManagement"] as bool,
+    infrastructure: (json["infrastructure"] as List).cast<String>(),
+    notes: json["notes"] == null ? null : json["notes"] as String,
+    organizationName: json["organizationName"] as String,
+    targetDate: json["targetDate"] == null ? null : json["targetDate"] as String,
+    website: json["website"] == null ? null : json["website"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    if (annualRevenueBand != null) "annualRevenueBand": annualRevenueBand,
+    "answersVersion": answersVersion,
+    "contactEmail": contactEmail,
+    "contactName": contactName,
+    if (contextKey != null) "contextKey": contextKey,
+    "currentStage": currentStage,
+    "dataSensitivity": dataSensitivity,
+    "employeeCount": employeeCount,
+    "frameworks": frameworks,
+    "hasIncidentResponsePlan": hasIncidentResponsePlan,
+    "hasPolicies": hasPolicies,
+    "hasRiskAssessment": hasRiskAssessment,
+    "hasSecurityProgram": hasSecurityProgram,
+    "hasVendorManagement": hasVendorManagement,
+    "infrastructure": infrastructure,
+    if (notes != null) "notes": notes,
+    "organizationName": organizationName,
+    if (targetDate != null) "targetDate": targetDate,
+    if (website != null) "website": website,
+  };
+}
+
 /// Accepted response after retrying a failed quote.
 final class QuoteRetryResponse {
   const QuoteRetryResponse({required this.quoteId, required this.status, required this.streamUrl, required this.updatedAt});
@@ -807,5 +695,117 @@ final class QuoteRetryResponse {
     "status": status,
     "streamUrl": streamUrl,
     "updatedAt": updatedAt,
+  };
+}
+
+/// Authenticated WebSocket progress message for one quote.
+final class QuoteStatusEvent {
+  const QuoteStatusEvent({this.estimate, required this.message, required this.occurredAt, this.problem, required this.quoteId, required this.sequence, required this.stage, required this.terminal});
+
+  /// Present only for a successful ready event.
+  final QuoteEstimate? estimate;
+  /// Human-readable progress summary without sensitive prompt content.
+  final String message;
+  /// RFC 3339 timestamp for the persisted event.
+  final String occurredAt;
+  /// Present only when the event reports a safe public failure.
+  final QuoteProblem? problem;
+  /// Quote identifier.
+  final String quoteId;
+  /// Monotonic decimal-string event sequence.
+  final String sequence;
+  /// Bounded processing stage. (one of: queued, loading_context, analyzing, validating, ready, failed)
+  final String stage;
+  /// True when no later state is expected.
+  final bool terminal;
+
+  factory QuoteStatusEvent.fromJson(Map<String, Object?> json) => QuoteStatusEvent(
+    estimate: json["estimate"] == null ? null : QuoteEstimate.fromJson((json["estimate"] as Map).cast<String, Object?>()),
+    message: json["message"] as String,
+    occurredAt: json["occurredAt"] as String,
+    problem: json["problem"] == null ? null : QuoteProblem.fromJson((json["problem"] as Map).cast<String, Object?>()),
+    quoteId: json["quoteId"] as String,
+    sequence: json["sequence"] as String,
+    stage: json["stage"] as String,
+    terminal: json["terminal"] as bool,
+  );
+
+  Map<String, Object?> toJson() => {
+    if (estimate != null) "estimate": estimate?.toJson(),
+    "message": message,
+    "occurredAt": occurredAt,
+    if (problem != null) "problem": problem?.toJson(),
+    "quoteId": quoteId,
+    "sequence": sequence,
+    "stage": stage,
+    "terminal": terminal,
+  };
+}
+
+/// Accepted response from POST /api/v1/quotes.
+final class QuoteSubmissionResponse {
+  const QuoteSubmissionResponse({required this.createdAt, required this.quoteId, required this.status, required this.streamUrl});
+
+  /// RFC 3339 creation timestamp.
+  final String createdAt;
+  /// Server-generated quote identifier.
+  final String quoteId;
+  /// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
+  final String status;
+  /// Authenticated WebSocket URL or relative path for quote progress.
+  final String streamUrl;
+
+  factory QuoteSubmissionResponse.fromJson(Map<String, Object?> json) => QuoteSubmissionResponse(
+    createdAt: json["createdAt"] as String,
+    quoteId: json["quoteId"] as String,
+    status: json["status"] as String,
+    streamUrl: json["streamUrl"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "createdAt": createdAt,
+    "quoteId": quoteId,
+    "status": status,
+    "streamUrl": streamUrl,
+  };
+}
+
+/// Owner-scoped list item for a compliance quote.
+final class QuoteSummary {
+  const QuoteSummary({required this.quoteId, required this.status, required this.organizationName, required this.frameworks, required this.createdAt, required this.updatedAt, this.estimate});
+
+  /// Server-generated quote identifier.
+  final String quoteId;
+  /// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
+  final String status;
+  /// Organization name from the accepted request.
+  final String organizationName;
+  /// Frameworks included in the request.
+  final List<String> frameworks;
+  /// RFC 3339 creation timestamp.
+  final String createdAt;
+  /// RFC 3339 last-status timestamp.
+  final String updatedAt;
+  /// Present only when the quote is ready.
+  final QuoteEstimate? estimate;
+
+  factory QuoteSummary.fromJson(Map<String, Object?> json) => QuoteSummary(
+    quoteId: json["quoteId"] as String,
+    status: json["status"] as String,
+    organizationName: json["organizationName"] as String,
+    frameworks: (json["frameworks"] as List).cast<String>(),
+    createdAt: json["createdAt"] as String,
+    updatedAt: json["updatedAt"] as String,
+    estimate: json["estimate"] == null ? null : QuoteEstimate.fromJson((json["estimate"] as Map).cast<String, Object?>()),
+  );
+
+  Map<String, Object?> toJson() => {
+    "quoteId": quoteId,
+    "status": status,
+    "organizationName": organizationName,
+    "frameworks": frameworks,
+    "createdAt": createdAt,
+    "updatedAt": updatedAt,
+    if (estimate != null) "estimate": estimate?.toJson(),
   };
 }
