@@ -21,6 +21,66 @@ const nonNull = (s) => {
 };
 const refOf = (s) => (s && s.$ref ? s.$ref.split("/").pop() : null);
 
+// Produces the shortest string matching a deliberately narrow subset of regex:
+// anchors, literal alternation groups, character classes with ranges, and the
+// {n}/{n,m}/*/+/? quantifiers. Anything outside that throws — a fixture suite
+// that silently emits schema-invalid data is worse than one that stops.
+export function satisfyPattern(pattern, fieldName) {
+  const body = pattern.replace(/^\^/, "").replace(/\$$/, "");
+  const unsupported = (why) =>
+    new Error(`fixtures: cannot satisfy pattern ${pattern} on "${fieldName}" (${why})`);
+
+  const firstOfClass = (contents) => {
+    // Ranges win over the literal `-` that may trail a class like [a-z0-9._-].
+    const range = /([^\\])-([^\]])/.exec(contents);
+    if (range) return range[1];
+    const literal = contents.replace(/^\^/, "")[0];
+    if (!literal) throw unsupported("empty character class");
+    return literal;
+  };
+
+  const readQuantifier = (rest) => {
+    const exact = /^\{(\d+)(?:,(\d+)?)?\}/.exec(rest);
+    if (exact) return { min: Number(exact[1]), width: exact[0].length };
+    if (rest.startsWith("*") || rest.startsWith("?")) return { min: 0, width: 1 };
+    if (rest.startsWith("+")) return { min: 1, width: 1 };
+    return { min: 1, width: 0 };
+  };
+
+  let out = "";
+  let i = 0;
+  while (i < body.length) {
+    const ch = body[i];
+    if (ch === "(") {
+      const close = body.indexOf(")", i);
+      if (close === -1) throw unsupported("unbalanced group");
+      const first = body.slice(i + 1, close).split("|")[0];
+      if (/[[\](){}*+?\\]/.test(first)) throw unsupported("non-literal alternation branch");
+      out += first;
+      i = close + 1;
+      const q = readQuantifier(body.slice(i));
+      i += q.width;
+    } else if (ch === "[") {
+      const close = body.indexOf("]", i + 1);
+      if (close === -1) throw unsupported("unbalanced character class");
+      const unit = firstOfClass(body.slice(i + 1, close));
+      i = close + 1;
+      const q = readQuantifier(body.slice(i));
+      i += q.width;
+      out += unit.repeat(q.min);
+    } else if (/[A-Za-z0-9_.:/-]/.test(ch)) {
+      i += 1;
+      const q = readQuantifier(body.slice(i));
+      i += q.width;
+      out += ch.repeat(q.min);
+    } else {
+      throw unsupported(`unsupported token "${ch}"`);
+    }
+  }
+  if (!new RegExp(pattern).test(out)) throw unsupported(`produced "${out}", which does not match`);
+  return out;
+}
+
 function stringValue(schema, fieldName) {
   if (Array.isArray(schema.enum) && schema.enum.length) return schema.enum[0];
   switch (schema.format) {
