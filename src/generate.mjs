@@ -184,6 +184,18 @@ function goType(s) {
     default: return "map[string]any";
   }
 }
+function dartType(s) {
+  s = nonNullSchema(s);
+  const r = refName(s); if (r) return r;
+  switch (s.type) {
+    case "string": return "String";
+    case "integer": return "int";
+    case "number": return "double";
+    case "boolean": return "bool";
+    case "array": return `List<${dartType(s.items || {})}>`;
+    default: return "Map<String, Object?>";
+  }
+}
 
 // --- emitters: type[] -> { relpath: content } --------------------------------
 
