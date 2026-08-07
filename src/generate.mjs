@@ -429,7 +429,10 @@ function emitDart(types) {
 
     if (t.description) out.push(`/// ${cLine(t.description)}`);
     out.push(`final class ${t.name} {`);
-    out.push(`  const ${t.name}({${t.props.map((p) => `${p.required && !isNullable(p.schema) ? "required " : ""}this.${dartIdent(p.name)}`).join(", ")}});`);
+    // `required` tracks JSON Schema `required`, not nullability: a required
+    // nullable field must still be passed explicitly (as null), matching the
+    // non-omittable key TypeScript, Go, and serde all produce for it.
+    out.push(`  const ${t.name}({${t.props.map((p) => `${p.required ? "required " : ""}this.${dartIdent(p.name)}`).join(", ")}});`);
     out.push("");
 
     for (const p of t.props) {
