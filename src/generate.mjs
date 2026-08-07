@@ -412,7 +412,13 @@ function emitDart(types) {
   for (const [enumName, values] of collectEnums(types)) {
     out.push(`/// Permitted wire values for the fields typed as \`${enumName}\`.`);
     out.push(`abstract final class ${enumName} {`);
-    for (const v of values) out.push(`  static const String ${dartConstName(v)} = ${JSON.stringify(v)};`);
+    const constNames = new Map();
+    for (const v of values) {
+      const c = dartConstName(v);
+      if (constNames.has(c)) fail(`${enumName}: values "${v}" and "${constNames.get(c)}" both map to Dart constant "${c}"`);
+      constNames.set(c, v);
+      out.push(`  static const String ${c} = ${JSON.stringify(v)};`);
+    }
     out.push(`  static const List<String> values = <String>[${values.map((v) => JSON.stringify(v)).join(", ")}];`);
     out.push("}", "");
   }
