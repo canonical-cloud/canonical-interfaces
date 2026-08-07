@@ -50,10 +50,10 @@ void main(List<String> args) {
 `;
 }
 
-export function runDart(dir, types, fixtures) {
+export function runDart(dir, types, fixtures, generatedDartFile) {
   const driver = path.join(dir, "dart_roundtrip.dart");
   const fixturePath = path.join(dir, "fixtures.json");
-  fs.writeFileSync(driver, dartDriverSource(types));
+  fs.writeFileSync(driver, dartDriverSource(types, generatedDartFile));
   fs.writeFileSync(fixturePath, JSON.stringify(fixtures));
   const stdout = execFileSync("dart", ["run", driver, fixturePath], {
     encoding: "utf8",
