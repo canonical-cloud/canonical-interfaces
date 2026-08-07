@@ -187,8 +187,8 @@ test('generated types carry through to every language', () => {
   assert.match(files['go/interfaces.go'], /package canonicalinterfaces/);
   assert.match(files['go/interfaces.go'], /type QuoteProblem struct/);
   assert.match(files['go/interfaces.go'], /type QuoteListResponse struct/);
-  assert.match(files['dart/lib/quote_v1.dart'], /final class QuoteRequest/);
-  assert.match(files['dart/lib/quote_v1.dart'], /final class QuoteDetail/);
+  assert.match(files['dart/lib/canonical_interfaces.dart'], /final class QuoteRequest/);
+  assert.match(files['dart/lib/canonical_interfaces.dart'], /final class QuoteDetail/);
 });
 
 test('string enums surface as typed unions/literals per language', () => {
@@ -229,7 +229,7 @@ test('optional fields are nullable/omittable per language', () => {
   assert.match(files['rust/src/lib.rs'], /pub context_key: Option<String>,/);
   assert.match(files['go/interfaces.go'], /json:"target_report_date,omitempty"/);
   assert.match(files['go/interfaces.go'], /json:"contextKey,omitempty"/);
-  assert.match(files['dart/lib/quote_v1.dart'], /final String\? contextKey;/);
+  assert.match(files['dart/lib/canonical_interfaces.dart'], /final String\? contextKey;/);
 });
 
 test('generated files on disk are up to date (run: npm run generate)', () => {

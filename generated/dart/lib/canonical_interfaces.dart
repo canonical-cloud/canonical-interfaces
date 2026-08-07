@@ -184,7 +184,7 @@ final class DraftNoteKey {
 
 /// One idempotent compare-and-swap operation in a draft-note mutation batch.
 final class MutationOperation {
-  const MutationOperation({required this.mutationId, required this.key, required this.action, this.baseVersion, required this.schemaVersion, this.value});
+  const MutationOperation({required this.mutationId, required this.key, required this.action, required this.baseVersion, required this.schemaVersion, this.value});
 
   /// UUID idempotency key, unique per client and logical mutation.
   final String mutationId;
