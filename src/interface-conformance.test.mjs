@@ -28,6 +28,7 @@ const types = loadTypes();
 const fixtures = buildFixtures(types);
 const byName = new Map(types.map((t) => [t.name, t]));
 
+const DART_LIB = join(root, 'generated', 'dart', 'lib', 'canonical_interfaces.dart');
 const workdir = () => fs.mkdtempSync(path.join(os.tmpdir(), 'canonical-conformance-'));
 
 test('fixtures cover every declared type in both variants', () => {
@@ -52,7 +53,7 @@ for (const runtime of ['dart', 'rust']) {
   test(`${runtime} round-trips every fixture without loss`, { skip: hasTool(bin) ? false : `${bin} not installed` }, () => {
     const dir = workdir();
     const results = runtime === 'dart'
-      ? runDart(dir, types, fixtures)
+      ? runDart(dir, types, fixtures, DART_LIB)
       : runRust(dir, types, fixtures, join(root, 'generated', 'rust'));
 
     for (const fixture of fixtures) {
@@ -74,7 +75,7 @@ for (const runtime of ['dart', 'rust']) {
 test('dart and rust agree with each other on every fixture', {
   skip: hasTool('dart') && hasTool('cargo') ? false : 'dart and cargo both required',
 }, () => {
-  const dartOut = runDart(workdir(), types, fixtures);
+  const dartOut = runDart(workdir(), types, fixtures, DART_LIB);
   const rustOut = runRust(workdir(), types, fixtures, join(root, 'generated', 'rust'));
   for (const fixture of fixtures) {
     assert.deepEqual(
