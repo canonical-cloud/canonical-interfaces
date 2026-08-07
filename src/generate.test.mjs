@@ -79,11 +79,50 @@ test('build() emits one file per language', () => {
     'typescript/index.ts',
     'python/canonical_interfaces.py',
     'go/interfaces.go',
+    'dart/lib/canonical_interfaces.dart',
     'dart/lib/quote_v1.dart',
     'dart/pubspec.yaml',
   ]) {
     assert.ok(rel in files, `missing ${rel}`);
   }
+});
+
+test('every language emits every schema type — no partial surfaces', () => {
+  const files = build();
+  const names = loadTypes().map((t) => t.name);
+  for (const name of names) {
+    assert.match(files['rust/src/lib.rs'], new RegExp(`pub struct ${name} \\{`), `rust missing ${name}`);
+    assert.match(files['typescript/index.ts'], new RegExp(`export type ${name} = \\{`), `typescript missing ${name}`);
+    assert.match(files['python/canonical_interfaces.py'], new RegExp(`class ${name}:`), `python missing ${name}`);
+    assert.match(files['go/interfaces.go'], new RegExp(`type ${name} struct`), `go missing ${name}`);
+    assert.match(files['dart/lib/canonical_interfaces.dart'], new RegExp(`final class ${name} \\{`), `dart missing ${name}`);
+  }
+});
+
+test('dart quote_v1.dart is a re-export shim, not a second surface', () => {
+  const files = build();
+  const shim = files['dart/lib/quote_v1.dart'];
+  assert.match(shim, /export 'canonical_interfaces\.dart';/);
+  assert.doesNotMatch(shim, /final class /);
+});
+
+test('dart guards required-nullable fields on both decode and encode', () => {
+  const dart = build()['dart/lib/canonical_interfaces.dart'];
+  // Required by the schema, so the key is never omitted and the ctor arg is
+  // mandatory — but the value is nullable, so decoding must not cast null.
+  assert.match(dart, /required this\.baseVersion/);
+  assert.match(dart, /final String\? baseVersion;/);
+  assert.match(dart, /baseVersion: json\["baseVersion"\] == null \? null : json\["baseVersion"\] as String,/);
+  assert.match(dart, /\n    "baseVersion": baseVersion,/);
+  // Genuinely optional ref field: omitted from the map and null-safe on encode.
+  assert.match(dart, /if \(value != null\) "value": value\?\.toJson\(\),/);
+});
+
+test('dart exposes enum vocabularies as constants', () => {
+  const dart = build()['dart/lib/canonical_interfaces.dart'];
+  assert.match(dart, /abstract final class AuditEngagementFramework \{/);
+  assert.match(dart, /static const String iso27001 = "iso_27001";/);
+  assert.match(dart, /static const List<String> values = <String>\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"\];/);
 });
 
 test('rust and rust-wasm never diverge in data shape (same structs + fields)', () => {
