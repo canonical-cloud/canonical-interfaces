@@ -24,7 +24,6 @@ export function build() {
     throw new Error("generated Rust/WASM manifest already owns the package entrypoint");
   }
   files[wasmManifest] = manifest.replace(generatedLibBlock, packagedLibBlock);
-  Object.assign(files, emitQuoteDart(loadTypes()));
   return files;
 }
 
