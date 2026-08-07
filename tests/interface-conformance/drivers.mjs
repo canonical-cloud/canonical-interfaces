@@ -12,6 +12,7 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 export const hasTool = (bin) => {
   try { execFileSync("sh", ["-c", `command -v ${bin}`], { stdio: "pipe" }); return true; }
