@@ -42,6 +42,14 @@ const RUST_KEYWORDS = new Set([
   "in","let","loop","match","mod","move","mut","pub","ref","return","self","static","struct","super",
   "trait","true","type","unsafe","use","where","while","async","await","box","union",
 ]);
+// Dart reserved words that can never be used as a plain identifier. Contextual
+// and built-in identifiers (`await`, `dynamic`, `late`, …) are legal as field
+// names, so they are deliberately not listed here.
+const DART_KEYWORDS = new Set([
+  "assert","break","case","catch","class","const","continue","default","do","else","enum","extends",
+  "false","final","finally","for","if","in","is","new","null","rethrow","return","super","switch",
+  "this","throw","true","try","var","void","while","with",
+]);
 const FIELD_RE = /^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[a-z][A-Za-z0-9]*)$/;
 
 const refName = (s) => (s && s.$ref ? s.$ref.split("/").pop() : null);
