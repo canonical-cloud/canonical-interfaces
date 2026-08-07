@@ -31,13 +31,9 @@ function stringValue(schema, fieldName) {
     case "uri": case "uri-reference": return "https://example.test/conformance";
     default: break;
   }
-  // A `pattern` we cannot satisfy generically would produce a value the schema
-  // rejects; surface that rather than emitting something quietly invalid.
-  if (schema.pattern) {
-    const literal = /^\^?([A-Za-z0-9:_\-./]+)\$?$/.exec(schema.pattern);
-    if (literal) return literal[1];
-    throw new Error(`fixtures: no generic value for pattern ${schema.pattern} on "${fieldName}"`);
-  }
+  // A `pattern` we cannot satisfy would produce a value the schema rejects, so
+  // satisfyPattern throws rather than emitting something quietly invalid.
+  if (schema.pattern) return satisfyPattern(schema.pattern, fieldName);
   const base = `${fieldName}-value`;
   const max = typeof schema.maxLength === "number" ? schema.maxLength : base.length;
   const min = typeof schema.minLength === "number" ? schema.minLength : 0;
