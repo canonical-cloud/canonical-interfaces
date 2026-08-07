@@ -32,6 +32,7 @@ const fail = (msg) => { throw new GenError(msg); };
 const oneLine = (s) => String(s || "").replace(/\s+/g, " ").trim();
 const pascal = (s) => s.split(/[_\-\s]+/).map((w) => (w ? w[0].toUpperCase() + w.slice(1) : "")).join("");
 const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
+const camel = (s) => s.replace(/[_\-]([a-z0-9])/g, (_, c) => c.toUpperCase());
 // Comment-escapers so a description can never break the generated file.
 const cLine = (s) => oneLine(s);                                  // // and /// and #
 const cBlock = (s) => oneLine(s).replace(/\*\//g, "*\\/");        // /** ... */
