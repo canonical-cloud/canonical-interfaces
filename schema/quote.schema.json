@@ -517,7 +517,7 @@
             "ready",
             "failed"
           ],
-          "pattern": "^(queued|loading_context|analyzing|validating|ready|failed)$",
+          "pattern": null,
           "type": "string"
         },
         "terminal": {
@@ -557,7 +557,7 @@
             "ready",
             "failed"
           ],
-          "pattern": "^(queued|analyzing|ready|failed)$",
+          "pattern": null,
           "type": "string"
         },
         "streamUrl": {
