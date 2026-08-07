@@ -517,7 +517,6 @@
             "ready",
             "failed"
           ],
-          "pattern": null,
           "type": "string"
         },
         "terminal": {
@@ -557,7 +556,6 @@
             "ready",
             "failed"
           ],
-          "pattern": null,
           "type": "string"
         },
         "streamUrl": {

@@ -105,6 +105,16 @@ function loadTypes() {
             fail(`${file}:${name}.${pname}: only one scalar type plus null is supported`);
           }
         }
+        // A null-valued keyword is never valid JSON Schema, and it reads as
+        // "absent" to a `!== undefined` guard while still being present — so a
+        // consumer builds `new RegExp(null)` and matches against /null/. Two of
+        // these arrived from a merge that reconciled a `pattern` on one side
+        // against its absence on the other; fail loudly instead.
+        for (const [keyword, value] of Object.entries(pschema)) {
+          if (value === null) {
+            fail(`${file}:${name}.${pname}: keyword "${keyword}" is null; omit the keyword instead`);
+          }
+        }
         return { name: pname, schema: pschema, required: required.has(pname), description: pschema.description || "" };
       });
       types.push({ name, description: def.description || "", props, source: file });
