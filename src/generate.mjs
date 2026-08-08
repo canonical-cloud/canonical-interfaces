@@ -105,6 +105,17 @@ function loadTypes() {
             fail(`${file}:${name}.${pname}: only one scalar type plus null is supported`);
           }
         }
+        // A null-valued keyword is never valid JSON Schema, and it is worse than
+        // a wrong value: `null !== undefined`, so a consumer's `if (rule.pattern
+        // !== undefined)` guard still fires and builds `new RegExp(null)`, which
+        // silently matches against /null/. src/quote-schema-semantic-merge-guards
+        // catches this in CI; rejecting it here also stops `npm run generate`
+        // from emitting adapters from a schema that is already invalid.
+        for (const [keyword, value] of Object.entries(pschema)) {
+          if (value === null) {
+            fail(`${file}:${name}.${pname}: keyword "${keyword}" is null; omit the keyword instead`);
+          }
+        }
         return { name: pname, schema: pschema, required: required.has(pname), description: pschema.description || "" };
       });
       types.push({ name, description: def.description || "", props, source: file });
