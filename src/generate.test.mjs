@@ -11,34 +11,31 @@ import { build, loadTypes } from './generate-output.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..');
 
-// Compared as a sorted set: the guarantee is which types exist, not the order
-// they happen to sit in within `$defs`. A merge that alphabetized the quote
-// schema previously failed this test without any type being added or removed.
 test('schema declares the expected canonical.cloud types', () => {
-  const names = loadTypes().map((t) => t.name).sort();
+  const names = loadTypes().map((t) => t.name);
   assert.deepEqual(names, [
-    'AuditEngagement',
-    'ChangesQuery',
-    'ChangesResponse',
-    'DraftNoteKey',
-    'DraftNoteValue',
     'HealthStatus',
+    'ServiceInfo',
+    'DraftNoteValue',
+    'DraftNoteKey',
     'MutationOperation',
     'MutationRequest',
-    'MutationResponse',
+    'WireRecord',
     'MutationResult',
-    'QuoteDetail',
+    'MutationResponse',
+    'ChangesQuery',
+    'ChangesResponse',
+    'AuditEngagement',
+    'QuoteRequest',
+    'QuoteSubmissionResponse',
     'QuoteEstimate',
+    'QuoteStatusEvent',
+    'QuoteProblem',
+    'QuoteSummary',
+    'QuoteDetail',
     'QuoteListQuery',
     'QuoteListResponse',
-    'QuoteProblem',
-    'QuoteRequest',
     'QuoteRetryResponse',
-    'QuoteStatusEvent',
-    'QuoteSubmissionResponse',
-    'QuoteSummary',
-    'ServiceInfo',
-    'WireRecord',
   ]);
 });
 

@@ -90,18 +90,6 @@ preserve_failure_evidence() {
   done
 }
 
-preserve_failure_evidence() {
-  if [[ -z "$artifact_dir" ]]; then
-    return
-  fi
-  mkdir -p "$artifact_dir"
-  for evidence in "$dom" "$server_log" "$chrome_log"; do
-    if [[ -f "$evidence" ]]; then
-      cp "$evidence" "$artifact_dir/$(basename "$evidence")"
-    fi
-  done
-}
-
 cleanup() {
   local status=$?
   trap - EXIT

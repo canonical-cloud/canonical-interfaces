@@ -92,6 +92,87 @@ class AuditEngagement:
     target_report_date: Optional[str] = None
 
 @dataclass
+class QuoteRequest:
+    """Authenticated request to generate a bounded compliance-services quote."""
+    organizationName: str
+    contactName: str
+    contactEmail: str
+    employeeCount: int
+    frameworks: List[str]
+    currentStage: str
+    infrastructure: List[str]
+    dataSensitivity: List[str]
+    hasSecurityProgram: bool
+    hasPolicies: bool
+    hasRiskAssessment: bool
+    hasIncidentResponsePlan: bool
+    hasVendorManagement: bool
+    answersVersion: int
+    website: Optional[str] = None
+    annualRevenueBand: Optional[str] = None
+    targetDate: Optional[str] = None
+    notes: Optional[str] = None
+    contextKey: Optional[str] = None
+
+@dataclass
+class QuoteSubmissionResponse:
+    """Accepted response from POST /api/v1/quotes."""
+    quoteId: str
+    status: Literal["queued", "analyzing", "ready", "failed"]
+    streamUrl: str
+    createdAt: str
+
+@dataclass
+class QuoteEstimate:
+    """Structured Gemini-assisted estimate persisted after server-side validation."""
+    quoteId: str
+    status: str
+    currency: str
+    lowerBoundCents: int
+    upperBoundCents: int
+    durationWeeksLow: int
+    durationWeeksHigh: int
+    confidence: str
+    summary: str
+    assumptions: List[str]
+    gaps: List[str]
+    nextSteps: List[str]
+    frameworks: List[str]
+    model: str
+    contextVersion: str
+    createdAt: str
+
+@dataclass
+class QuoteStatusEvent:
+    """Authenticated WebSocket progress message for one quote."""
+    quoteId: str
+    sequence: str
+    stage: Literal["queued", "loading_context", "analyzing", "validating", "ready", "failed"]
+    message: str
+    terminal: bool
+    occurredAt: str
+    estimate: Optional[QuoteEstimate] = None
+    problem: Optional[QuoteProblem] = None
+
+@dataclass
+class QuoteProblem:
+    """Bounded public error payload for quote endpoints."""
+    code: str
+    message: str
+    requestId: str
+
+@dataclass
+class QuoteSummary:
+    """Owner-scoped list item for a compliance quote."""
+    quoteId: str
+    status: Literal["queued", "analyzing", "ready", "failed"]
+    organizationName: str
+    frameworks: List[str]
+    createdAt: str
+    updatedAt: str
+    estimate: Optional[QuoteEstimate] = None
+
+@dataclass
 class QuoteDetail:
     """Owner-scoped authoritative REST representation of one quote."""
     quoteId: str
@@ -102,26 +183,6 @@ class QuoteDetail:
     updatedAt: str
     estimate: Optional[QuoteEstimate] = None
     problem: Optional[QuoteProblem] = None
-
-@dataclass
-class QuoteEstimate:
-    """Structured Gemini-assisted estimate persisted after server-side validation."""
-    assumptions: List[str]
-    confidence: str
-    contextVersion: str
-    createdAt: str
-    currency: str
-    durationWeeksHigh: int
-    durationWeeksLow: int
-    frameworks: List[str]
-    gaps: List[str]
-    lowerBoundCents: int
-    model: str
-    nextSteps: List[str]
-    quoteId: str
-    status: str
-    summary: str
-    upperBoundCents: int
 
 @dataclass
 class QuoteListQuery:
@@ -136,70 +197,9 @@ class QuoteListResponse:
     nextCursor: Optional[str] = None
 
 @dataclass
-class QuoteProblem:
-    """Bounded public error payload for quote endpoints."""
-    code: str
-    message: str
-    requestId: str
-
-@dataclass
-class QuoteRequest:
-    """Authenticated request to generate a bounded compliance-services quote."""
-    answersVersion: int
-    contactEmail: str
-    contactName: str
-    currentStage: str
-    dataSensitivity: List[str]
-    employeeCount: int
-    frameworks: List[str]
-    hasIncidentResponsePlan: bool
-    hasPolicies: bool
-    hasRiskAssessment: bool
-    hasSecurityProgram: bool
-    hasVendorManagement: bool
-    infrastructure: List[str]
-    organizationName: str
-    annualRevenueBand: Optional[str] = None
-    contextKey: Optional[str] = None
-    notes: Optional[str] = None
-    targetDate: Optional[str] = None
-    website: Optional[str] = None
-
-@dataclass
 class QuoteRetryResponse:
     """Accepted response after retrying a failed quote."""
     quoteId: str
     status: Literal["queued"]
     streamUrl: str
     updatedAt: str
-
-@dataclass
-class QuoteStatusEvent:
-    """Authenticated WebSocket progress message for one quote."""
-    message: str
-    occurredAt: str
-    quoteId: str
-    sequence: str
-    stage: Literal["queued", "loading_context", "analyzing", "validating", "ready", "failed"]
-    terminal: bool
-    estimate: Optional[QuoteEstimate] = None
-    problem: Optional[QuoteProblem] = None
-
-@dataclass
-class QuoteSubmissionResponse:
-    """Accepted response from POST /api/v1/quotes."""
-    createdAt: str
-    quoteId: str
-    status: Literal["queued", "analyzing", "ready", "failed"]
-    streamUrl: str
-
-@dataclass
-class QuoteSummary:
-    """Owner-scoped list item for a compliance quote."""
-    quoteId: str
-    status: Literal["queued", "analyzing", "ready", "failed"]
-    organizationName: str
-    frameworks: List[str]
-    createdAt: str
-    updatedAt: str
-    estimate: Optional[QuoteEstimate] = None
