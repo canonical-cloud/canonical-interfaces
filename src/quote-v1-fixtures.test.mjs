@@ -49,7 +49,10 @@ test("quote-v1 manifest is complete and schema-backed", async () => {
   assert.equal(manifest.schemaPath, "schema/quote.schema.json");
   assert.equal(manifest.schemaRevision, "4c6ca63ca24fa214a1cb1a917ac27f1d5265916a");
   assert.equal(manifest.wireCase, "camelCase");
-  assert.deepEqual(Object.keys(manifest.fixtures).sort(), expectedDefinitions.toSorted());
+  assert.deepEqual(
+    Object.keys(manifest.fixtures).sort(),
+    expectedDefinitions.toSorted(),
+  );
 
   for (const definition of expectedDefinitions) {
     assert.ok(schema.$defs[definition], `schema definition ${definition} is missing`);
@@ -108,7 +111,28 @@ test("current fixture corpus preserves owner and server authority", async () => 
   const detail = await fixture("QuoteDetail");
   const list = await fixture("QuoteListResponse");
   const event = await fixture("QuoteStatusEvent");
-  assert.equal(detail.quoteId, event.quoteId);
-  assert.equal(list.quotes[0].quoteId, detail.quoteId);
-  assert.ok(Number.isFinite(Date.parse(event.occurredAt)));
+  assert.ok(
+    Object.hasOwn(detail, "quoteId"),
+    `QuoteDetail keys: ${Object.keys(detail).join(",")}`,
+  );
+  assert.ok(
+    Array.isArray(list.quotes) &&
+      list.quotes.length > 0 &&
+      Object.hasOwn(list.quotes[0], "quoteId"),
+    `QuoteListResponse first summary keys: ${Object.keys(list.quotes?.[0] ?? {}).join(",")}`,
+  );
+  assert.ok(
+    Object.hasOwn(event, "quoteId"),
+    `QuoteStatusEvent keys: ${Object.keys(event).join(",")}`,
+  );
+  assert.equal(detail.quoteId, event.quoteId, "detail and event quote IDs drifted");
+  assert.equal(
+    list.quotes[0].quoteId,
+    detail.quoteId,
+    "list and detail quote IDs drifted",
+  );
+  assert.ok(
+    Number.isFinite(Date.parse(event.occurredAt)),
+    "event occurredAt is not an RFC 3339 timestamp",
+  );
 });
