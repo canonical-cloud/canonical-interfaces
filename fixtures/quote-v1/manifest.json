@@ -10,11 +10,11 @@
     },
     "QuoteSubmissionResponse": {
       "path": "submission-response.json",
-      "gitBlob": "38961c6d117919f4ce919c39fc0d730c8f450a7a"
+      "gitBlob": "ea732b7ee4de6ac418232ecdb61d489954cc115d"
     },
     "QuoteDetail": {
       "path": "detail-ready.json",
-      "gitBlob": "7c559915f1ee5adaafafbd6edc0fa05645033d87"
+      "gitBlob": "cfa8b6498f9f87317a48dd83774c0fec9106dfdf"
     },
     "QuoteListResponse": {
       "path": "list-response.json",
@@ -22,7 +22,7 @@
     },
     "QuoteStatusEvent": {
       "path": "status-event.json",
-      "gitBlob": "af2be03fb9556265c77827e8820271ee3e3f6282"
+      "gitBlob": "053f5cd80d29aa2b1c0ff214c14aa4d5cfa57c0d"
     },
     "QuoteProblem": {
       "path": "problem.json",
