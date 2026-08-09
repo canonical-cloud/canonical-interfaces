@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "schemaPath": "schema/quote.schema.json",
+  "schemaRevision": "4c6ca63ca24fa214a1cb1a917ac27f1d5265916a",
+  "wireCase": "camelCase",
+  "fixtures": {
+    "QuoteRequest": {
+      "path": "create-request.json",
+      "gitBlob": "d76ee3a5e56440f92f25fad504fa1bb3eeae0bae"
+    },
+    "QuoteSubmissionResponse": {
+      "path": "submission-response.json",
+      "gitBlob": "38961c6d117919f4ce919c39fc0d730c8f450a7a"
+    },
+    "QuoteDetail": {
+      "path": "detail-ready.json",
+      "gitBlob": "7c559915f1ee5adaafafbd6edc0fa05645033d87"
+    },
+    "QuoteListResponse": {
+      "path": "list-response.json",
+      "gitBlob": "ed3331d842c32a776d9ca581bdba4b03cb34c893"
+    },
+    "QuoteStatusEvent": {
+      "path": "status-event.json",
+      "gitBlob": "af2be03fb9556265c77827e8820271ee3e3f6282"
+    },
+    "QuoteProblem": {
+      "path": "problem.json",
+      "gitBlob": "1c7ef6cc9b42475f857823852c9b788424e13d06"
+    },
+    "QuoteRetryResponse": {
+      "path": "retry-response.json",
+      "gitBlob": "8d71f86bb251e5fb376eb98b6f15387bcb9606f5"
+    }
+  }
+}
