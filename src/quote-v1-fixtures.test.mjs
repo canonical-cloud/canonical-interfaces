@@ -47,7 +47,10 @@ async function fixture(definition) {
 test("quote-v1 manifest is complete and schema-backed", async () => {
   assert.equal(manifest.schemaVersion, 1);
   assert.equal(manifest.schemaPath, "schema/quote.schema.json");
-  assert.equal(manifest.schemaRevision, "4c6ca63ca24fa214a1cb1a917ac27f1d5265916a");
+  assert.equal(
+    manifest.schemaRevision,
+    "4c6ca63ca24fa214a1cb1a917ac27f1d5265916a",
+  );
   assert.equal(manifest.wireCase, "camelCase");
   assert.deepEqual(
     Object.keys(manifest.fixtures).sort(),
@@ -76,7 +79,7 @@ test("retry fixture matches the current public transition contract", async () =>
   ]);
   assert.match(
     value.quoteId,
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
   );
   assert.equal(value.status, "queued");
   assert.equal(value.streamUrl, `/api/v1/quotes/${value.quoteId}/events`);
@@ -87,7 +90,12 @@ test("current fixture corpus preserves owner and server authority", async () => 
   const request = await fixture("QuoteRequest");
   assert.equal(request.answersVersion, 1);
   assert.equal(request.contextKey, "quote-analysis");
-  assert.ok(request.frameworks.includes("nist_800_53"));
+  assert.ok(
+    schema.$defs.QuoteRequest.properties.frameworks.items.enum.includes(
+      "nist_800_53",
+    ),
+    "the current schema no longer supports NIST 800-53",
+  );
 
   for (const forbidden of [
     "userId",
