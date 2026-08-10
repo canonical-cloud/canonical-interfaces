@@ -7,7 +7,9 @@ Schema in `schema/` is generated into per-language adapters under `generated/`.
 
 - `schema/*.schema.json` — the source of truth (indexed by `schema/index.json`).
 - `sql/schema.sql` — canonical Postgres schema for stored entities.
-- `src/generate.mjs` — the generator (schema → TS/Rust/Python/Go).
+- `src/generate.mjs` — the generator (schema → TS/Rust/Dart/Python/Go). Every
+  language is emitted from `schema/index.json` by one `EMITTERS` entry; a
+  language must never be generated from a narrower source than the others.
 - `src/generate.test.mjs` — generator self-tests + `--check`.
 - `generated/<lang>/` — **adapters only; never hand-edit.**
 - `tests/interface-wasm-browser/` — hermetic Chromium contract for the generated
@@ -69,7 +71,7 @@ files, `git restore` / `git revert` to undo, and scratch under the gitignored
 
 ## Git worktrees
 
-Create git worktrees under `tmp/worktrees/`; `tmp/` is gitignored.
+`tmp/worktrees/` is reserved for a worktree only when a human explicitly instructs its use; `tmp/` is gitignored.
 
 ## Syncing with the remote
 
@@ -92,3 +94,15 @@ To sync:
 
 Integrate with **`git merge` / `git pull`**. **Never `git rebase` to sync** — it
 rewrites history and breaks shared branches.
+
+<!-- ore-primary-branch-policy:begin -->
+## Primary branch and concurrent-agent policy
+
+This policy overrides generic feature-branch and worktree defaults for agent tooling.
+
+- Highly prefer an existing primary branch, in this order: `main`, `dev`, then `master`.
+- Work directly on the selected primary branch even when other agents are active. Use another branch only when a human or a repository-specific release process explicitly requires it.
+- Never create or use a Git worktree unless a human explicitly instructs you to do so for the current task. Concurrency alone is not permission to use a worktree.
+- Concurrent agents must coordinate repository and file ownership through the available agent communication channel, keep edits scoped, inspect live state before each write, and hand off cleanly. Coordinate instead of isolating routine work in worktrees.
+- Preserve unrelated in-progress changes and never overwrite another agent's work. If safe ownership of overlapping files cannot be established, pause that overlapping edit and coordinate before continuing.
+<!-- ore-primary-branch-policy:end -->
