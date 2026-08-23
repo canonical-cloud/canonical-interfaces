@@ -1,11 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CanonicalCompliance",
-  "description": "Domain types for canonical.cloud compliance-audit engagements.",
+  "description": "Domain types for canonical.plus compliance-readiness engagements. Boundary note: canonical.plus prepares clients for independent review only; formal determinations (audits, attestations, certifications, authorizations) are made by independent auditors, assessors, and regulators.",
   "$defs": {
     "AuditEngagement": {
       "type": "object",
-      "description": "A single compliance-audit engagement for a customer company.",
+      "description": "A single readiness engagement preparing a customer company for independent review against a framework.",
       "required": ["id", "company", "framework", "status", "opened_at"],
       "properties": {
         "id": {
@@ -18,13 +18,13 @@
         },
         "framework": {
           "type": "string",
-          "enum": ["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"],
-          "description": "Compliance framework being audited."
+          "enum": ["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr", "cis_controls", "cmmc", "csa_ccm", "dora", "iso_22301", "iso_27701", "nis2", "nist_csf", "nist_800_53"],
+          "description": "Framework the readiness engagement prepares the client for."
         },
         "status": {
           "type": "string",
-          "enum": ["scoping", "remediation", "in_audit", "complete"],
-          "description": "Lifecycle stage of the engagement."
+          "enum": ["scoping", "remediation", "audit_ready", "in_audit", "complete"],
+          "description": "Lifecycle stage of the readiness engagement. audit_ready means preparation is complete and the client is ready to enter independent review; in_audit means the independent auditor's review is underway."
         },
         "opened_at": {
           "type": "string",
@@ -32,7 +32,7 @@
         },
         "target_report_date": {
           "type": "string",
-          "description": "Optional RFC 3339 date the attestation report is targeted for."
+          "description": "Optional RFC 3339 date the client targets for the independent auditor's report."
         }
       }
     }
