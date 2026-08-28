@@ -11,34 +11,6 @@ pub enum HealthStatusStatus {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum DraftNoteKeyKind {
-    #[serde(rename = "draft_note")]
-    DraftNote,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MutationOperationAction {
-    #[serde(rename = "put")]
-    Put,
-    #[serde(rename = "delete")]
-    Delete,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MutationResultStatus {
-    #[serde(rename = "applied")]
-    Applied,
-    #[serde(rename = "conflict")]
-    Conflict,
-    #[serde(rename = "gone")]
-    Gone,
-    #[serde(rename = "invalid")]
-    Invalid,
-    #[serde(rename = "idempotency_key_reused")]
-    IdempotencyKeyReused,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AuditEngagementFramework {
     #[serde(rename = "soc2")]
     Soc2,
@@ -52,6 +24,24 @@ pub enum AuditEngagementFramework {
     PciDss,
     #[serde(rename = "gdpr")]
     Gdpr,
+    #[serde(rename = "cis_controls")]
+    CisControls,
+    #[serde(rename = "cmmc")]
+    Cmmc,
+    #[serde(rename = "csa_ccm")]
+    CsaCcm,
+    #[serde(rename = "dora")]
+    Dora,
+    #[serde(rename = "iso_22301")]
+    Iso22301,
+    #[serde(rename = "iso_27701")]
+    Iso27701,
+    #[serde(rename = "nis2")]
+    Nis2,
+    #[serde(rename = "nist_csf")]
+    NistCsf,
+    #[serde(rename = "nist_800_53")]
+    Nist80053,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -60,6 +50,8 @@ pub enum AuditEngagementStatus {
     Scoping,
     #[serde(rename = "remediation")]
     Remediation,
+    #[serde(rename = "audit_ready")]
+    AuditReady,
     #[serde(rename = "in_audit")]
     InAudit,
     #[serde(rename = "complete")]
@@ -146,136 +138,20 @@ pub struct ServiceInfo {
     pub stack: Vec<String>,
 }
 
-/// Schema-version-1 value for the only record kind accepted by the initial sync protocol.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DraftNoteValue {
-    /// Draft-note title, limited to 200 characters.
-    pub title: String,
-    /// Draft-note body, limited to 100,000 characters.
-    pub body: String,
-}
-
-/// Owner-scoped key for a draft-note sync record.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct DraftNoteKey {
-    /// Bounded record-kind discriminator.
-    pub kind: DraftNoteKeyKind,
-    /// Client-generated UUID for the record.
-    pub id: String,
-}
-
-/// One idempotent compare-and-swap operation in a draft-note mutation batch.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MutationOperation {
-    /// UUID idempotency key, unique per client and logical mutation.
-    #[serde(rename = "mutationId")]
-    pub mutation_id: String,
-    /// Record targeted by the operation.
-    pub key: DraftNoteKey,
-    /// Mutation action.
-    pub action: MutationOperationAction,
-    /// Unsigned decimal-string version used for compare-and-swap, or null for a create.
-    #[serde(rename = "baseVersion")]
-    pub base_version: Option<String>,
-    /// Draft-note payload schema version; only version 1 is accepted.
-    #[serde(rename = "schemaVersion")]
-    pub schema_version: i64,
-    /// Required for put and omitted for delete.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub value: Option<DraftNoteValue>,
-}
-
-/// Body of POST /api/v1/sync/mutations.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MutationRequest {
-    /// Sync protocol version; only version 1 is accepted.
-    #[serde(rename = "protocolVersion")]
-    pub protocol_version: i64,
-    /// Stable UUID for this browser installation or API client.
-    #[serde(rename = "clientId")]
-    pub client_id: String,
-    /// Bounded mutation batch containing between 1 and 50 operations.
-    pub operations: Vec<MutationOperation>,
-}
-
-/// Authoritative server snapshot of a draft-note record or tombstone.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct WireRecord {
-    /// Owner-scoped record key.
-    pub key: DraftNoteKey,
-    /// Authoritative record version encoded as an unsigned decimal string.
-    pub version: String,
-    /// Draft-note payload schema version.
-    #[serde(rename = "schemaVersion")]
-    pub schema_version: i64,
-    /// True when the snapshot is a permanent tombstone.
-    pub deleted: bool,
-    /// Present for live records and omitted for tombstones.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub value: Option<DraftNoteValue>,
-}
-
-/// Per-operation result returned in the same order as the mutation request.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MutationResult {
-    /// Idempotency key copied from the operation.
-    #[serde(rename = "mutationId")]
-    pub mutation_id: String,
-    /// Outcome of the compare-and-swap operation.
-    pub status: MutationResultStatus,
-    /// Applied or authoritative conflicting snapshot when available.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub record: Option<WireRecord>,
-    /// Optional human-readable failure detail; clients must branch on status.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
-}
-
-/// Response of POST /api/v1/sync/mutations.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MutationResponse {
-    /// One result for every submitted operation, in request order.
-    pub results: Vec<MutationResult>,
-}
-
-/// Query parameters accepted by GET /api/v1/sync/changes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ChangesQuery {
-    /// Opaque, encrypted, owner-bound cursor returned by the previous pull.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub cursor: Option<String>,
-    /// Requested page size; the server clamps values to 1 through 500.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub limit: Option<i64>,
-}
-
-/// Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ChangesResponse {
-    /// Commit-ordered authoritative snapshots and tombstones.
-    pub changes: Vec<WireRecord>,
-    /// Opaque cursor to persist and send on the next pull.
-    #[serde(rename = "nextCursor")]
-    pub next_cursor: String,
-    /// True when the response reached the pull's stable high-water mark.
-    #[serde(rename = "caughtUp")]
-    pub caught_up: bool,
-}
-
-/// A single compliance-audit engagement for a customer company.
+/// A single readiness engagement preparing a customer company for independent review against a framework.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AuditEngagement {
     /// Opaque engagement identifier (UUID).
     pub id: String,
     /// Customer company name.
     pub company: String,
-    /// Compliance framework being audited.
+    /// Framework the readiness engagement prepares the client for.
     pub framework: AuditEngagementFramework,
-    /// Lifecycle stage of the engagement.
+    /// Lifecycle stage of the readiness engagement. audit_ready means preparation is complete and the client is ready to enter independent review; in_audit means the independent auditor's review is underway.
     pub status: AuditEngagementStatus,
     /// RFC 3339 timestamp the engagement was opened.
     pub opened_at: String,
-    /// Optional RFC 3339 date the attestation report is targeted for.
+    /// Optional RFC 3339 date the client targets for the independent auditor's report.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub target_report_date: Option<String>,
 }
@@ -404,6 +280,18 @@ pub struct QuoteEstimate {
     pub created_at: String,
 }
 
+/// Bounded public error payload for quote endpoints.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteProblem {
+    /// Stable machine-readable error code.
+    pub code: String,
+    /// Safe human-readable error detail.
+    pub message: String,
+    /// Request correlation identifier.
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+}
+
 /// Authenticated WebSocket progress message for one quote.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuoteStatusEvent {
@@ -427,18 +315,6 @@ pub struct QuoteStatusEvent {
     /// Present only when the event reports a safe public failure.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub problem: Option<QuoteProblem>,
-}
-
-/// Bounded public error payload for quote endpoints.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct QuoteProblem {
-    /// Stable machine-readable error code.
-    pub code: String,
-    /// Safe human-readable error detail.
-    pub message: String,
-    /// Request correlation identifier.
-    #[serde(rename = "requestId")]
-    pub request_id: String,
 }
 
 /// Owner-scoped list item for a compliance quote.
@@ -529,3 +405,6 @@ pub struct QuoteRetryResponse {
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
 }
+
+#[cfg(feature = "internal")]
+pub mod internal;

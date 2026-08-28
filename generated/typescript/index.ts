@@ -20,111 +20,19 @@ export type ServiceInfo = {
   stack: string[];
 };
 
-/** Schema-version-1 value for the only record kind accepted by the initial sync protocol. */
-export type DraftNoteValue = {
-  /** Draft-note title, limited to 200 characters. */
-  title: string;
-  /** Draft-note body, limited to 100,000 characters. */
-  body: string;
-};
-
-/** Owner-scoped key for a draft-note sync record. */
-export type DraftNoteKey = {
-  /** Bounded record-kind discriminator. */
-  kind: "draft_note";
-  /** Client-generated UUID for the record. */
-  id: string;
-};
-
-/** One idempotent compare-and-swap operation in a draft-note mutation batch. */
-export type MutationOperation = {
-  /** UUID idempotency key, unique per client and logical mutation. */
-  mutationId: string;
-  /** Record targeted by the operation. */
-  key: DraftNoteKey;
-  /** Mutation action. */
-  action: "put" | "delete";
-  /** Unsigned decimal-string version used for compare-and-swap, or null for a create. */
-  baseVersion: string | null;
-  /** Draft-note payload schema version; only version 1 is accepted. */
-  schemaVersion: number;
-  /** Required for put and omitted for delete. */
-  value?: DraftNoteValue;
-};
-
-/** Body of POST /api/v1/sync/mutations. */
-export type MutationRequest = {
-  /** Sync protocol version; only version 1 is accepted. */
-  protocolVersion: number;
-  /** Stable UUID for this browser installation or API client. */
-  clientId: string;
-  /** Bounded mutation batch containing between 1 and 50 operations. */
-  operations: MutationOperation[];
-};
-
-/** Authoritative server snapshot of a draft-note record or tombstone. */
-export type WireRecord = {
-  /** Owner-scoped record key. */
-  key: DraftNoteKey;
-  /** Authoritative record version encoded as an unsigned decimal string. */
-  version: string;
-  /** Draft-note payload schema version. */
-  schemaVersion: number;
-  /** True when the snapshot is a permanent tombstone. */
-  deleted: boolean;
-  /** Present for live records and omitted for tombstones. */
-  value?: DraftNoteValue;
-};
-
-/** Per-operation result returned in the same order as the mutation request. */
-export type MutationResult = {
-  /** Idempotency key copied from the operation. */
-  mutationId: string;
-  /** Outcome of the compare-and-swap operation. */
-  status: "applied" | "conflict" | "gone" | "invalid" | "idempotency_key_reused";
-  /** Applied or authoritative conflicting snapshot when available. */
-  record?: WireRecord;
-  /** Optional human-readable failure detail; clients must branch on status. */
-  message?: string;
-};
-
-/** Response of POST /api/v1/sync/mutations. */
-export type MutationResponse = {
-  /** One result for every submitted operation, in request order. */
-  results: MutationResult[];
-};
-
-/** Query parameters accepted by GET /api/v1/sync/changes. */
-export type ChangesQuery = {
-  /** Opaque, encrypted, owner-bound cursor returned by the previous pull. */
-  cursor?: string;
-  /** Requested page size; the server clamps values to 1 through 500. */
-  limit?: number;
-};
-
-/** Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints. */
-export type ChangesResponse = {
-  /** Commit-ordered authoritative snapshots and tombstones. */
-  changes: WireRecord[];
-  /** Opaque cursor to persist and send on the next pull. */
-  nextCursor: string;
-  /** True when the response reached the pull's stable high-water mark. */
-  caughtUp: boolean;
-};
-
-/** A single compliance-audit engagement for a customer company. */
+/** A single readiness engagement preparing a customer company for independent review against a framework. */
 export type AuditEngagement = {
   /** Opaque engagement identifier (UUID). */
   id: string;
   /** Customer company name. */
   company: string;
-  /** Compliance framework being audited. */
-  framework: "soc2" | "fedramp" | "hipaa" | "iso_27001" | "pci_dss" | "gdpr";
-  /** Lifecycle stage of the engagement. */
-  status: "scoping" | "remediation" | "in_audit" | "complete";
+  /** Framework the readiness engagement prepares the client for. */
+  framework: "soc2" | "fedramp" | "hipaa" | "iso_27001" | "pci_dss" | "gdpr" | "cis_controls" | "cmmc" | "csa_ccm" | "dora" | "iso_22301" | "iso_27701" | "nis2" | "nist_csf" | "nist_800_53";
+  /** Lifecycle stage of the readiness engagement. audit_ready means preparation is complete and the client is ready to enter independent review; in_audit means the independent auditor's review is underway. */
+  status: "scoping" | "remediation" | "audit_ready" | "in_audit" | "complete";
   /** RFC 3339 timestamp the engagement was opened. */
   opened_at: string;
-  /** Optional RFC 3339 date the attestation report is targeted for. */
+  /** Optional RFC 3339 date the client targets for the independent auditor's report. */
   target_report_date?: string;
 };
 
@@ -218,6 +126,16 @@ export type QuoteEstimate = {
   createdAt: string;
 };
 
+/** Bounded public error payload for quote endpoints. */
+export type QuoteProblem = {
+  /** Stable machine-readable error code. */
+  code: string;
+  /** Safe human-readable error detail. */
+  message: string;
+  /** Request correlation identifier. */
+  requestId: string;
+};
+
 /** Authenticated WebSocket progress message for one quote. */
 export type QuoteStatusEvent = {
   /** Quote identifier. */
@@ -236,16 +154,6 @@ export type QuoteStatusEvent = {
   occurredAt: string;
   /** Present only when the event reports a safe public failure. */
   problem?: QuoteProblem;
-};
-
-/** Bounded public error payload for quote endpoints. */
-export type QuoteProblem = {
-  /** Stable machine-readable error code. */
-  code: string;
-  /** Safe human-readable error detail. */
-  message: string;
-  /** Request correlation identifier. */
-  requestId: string;
 };
 
 /** Owner-scoped list item for a compliance quote. */

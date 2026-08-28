@@ -4,6 +4,7 @@
   "description": "Domain types for canonical.plus compliance-readiness engagements. Boundary note: canonical.plus prepares clients for independent review only; formal determinations (audits, attestations, certifications, authorizations) are made by independent auditors, assessors, and regulators.",
   "$defs": {
     "AuditEngagement": {
+      "x-visibility": "public",
       "type": "object",
       "description": "A single readiness engagement preparing a customer company for independent review against a framework.",
       "required": ["id", "company", "framework", "status", "opened_at"],

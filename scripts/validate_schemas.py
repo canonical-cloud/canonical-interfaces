@@ -19,7 +19,11 @@ Checks, per schema file:
 Then, across the repo:
 
   7. `$id` values are unique
-  8. if a sibling `*-clients` checkout vendored a copy of a schema, the copy
+  8. every `$def` in a schema listed by schema/index.json declares
+     `x-visibility` (public | internal), and no public type `$ref`s an
+     internal one -- the split between the published SDK surface and the
+     first-party payloads is only real if it cannot be forgotten
+  9. if a sibling `*-clients` checkout vendored a copy of a schema, the copy
      still matches (drift here means the SDKs are validating against a schema
      this repo has already moved past)
 
@@ -111,6 +115,69 @@ def structural_check(doc, rel, problems):
             stack.extend(v for v in node if isinstance(v, (dict, list)))
 
 
+VISIBILITIES = ("public", "internal")
+
+
+def check_visibility(repo, problems):
+    """Every domain type declares its audience, and the boundary points one way.
+
+    The generator refuses to emit without this, but the schemas are also vendored
+    into the clients repo and read by hand, so the rule is enforced here too --
+    where it is checked without running node.
+
+    Two rules:
+      * every $def listed in schema/index.json declares x-visibility
+      * a public type never $refs an internal one, which would republish the
+        internal type as part of the external surface
+    """
+    index_path = os.path.join(repo, "schema", "index.json")
+    if not os.path.exists(index_path):
+        return
+    try:
+        index = json.load(open(index_path, encoding="utf-8"))
+    except ValueError as exc:
+        problems.append(Problem("error", "schema/index.json", "does not parse: %s" % exc))
+        return
+
+    visibility = {}
+    owner = {}
+    defs = {}
+    for name in index.get("schemas") or []:
+        rel = os.path.join("schema", name)
+        path = os.path.join(repo, rel)
+        if not os.path.exists(path):
+            continue
+        try:
+            doc = json.load(open(path, encoding="utf-8"))
+        except ValueError:
+            continue
+        for type_name, body in (doc.get("$defs") or {}).items():
+            vis = body.get("x-visibility")
+            if vis not in VISIBILITIES:
+                problems.append(Problem(
+                    "error", rel,
+                    "%s does not declare x-visibility (one of %s); a type with no "
+                    "declared audience would default into the published SDK surface"
+                    % (type_name, ", ".join(VISIBILITIES))))
+                continue
+            visibility[type_name] = vis
+            owner[type_name] = rel
+            defs[type_name] = body
+
+    for type_name, body in sorted(defs.items()):
+        if visibility.get(type_name) != "public":
+            continue
+        refs = []
+        walk_refs(body, refs)
+        for ref in refs:
+            target = ref.rsplit("/", 1)[-1]
+            if visibility.get(target) == "internal":
+                problems.append(Problem(
+                    "error", owner[type_name],
+                    "public type %s $refs internal type %s; either publish %s or "
+                    "mark %s internal" % (type_name, target, target, type_name)))
+
+
 def validate_repo(repo, consumers=()):
     problems = []
     ids = {}
@@ -179,6 +246,8 @@ def validate_repo(repo, consumers=()):
                             "examples[%d] does not satisfy its own schema: %s" % (i, errs[0].message)))
         else:
             structural_check(doc, rel, problems)
+
+    check_visibility(repo, problems)
 
     # Vendored copies in sibling *-clients checkouts must not be stale.
     for consumer in consumers:
