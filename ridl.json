@@ -1,0 +1,12 @@
+{
+  "maps": [
+    "route-maps/api.route-map.json",
+    "route-maps/web.route-map.json"
+  ],
+  "identical_to": [
+    "../canonical-lib-core/route-maps/api.route-map.json",
+    "../canonical-lib-core/route-maps/web.route-map.json"
+  ],
+  "out": "generated",
+  "skip_drift": true
+}

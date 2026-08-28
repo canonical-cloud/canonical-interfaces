@@ -1,0 +1,700 @@
+{
+  "schema_version": "2.0.0",
+  "service": "canonical-web-server",
+  "title": "Canonical Cloud Web Server",
+  "version": "0.1.0",
+  "description": "Typed route map for canonical-web-server.rs. Paths are the URLs the process actually serves, i.e. the `.route(..)` literal with its enclosing `.nest(..)` prefix applied: api::router() is nested at /api (and /api/v1 inside it), auth::router() at /auth, pages::router() at /app. Server-rendered HTML, form posts, redirects, the Prometheus endpoint and the WebSocket upgrade carry `client: false`: they belong to the contract but there is no typed JSON unary client to generate for them.",
+  "types": {
+    "EngagementId": {
+      "kind": "scalar",
+      "base": "Uuid",
+      "doc": "Audit-engagement identifier. The handler extracts `Path<String>` and parses it as a UUID; a malformed id is deliberately indistinguishable from someone else's engagement (404)."
+    },
+    "QuoteId": {
+      "kind": "scalar",
+      "base": "Uuid",
+      "doc": "Quote identifier minted by canonical-api-server and proxied through this process."
+    },
+    "HealthStatusValue": {
+      "kind": "enum",
+      "variants": [
+        "ok",
+        "degraded"
+      ],
+      "doc": "canonical-interfaces HealthStatusStatus. This process only ever emits `ok`; a non-ok liveness is expressed as a non-200 status instead."
+    },
+    "MutationAction": {
+      "kind": "enum",
+      "variants": [
+        "put",
+        "delete"
+      ],
+      "doc": "src/sync/protocol.rs MutationAction, `rename_all = \"snake_case\"`."
+    },
+    "MutationStatus": {
+      "kind": "enum",
+      "variants": [
+        "applied",
+        "conflict",
+        "gone",
+        "invalid",
+        "idempotency_key_reused"
+      ],
+      "doc": "src/sync/protocol.rs MutationStatus, `rename_all = \"snake_case\"`."
+    },
+    "HealthStatus": {
+      "kind": "record",
+      "doc": "src/routes/health.rs HealthResponse. No rename_all, so the keys are exactly `status` and `service`.",
+      "fields": {
+        "status": "HealthStatusValue",
+        "service": "String"
+      }
+    },
+    "ServiceInfo": {
+      "kind": "record",
+      "doc": "src/routes/health.rs InfoResponse. `stack` is a fixed five-element array of runtime component names.",
+      "fields": {
+        "service": "String",
+        "version": "String",
+        "domain": "String",
+        "stack": {
+          "type": {
+            "kind": "list",
+            "item": "String"
+          }
+        }
+      }
+    },
+    "SessionIdentity": {
+      "kind": "record",
+      "doc": "canonical-auth AuthContext as it reaches the wire. Every other field on that struct is `#[serde(skip_serializing)]`, so only these two are ever emitted.",
+      "fields": {
+        "userId": "Uuid",
+        "email": "String"
+      }
+    },
+    "DraftNote": {
+      "kind": "record",
+      "doc": "The only record payload the v1 sync protocol accepts.",
+      "fields": {
+        "title": "String",
+        "body": "String"
+      }
+    },
+    "RecordKey": {
+      "kind": "record",
+      "doc": "Owner-scoped record key. No rename_all on this struct. `kind` is a plain String in the server; the only value the protocol accepts today is `draft_note`.",
+      "fields": {
+        "kind": "String",
+        "id": "Uuid"
+      }
+    },
+    "Mutation": {
+      "kind": "record",
+      "doc": "One idempotent compare-and-swap operation. `rename_all = \"camelCase\"`.",
+      "fields": {
+        "mutationId": "Uuid",
+        "key": "RecordKey",
+        "action": "MutationAction",
+        "baseVersion": {
+          "type": "String",
+          "required": false,
+          "doc": "Unsigned decimal-string version for the compare-and-swap; null for a create. Serialised even when absent (no skip_serializing_if)."
+        },
+        "schemaVersion": {
+          "type": "I32",
+          "doc": "Draft-note payload schema version; only 1 is accepted."
+        },
+        "value": {
+          "type": "DraftNote",
+          "required": false,
+          "doc": "Required for put, omitted for delete."
+        }
+      }
+    },
+    "MutationBatch": {
+      "kind": "record",
+      "doc": "Body of POST /api/v1/sync/mutations. `rename_all = \"camelCase\"`.",
+      "fields": {
+        "protocolVersion": {
+          "type": "I32",
+          "doc": "Only version 1 is accepted."
+        },
+        "clientId": "Uuid",
+        "operations": {
+          "type": {
+            "kind": "list",
+            "item": "Mutation"
+          }
+        }
+      }
+    },
+    "RecordSnapshot": {
+      "kind": "record",
+      "doc": "Authoritative server snapshot or tombstone. `rename_all = \"camelCase\"`.",
+      "fields": {
+        "key": "RecordKey",
+        "version": "String",
+        "schemaVersion": "I32",
+        "deleted": "Bool",
+        "value": {
+          "type": "DraftNote",
+          "required": false,
+          "doc": "Present for live records, omitted for tombstones."
+        }
+      }
+    },
+    "MutationResult": {
+      "kind": "record",
+      "doc": "One result per submitted operation, in request order. `rename_all = \"camelCase\"`.",
+      "fields": {
+        "mutationId": "Uuid",
+        "status": "MutationStatus",
+        "record": {
+          "type": "RecordSnapshot",
+          "required": false
+        },
+        "message": {
+          "type": "String",
+          "required": false,
+          "doc": "Human-readable detail only; clients must branch on `status`."
+        }
+      }
+    },
+    "MutationBatchResponse": {
+      "kind": "record",
+      "doc": "No rename_all on this struct; the single key is `results`.",
+      "fields": {
+        "results": {
+          "type": {
+            "kind": "list",
+            "item": "MutationResult"
+          }
+        }
+      }
+    },
+    "PullResponse": {
+      "kind": "record",
+      "doc": "Response of GET /api/v1/sync/changes. REST pull is authoritative over WebSocket hints. `rename_all = \"camelCase\"`.",
+      "fields": {
+        "changes": {
+          "type": {
+            "kind": "list",
+            "item": "RecordSnapshot"
+          }
+        },
+        "nextCursor": "String",
+        "caughtUp": "Bool"
+      }
+    },
+    "ApiErrorDetail": {
+      "kind": "record",
+      "fields": {
+        "code": "String",
+        "message": "String"
+      }
+    },
+    "ApiError": {
+      "kind": "record",
+      "doc": "src/error.rs AppError renders every JSON failure as {\"error\":{\"code\":..,\"message\":..}}.",
+      "fields": {
+        "error": "ApiErrorDetail"
+      }
+    },
+    "LoginForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /auth/login. No rename_all; keys are exactly these.",
+      "fields": {
+        "email": "String",
+        "password": "String",
+        "csrf": {
+          "type": "String",
+          "doc": "Must equal the canonical_login_csrf cookie set by GET /login."
+        }
+      }
+    },
+    "LogoutForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /auth/logout.",
+      "fields": {
+        "csrf": "String"
+      }
+    },
+    "CreateEngagementForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /app/engagements.",
+      "fields": {
+        "csrf": "String",
+        "company": {
+          "type": "String",
+          "doc": "Required, at most 200 characters."
+        },
+        "framework": {
+          "type": "String",
+          "doc": "Must be one of audit_engagement::FRAMEWORKS."
+        },
+        "target_report_date": {
+          "type": "String",
+          "default": "",
+          "doc": "`#[serde(default)]`; empty means unset, otherwise YYYY-MM-DD."
+        }
+      }
+    },
+    "UpdateStatusForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /app/engagements/{id}/status.",
+      "fields": {
+        "csrf": "String",
+        "status": {
+          "type": "String",
+          "doc": "Must be one of audit_engagement::STATUSES."
+        }
+      }
+    },
+    "AddNoteForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /app/engagements/{id}/notes.",
+      "fields": {
+        "csrf": "String",
+        "body": {
+          "type": "String",
+          "doc": "Required, at most 4000 characters."
+        }
+      }
+    },
+    "QuoteForm": {
+      "kind": "record",
+      "doc": "urlencoded body of POST /u/quote (src/routes/quote.rs QuoteForm). Checkbox groups arrive as one optional field per choice; the handler folds present keys into the frameworks/infrastructure/dataSensitivity arrays of the canonical v1 quote request. contactEmail is taken from the signed-in account, never from the form.",
+      "fields": {
+        "csrf": "String",
+        "client_request_id": {
+          "type": "Uuid",
+          "doc": "Used verbatim as the Idempotency-Key on the upstream quote submission."
+        },
+        "organization_name": "String",
+        "contact_name": "String",
+        "website": {
+          "type": "String",
+          "default": ""
+        },
+        "employee_count": {
+          "type": "I64",
+          "doc": "u32 in Rust; the handler additionally requires 1..=1000000."
+        },
+        "annual_revenue_band": {
+          "type": "String",
+          "default": ""
+        },
+        "current_stage": "String",
+        "target_date": {
+          "type": "String",
+          "default": ""
+        },
+        "notes": {
+          "type": "String",
+          "default": ""
+        },
+        "soc2_type_1": {
+          "type": "String",
+          "required": false
+        },
+        "soc2_type_2": {
+          "type": "String",
+          "required": false
+        },
+        "nist_csf_2": {
+          "type": "String",
+          "required": false
+        },
+        "nist_800_53": {
+          "type": "String",
+          "required": false
+        },
+        "hipaa": {
+          "type": "String",
+          "required": false
+        },
+        "iso_27001": {
+          "type": "String",
+          "required": false
+        },
+        "pci_dss_4": {
+          "type": "String",
+          "required": false
+        },
+        "fedramp": {
+          "type": "String",
+          "required": false
+        },
+        "gdpr": {
+          "type": "String",
+          "required": false
+        },
+        "custom": {
+          "type": "String",
+          "required": false
+        },
+        "infra_aws": {
+          "type": "String",
+          "required": false
+        },
+        "infra_azure": {
+          "type": "String",
+          "required": false
+        },
+        "infra_gcp": {
+          "type": "String",
+          "required": false
+        },
+        "infra_supabase": {
+          "type": "String",
+          "required": false
+        },
+        "infra_on_prem": {
+          "type": "String",
+          "required": false
+        },
+        "infra_colocation": {
+          "type": "String",
+          "required": false
+        },
+        "infra_saas_only": {
+          "type": "String",
+          "required": false
+        },
+        "infra_multi_cloud": {
+          "type": "String",
+          "required": false
+        },
+        "infra_other": {
+          "type": "String",
+          "required": false
+        },
+        "data_public": {
+          "type": "String",
+          "required": false
+        },
+        "data_internal": {
+          "type": "String",
+          "required": false
+        },
+        "data_confidential": {
+          "type": "String",
+          "required": false
+        },
+        "data_pii": {
+          "type": "String",
+          "required": false
+        },
+        "data_phi": {
+          "type": "String",
+          "required": false
+        },
+        "data_pci": {
+          "type": "String",
+          "required": false
+        },
+        "data_government_cui": {
+          "type": "String",
+          "required": false
+        },
+        "data_customer_secrets": {
+          "type": "String",
+          "required": false
+        },
+        "data_other": {
+          "type": "String",
+          "required": false
+        },
+        "has_security_program": {
+          "type": "String",
+          "required": false
+        },
+        "has_policies": {
+          "type": "String",
+          "required": false
+        },
+        "has_risk_assessment": {
+          "type": "String",
+          "required": false
+        },
+        "has_incident_response_plan": {
+          "type": "String",
+          "required": false
+        },
+        "has_vendor_management": {
+          "type": "String",
+          "required": false
+        }
+      }
+    },
+    "AdminPath": {
+      "kind": "scalar",
+      "base": "String",
+      "doc": "The remainder of an /admin URL. A catch-all, so it may contain slashes."
+    }
+  },
+  "map": {
+    "healthz": {
+      "path": "/healthz",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Liveness probe. Returns 200 with an empty body.",
+      "client": false
+    },
+    "readyz": {
+      "path": "/readyz",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Readiness probe: pings the database and returns 200 or 503 with an empty body.",
+      "client": false
+    },
+    "metrics": {
+      "path": "/metrics",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Prometheus text exposition (text/plain; version=0.0.4). Not JSON.",
+      "client": false
+    },
+    "api_health": {
+      "path": "/api/health",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Compatibility alias of api_v1_health.",
+      "response": "HealthStatus"
+    },
+    "api_info": {
+      "path": "/api/info",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Compatibility alias of api_v1_info.",
+      "response": "ServiceInfo"
+    },
+    "api_v1_health": {
+      "path": "/api/v1/health",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Service liveness.",
+      "response": "HealthStatus"
+    },
+    "api_v1_info": {
+      "path": "/api/v1/info",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Service name, version, public domain, and runtime stack.",
+      "response": "ServiceInfo"
+    },
+    "api_v1_me": {
+      "path": "/api/v1/me",
+      "methods": [
+        "GET"
+      ],
+      "summary": "The authenticated identity behind the presented session cookie or bearer token.",
+      "response": "SessionIdentity",
+      "errors": {
+        "401": "ApiError",
+        "429": "ApiError"
+      }
+    },
+    "sync_pull": {
+      "path": "/api/v1/sync/changes",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Commit-ordered authoritative snapshots and tombstones since the cursor.",
+      "query_params": {
+        "cursor": {
+          "type": "String",
+          "required": false,
+          "doc": "Opaque, encrypted, owner-bound cursor from the previous pull."
+        },
+        "limit": {
+          "type": "I64",
+          "required": false,
+          "doc": "Requested page size; the server clamps to 1..=500."
+        }
+      },
+      "response": "PullResponse",
+      "errors": {
+        "400": "ApiError",
+        "401": "ApiError"
+      }
+    },
+    "sync_push": {
+      "path": "/api/v1/sync/mutations",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Apply a bounded batch of compare-and-swap draft-note mutations. Session-cookie callers must also pass origin and CSRF checks.",
+      "request": "MutationBatch",
+      "response": "MutationBatchResponse",
+      "errors": {
+        "400": "ApiError",
+        "401": "ApiError",
+        "403": "ApiError"
+      }
+    },
+    "login_page": {
+      "path": "/login",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered password login page; sets the login CSRF cookie. Redirects to /app when already signed in.",
+      "client": false
+    },
+    "login": {
+      "path": "/auth/login",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Password sign-in. Sets the session cookie and redirects (or hx-redirects) to /app.",
+      "content_type": "form",
+      "request": "LoginForm",
+      "client": false
+    },
+    "logout": {
+      "path": "/auth/logout",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Revoke the session, clear site data, and redirect to /login.",
+      "content_type": "form",
+      "request": "LogoutForm",
+      "client": false
+    },
+    "websocket": {
+      "path": "/ws",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Authenticated WebSocket upgrade for sync hints. Registered with `any(..)`; a browser upgrade is a GET.",
+      "client": false
+    },
+    "quote_page": {
+      "path": "/u/quote",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered quote questionnaire and the caller's existing quotes.",
+      "client": false
+    },
+    "quote_submit": {
+      "path": "/u/quote",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Validate the questionnaire and forward it to canonical-api-server, then redirect to /u/quote/{id}.",
+      "content_type": "form",
+      "request": "QuoteForm",
+      "client": false
+    },
+    "quote_detail": {
+      "path": "/u/quote/{id}",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered quote detail, or an HTMX status fragment when hx-request is set.",
+      "path_params": {
+        "id": "QuoteId"
+      },
+      "client": false
+    },
+    "app_dashboard": {
+      "path": "/app",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered application dashboard. Redirects to /login when unauthenticated.",
+      "client": false
+    },
+    "app_session_fragment": {
+      "path": "/app/fragments/session",
+      "methods": [
+        "GET"
+      ],
+      "summary": "HTMX fragment describing the current session.",
+      "client": false
+    },
+    "app_engagements": {
+      "path": "/app/engagements",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered list of the caller's audit engagements.",
+      "client": false
+    },
+    "app_create_engagement": {
+      "path": "/app/engagements",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Create an audit engagement, then redirect to /app/engagements or return the HTMX list fragment.",
+      "content_type": "form",
+      "request": "CreateEngagementForm",
+      "client": false
+    },
+    "app_engagement_detail": {
+      "path": "/app/engagements/{id}",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Server-rendered engagement detail with its notes.",
+      "path_params": {
+        "id": "EngagementId"
+      },
+      "client": false
+    },
+    "app_update_engagement_status": {
+      "path": "/app/engagements/{id}/status",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Move an engagement to another lifecycle status.",
+      "path_params": {
+        "id": "EngagementId"
+      },
+      "content_type": "form",
+      "request": "UpdateStatusForm",
+      "client": false
+    },
+    "app_add_engagement_note": {
+      "path": "/app/engagements/{id}/notes",
+      "methods": [
+        "POST"
+      ],
+      "summary": "Append a note to an engagement.",
+      "path_params": {
+        "id": "EngagementId"
+      },
+      "content_type": "form",
+      "request": "AddNoteForm",
+      "client": false
+    },
+    "admin_reserved": {
+      "path": "/admin",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Reserved namespace; always answers 404.",
+      "client": false
+    },
+    "admin_reserved_subpath": {
+      "path": "/admin/{*path}",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Reserved namespace; always answers 404.",
+      "path_params": {
+        "path": "AdminPath"
+      },
+      "client": false
+    }
+  }
+}
