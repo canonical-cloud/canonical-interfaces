@@ -1,0 +1,308 @@
+{
+  "schema_version": "2.0.0",
+  "service": "canonical-api-server",
+  "title": "Canonical Cloud Quote API",
+  "version": "0.1.0",
+  "description": "Typed route map for canonical-api-server.rs. Keys are operations; values are typed routes. Wire field names are the exact JSON keys produced by canonical-interfaces (camelCase) and by the server's own local response structs. /v1/* is a compatibility alias of /api/v1/* registered by the same handlers.",
+  "types": {
+    "QuoteId": {
+      "kind": "scalar",
+      "base": "Uuid",
+      "doc": "Server-minted quote identifier. Path segments are parsed with `Path<Uuid>`; on the wire it is the UUID's string form."
+    },
+
+    "QuoteSubmissionStatus": {
+      "kind": "enum",
+      "variants": ["queued", "analyzing", "ready", "failed"],
+      "doc": "canonical-interfaces QuoteSubmissionResponseStatus."
+    },
+    "QuoteSummaryStatus": {
+      "kind": "enum",
+      "variants": ["queued", "analyzing", "ready", "failed"]
+    },
+    "QuoteDetailStatus": {
+      "kind": "enum",
+      "variants": ["queued", "analyzing", "ready", "failed"]
+    },
+    "QuoteRetryStatus": {
+      "kind": "enum",
+      "variants": ["queued"],
+      "doc": "A successful retry only ever requeues; the server has no other terminal value here."
+    },
+    "QuoteStage": {
+      "kind": "enum",
+      "variants": ["queued", "loading_context", "analyzing", "validating", "ready", "failed"],
+      "doc": "canonical-interfaces QuoteStatusEventStage."
+    },
+
+    "QuoteRequest": {
+      "kind": "record",
+      "doc": "Authenticated quote intake. The handler takes `Json<serde_json::Value>` and then rejects any key outside this set (contract.rs REQUEST_FIELDS) before deserialising into the canonical-interfaces QuoteRequest.",
+      "fields": {
+        "organizationName": { "type": "String" },
+        "contactName": { "type": "String" },
+        "contactEmail": { "type": "String", "doc": "Follow-up address only. Owner identity comes from the accepted credential, never from this field." },
+        "website": { "type": "String", "required": false },
+        "employeeCount": { "type": "I64" },
+        "annualRevenueBand": { "type": "String", "required": false },
+        "frameworks": { "type": { "kind": "list", "item": "String" } },
+        "currentStage": { "type": "String" },
+        "infrastructure": { "type": { "kind": "list", "item": "String" } },
+        "dataSensitivity": { "type": { "kind": "list", "item": "String" } },
+        "targetDate": { "type": "String", "required": false },
+        "hasSecurityProgram": { "type": "Bool" },
+        "hasPolicies": { "type": "Bool" },
+        "hasRiskAssessment": { "type": "Bool" },
+        "hasIncidentResponsePlan": { "type": "Bool" },
+        "hasVendorManagement": { "type": "Bool" },
+        "notes": { "type": "String", "required": false },
+        "contextKey": { "type": "String", "required": false, "doc": "Allow-listed context selector. The server substitutes `quote-analysis` when omitted." },
+        "answersVersion": { "type": "I64", "doc": "Questionnaire schema version; only 1 is accepted." }
+      }
+    },
+
+    "QuoteEstimate": {
+      "kind": "record",
+      "doc": "Structured Gemini-assisted estimate, persisted only after server-side validation.",
+      "fields": {
+        "quoteId": "QuoteId",
+        "status": "String",
+        "currency": "String",
+        "lowerBoundCents": "I64",
+        "upperBoundCents": "I64",
+        "durationWeeksLow": "I64",
+        "durationWeeksHigh": "I64",
+        "confidence": "String",
+        "summary": "String",
+        "assumptions": { "type": { "kind": "list", "item": "String" } },
+        "gaps": { "type": { "kind": "list", "item": "String" } },
+        "nextSteps": { "type": { "kind": "list", "item": "String" } },
+        "frameworks": { "type": { "kind": "list", "item": "String" } },
+        "model": "String",
+        "contextVersion": "String",
+        "createdAt": "DateTime"
+      }
+    },
+
+    "QuoteProblem": {
+      "kind": "record",
+      "doc": "Bounded public error payload. Every 4xx and 5xx JSON response from this service is one of these.",
+      "fields": {
+        "code": "String",
+        "message": "String",
+        "requestId": "String"
+      }
+    },
+
+    "QuoteSubmissionResponse": {
+      "kind": "record",
+      "fields": {
+        "quoteId": "QuoteId",
+        "status": "QuoteSubmissionStatus",
+        "streamUrl": "String",
+        "createdAt": "DateTime"
+      }
+    },
+
+    "QuoteRetryResponse": {
+      "kind": "record",
+      "fields": {
+        "quoteId": "QuoteId",
+        "status": "QuoteRetryStatus",
+        "streamUrl": "String",
+        "updatedAt": "DateTime"
+      }
+    },
+
+    "QuoteSummary": {
+      "kind": "record",
+      "fields": {
+        "quoteId": "QuoteId",
+        "status": "QuoteSummaryStatus",
+        "organizationName": "String",
+        "frameworks": { "type": { "kind": "list", "item": "String" } },
+        "createdAt": "DateTime",
+        "updatedAt": "DateTime",
+        "estimate": { "type": "QuoteEstimate", "required": false, "doc": "Present only when the quote is ready." }
+      }
+    },
+
+    "QuoteDetail": {
+      "kind": "record",
+      "fields": {
+        "quoteId": "QuoteId",
+        "status": "QuoteDetailStatus",
+        "request": "QuoteRequest",
+        "eventsUrl": "String",
+        "createdAt": "DateTime",
+        "updatedAt": "DateTime",
+        "estimate": { "type": "QuoteEstimate", "required": false },
+        "problem": { "type": "QuoteProblem", "required": false, "doc": "Present only when the quote is failed." }
+      }
+    },
+
+    "QuoteListResponse": {
+      "kind": "record",
+      "fields": {
+        "quotes": { "type": { "kind": "list", "item": "QuoteSummary" } },
+        "nextCursor": { "type": "String", "required": false }
+      }
+    },
+
+    "QuoteStatusEvent": {
+      "kind": "record",
+      "doc": "One frame of the authenticated quote-progress WebSocket.",
+      "fields": {
+        "quoteId": "QuoteId",
+        "sequence": { "type": "String", "doc": "Monotonic decimal-string event sequence." },
+        "stage": "QuoteStage",
+        "message": "String",
+        "terminal": "Bool",
+        "estimate": { "type": "QuoteEstimate", "required": false },
+        "occurredAt": "DateTime",
+        "problem": { "type": "QuoteProblem", "required": false }
+      }
+    },
+
+    "HealthResponse": {
+      "kind": "record",
+      "doc": "Public liveness plus which optional subsystems were configured at boot. `#[serde(rename_all = \"camelCase\")]` in src/lib.rs.",
+      "fields": {
+        "databaseConfigured": "Bool",
+        "geminiConfigured": "Bool",
+        "geminiModel": "String",
+        "service": "String",
+        "sharedAuthConfigured": "Bool",
+        "status": "String",
+        "version": "String",
+        "webhookConfigured": "Bool"
+      }
+    },
+
+    "ReadyResponse": {
+      "kind": "record",
+      "doc": "200 body of /readyz. `#[serde(rename_all = \"camelCase\")]` in src/readiness.rs.",
+      "fields": {
+        "databaseReady": "Bool",
+        "service": "String",
+        "status": "String",
+        "version": "String"
+      }
+    },
+
+    "NotReadyResponse": {
+      "kind": "record",
+      "doc": "503 body of /readyz. This struct carries no rename_all, so the keys are exactly `code` and `message`.",
+      "fields": {
+        "code": "String",
+        "message": "String"
+      }
+    }
+  },
+
+  "map": {
+    "healthz": {
+      "path": "/healthz",
+      "methods": ["GET"],
+      "summary": "Unauthenticated liveness and boot configuration.",
+      "response": "HealthResponse"
+    },
+    "readyz": {
+      "path": "/readyz",
+      "methods": ["GET"],
+      "summary": "Readiness: PostgreSQL reachable and the quote schema, RLS policies, and runtime role all verified.",
+      "response": "ReadyResponse",
+      "errors": { "503": "NotReadyResponse" }
+    },
+
+    "list_quotes": {
+      "path": "/api/v1/quotes",
+      "methods": ["GET"],
+      "summary": "Owner-scoped quotes, newest first.",
+      "query_params": {
+        "cursor": { "type": "String", "required": false, "doc": "Opaque owner-bound cursor; the server rejects a cursor that is not a UUID." },
+        "limit": { "type": "I64", "required": false, "doc": "Clamped to 1..=100; defaults to 25." }
+      },
+      "response": "QuoteListResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "create_quote": {
+      "path": "/api/v1/quotes",
+      "methods": ["POST"],
+      "summary": "Submit a quote request. Requires an `Idempotency-Key` header; replies 202 Accepted.",
+      "request": "QuoteRequest",
+      "response": "QuoteSubmissionResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "get_quote": {
+      "path": "/api/v1/quotes/{quote_id}",
+      "methods": ["GET"],
+      "summary": "One owner-scoped quote.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteDetail",
+      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "retry_quote": {
+      "path": "/api/v1/quotes/{quote_id}/retry",
+      "methods": ["POST"],
+      "summary": "Requeue a failed quote. Requires an `Idempotency-Key` header and carries no request body.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteRetryResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "404": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "quote_events": {
+      "path": "/api/v1/quotes/{quote_id}/events",
+      "methods": ["GET"],
+      "summary": "WebSocket upgrade. Each frame is a QuoteStatusEvent; there is no JSON unary response to generate a client for.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteStatusEvent",
+      "client": false,
+      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+    },
+
+    "list_quotes_alias": {
+      "path": "/v1/quotes",
+      "methods": ["GET"],
+      "summary": "Compatibility alias of list_quotes, registered by the same handler.",
+      "query_params": {
+        "cursor": { "type": "String", "required": false },
+        "limit": { "type": "I64", "required": false }
+      },
+      "response": "QuoteListResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "create_quote_alias": {
+      "path": "/v1/quotes",
+      "methods": ["POST"],
+      "summary": "Compatibility alias of create_quote. Note that the returned streamUrl always points at /api/v1/quotes/{id}/events.",
+      "request": "QuoteRequest",
+      "response": "QuoteSubmissionResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "get_quote_alias": {
+      "path": "/v1/quotes/{quote_id}",
+      "methods": ["GET"],
+      "summary": "Compatibility alias of get_quote.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteDetail",
+      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "retry_quote_alias": {
+      "path": "/v1/quotes/{quote_id}/retry",
+      "methods": ["POST"],
+      "summary": "Compatibility alias of retry_quote.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteRetryResponse",
+      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "404": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+    },
+    "quote_events_alias": {
+      "path": "/v1/quotes/{quote_id}/events",
+      "methods": ["GET"],
+      "summary": "Compatibility alias of quote_events. WebSocket upgrade.",
+      "path_params": { "quote_id": "QuoteId" },
+      "response": "QuoteStatusEvent",
+      "client": false,
+      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+    }
+  }
+}
