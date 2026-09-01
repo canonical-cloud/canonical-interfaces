@@ -27,6 +27,9 @@ const expectedFields = [
   "referralCode",
   "displayName",
   "websiteUrl",
+  "registrationConsent",
+  "marketingConsent",
+  "marketingConsentRevision",
 ];
 
 const protoFields = [
@@ -42,6 +45,9 @@ const protoFields = [
   ["referral_code", 10],
   ["display_name", 11],
   ["website_url", 12],
+  ["registration_consent", 13],
+  ["marketing_consent", 14],
+  ["marketing_consent_revision", 15],
 ];
 
 function isUuid(value) {
@@ -148,6 +154,28 @@ function validateRequest(value) {
   ) {
     errors.push("invalid websiteUrl");
   }
+  if (value.registrationConsent !== true) {
+    errors.push("registration consent required");
+  }
+  if (typeof value.marketingConsent !== "boolean") {
+    errors.push("marketing consent choice required");
+  }
+  if (value.marketingConsent === true) {
+    if (
+      typeof value.marketingConsentRevision !== "string" ||
+      !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(
+        value.marketingConsentRevision,
+      )
+    ) {
+      errors.push("marketing consent revision required");
+    }
+  }
+  if (
+    value.marketingConsent === false &&
+    "marketingConsentRevision" in value
+  ) {
+    errors.push("marketing consent revision forbidden");
+  }
 
   return errors;
 }
@@ -172,8 +200,11 @@ test("protobuf field numbers are unique, contiguous, and stable", () => {
       /^\s*(?:optional\s+|repeated\s+)?[\w.<>]+\s+\w+\s*=\s*(\d+)\s*;/gm,
     ),
   ].map((match) => Number(match[1]));
-  const requestTags = tags.slice(0, 12);
-  assert.deepEqual(requestTags, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  const requestTags = tags.slice(0, 15);
+  assert.deepEqual(
+    requestTags,
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  );
   assert.equal(new Set(requestTags).size, requestTags.length);
 });
 
@@ -214,10 +245,18 @@ test("reviewed negative fixtures are rejected", () => {
   const cases = JSON.parse(
     fs.readFileSync(path.join(contract, "fixtures", "invalid.json"), "utf8"),
   );
-  assert.ok(cases.length >= 9);
+  assert.ok(cases.length >= 12);
   for (const fixture of cases) {
     assert.ok(validateRequest(fixture.value).length > 0, fixture.name);
   }
+});
+
+test("registration and marketing consent are explicitly independent", () => {
+  assert.equal(requestSchema.properties.registrationConsent.const, true);
+  assert.equal(requestSchema.properties.marketingConsent.type, "boolean");
+  const serialized = JSON.stringify(requestSchema.allOf);
+  assert.match(serialized, /marketingConsentRevision/);
+  assert.match(serialized, /marketingConsent/);
 });
 
 test("the accepted response is enumeration resistant and cannot imply account or quote creation", () => {
