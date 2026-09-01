@@ -1,0 +1,57 @@
+name: Generate pre-interest adapters once
+# dd:execution-carrier owner=DEN-2649 expires=2026-09-03
+
+on:
+  push:
+    branches: [feat/den-2649-pre-interest-contract]
+    paths:
+      - schema/pre-interest.schema.json
+      - schema/index.json
+      - route-maps/api.route-map.json
+      - fixtures/pre-interest/**
+      - src/pre-interest-contract.test.mjs
+      - .github/workflows/temporary-generate-pre-interest.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-pre-interest-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate-and-retire:
+    if: github.actor == 'ORESoftware'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: feat/den-2649-pre-interest-contract
+          fetch-depth: 2
+          persist-credentials: true
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Generate all language and route adapters from reviewed sources
+        run: |
+          npm run generate
+          python3 scripts/generate-routes.py --map route-maps/api.route-map.json --out generated/routes
+      - name: Validate generated outputs and contract tests
+        run: |
+          npm test
+          python3 scripts/generate-routes.py --map route-maps/api.route-map.json --out generated/routes --check
+      - name: Retire this feature-branch carrier and push generated review content
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          Path('.github/workflows/temporary-generate-pre-interest.yml').unlink()
+          PY
+          git add -A
+          git diff --cached --quiet && { echo 'no generated changes'; exit 1; }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(interfaces): regenerate pre-interest adapters'
+          git push origin "HEAD:${GITHUB_REF_NAME}"

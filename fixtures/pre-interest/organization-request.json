@@ -1,0 +1,15 @@
+{
+  "requestVersion": 1,
+  "registrationKind": "organization",
+  "contactEmail": "security@example.com",
+  "displayName": "Security Lead",
+  "organizationName": "Example Corporation",
+  "organizationDomain": "example.com",
+  "role": "Security",
+  "website": "https://example.com",
+  "interestAreas": ["compliance_quote", "managed_remediation", "vendor_risk"],
+  "notes": "We are planning a bounded readiness engagement. No sensitive data is included.",
+  "privacyVersion": "v1",
+  "contactConsent": true,
+  "sourcePath": "/compliance"
+}

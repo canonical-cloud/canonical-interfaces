@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CanonicalPreInterest",
+  "description": "Public, write-only pre-interest registration contracts for the Canonical quote platform.",
+  "$defs": {
+    "PreInterestRegistrationRequest": {
+      "type": "object",
+      "description": "Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server.",
+      "required": [
+        "requestVersion",
+        "registrationKind",
+        "contactEmail",
+        "interestAreas",
+        "privacyVersion",
+        "contactConsent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requestVersion": {
+          "type": "integer",
+          "const": 1,
+          "minimum": 1,
+          "maximum": 1,
+          "description": "Public registration contract version; only version 1 is accepted."
+        },
+        "registrationKind": {
+          "type": "string",
+          "pattern": "^(user|organization)$",
+          "description": "Whether the prospect is registering as an individual or for an organization."
+        },
+        "contactEmail": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 320,
+          "description": "Business contact email normalized by the server. A receipt never reveals whether it was already registered."
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "description": "Optional contact name."
+        },
+        "organizationName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Organization name; required for organization registrations."
+        },
+        "organizationDomain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 253,
+          "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$",
+          "description": "Optional lower-case DNS domain normalized by the server; no scheme, port, path, or credentials."
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "description": "Optional role or team for follow-up context."
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048,
+          "description": "Optional public HTTPS organization website."
+        },
+        "interestAreas": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "compliance_quote",
+              "readiness_assessment",
+              "managed_remediation",
+              "vendor_risk",
+              "security_program",
+              "platform_partnership"
+            ]
+          },
+          "description": "Bounded products or programs the prospect wants to discuss."
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Optional bounded context. Secrets, credentials, regulated records, and customer datasets must not be submitted."
+        },
+        "privacyVersion": {
+          "type": "string",
+          "pattern": "^v[1-9][0-9]{0,5}$",
+          "maxLength": 7,
+          "description": "Versioned privacy notice acknowledged by the registrant."
+        },
+        "contactConsent": {
+          "type": "boolean",
+          "const": true,
+          "description": "Explicit consent to receive follow-up about the selected interests."
+        },
+        "sourcePath": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^/[A-Za-z0-9._~!$&'()*+,;=:@%/-]*$",
+          "description": "Optional same-site path attribution. The source host is always derived from the accepted request host."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "registrationKind": { "const": "organization" }
+            },
+            "required": ["registrationKind"]
+          },
+          "then": {
+            "required": ["organizationName"]
+          }
+        }
+      ]
+    },
+    "PreInterestRegistrationReceipt": {
+      "type": "object",
+      "description": "Uniform accepted receipt returned for both new and idempotently repeated registrations.",
+      "required": [
+        "requestId",
+        "registrationId",
+        "status",
+        "acceptedAt",
+        "nextPath",
+        "message"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Request correlation identifier."
+        },
+        "registrationId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Opaque registration receipt identifier; it is not an authorization credential."
+        },
+        "status": {
+          "type": "string",
+          "pattern": "^accepted$",
+          "description": "Uniform public status that does not reveal prior registration state."
+        },
+        "acceptedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC 3339 server acceptance time."
+        },
+        "nextPath": {
+          "type": "string",
+          "pattern": "^/(?:pre-interest|u/quote)$",
+          "maxLength": 32,
+          "description": "Same-site next step selected by registration kind and feature readiness."
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240,
+          "description": "Safe public confirmation text with no account or duplication disclosure."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "requestVersion": 1,
+  "registrationKind": "user",
+  "contactEmail": "prospect@example.com",
+  "displayName": "Example Prospect",
+  "interestAreas": ["compliance_quote", "readiness_assessment"],
+  "privacyVersion": "v1",
+  "contactConsent": true,
+  "sourcePath": "/pricing"
+}
