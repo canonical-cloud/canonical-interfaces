@@ -10,5 +10,7 @@
   "consentedAt": "2026-09-01T15:30:00Z",
   "sourceHost": "user.canonical.plus",
   "locale": "en-US",
-  "referralCode": "launch-2026"
+  "referralCode": "launch-2026",
+  "displayName": "Example Person",
+  "websiteUrl": "https://person.example.com"
 }
