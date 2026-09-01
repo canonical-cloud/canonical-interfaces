@@ -241,6 +241,9 @@
         "nextStepUrl": {
           "type": "string",
           "maxLength": 2048,
+          "examples": [
+            "https://user.canonical.plus/u/quote"
+          ],
           "pattern": "^https://(?:user|org)\\.canonical\\.plus/"
         }
       }
