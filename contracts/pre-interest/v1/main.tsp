@@ -19,9 +19,9 @@ enum InterestArea {
   cmmc,
 }
 
-@doc("A public, consented pre-interest registration. Host/party matching is revalidated by the origin.")
+@doc("A public, consented pre-interest registration. Trust-bearing metadata is derived by the same-origin BFF and revalidated by the API.")
 model PreInterestRegistrationRequest {
-  @doc("Client-generated opaque UUID used for durable idempotency. It must not contain or derive from the email address.")
+  @doc("Server-generated opaque UUID used for durable idempotency. It must not contain or derive from the email address.")
   @format("uuid")
   requestId: string;
 
@@ -30,6 +30,7 @@ model PreInterestRegistrationRequest {
   @maxLength(320)
   email: string;
 
+  @doc("Derived from the accepted user or organization host, never trusted from a public form field.")
   partyType: PartyType;
 
   @doc("Required only for organization registrations and forbidden for individual registrations.")
@@ -41,16 +42,16 @@ model PreInterestRegistrationRequest {
   @maxItems(9)
   interestAreas: InterestArea[];
 
-  @doc("Immutable reviewed consent-copy revision.")
+  @doc("Immutable reviewed registration-consent copy revision.")
   @minLength(1)
   @maxLength(64)
   consentRevision: string;
 
-  @doc("Client-observed consent time. The server separately records its acceptance time.")
+  @doc("Server-recorded BFF acceptance time. The durable API records its own acceptance time separately.")
   @format("date-time")
   consentedAt: string;
 
-  @doc("Must be user.canonical.plus for an individual or org.canonical.plus for an organization.")
+  @doc("Derived from the exact accepted host: user.canonical.plus or org.canonical.plus.")
   @minLength(1)
   @maxLength(253)
   sourceHost: string;
@@ -98,7 +99,7 @@ model PreInterestRegistrationResponse {
   @format("date-time")
   acceptedAt: string;
 
-  @doc("Explicit next step only; registering never creates or submits a quote.")
+  @doc("Explicit reviewed next step only; registering never creates or submits a quote and callers must not treat this as an open redirect.")
   @maxLength(2048)
   nextStepUrl: string;
 }
