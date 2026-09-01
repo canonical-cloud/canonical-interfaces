@@ -157,7 +157,7 @@
         },
         "nextPath": {
           "type": "string",
-          "pattern": "^/(?:pre-interest|u/quote)$",
+          "enum": ["/pre-interest", "/u/quote"],
           "maxLength": 32,
           "description": "Same-site next step selected by registration kind and feature readiness."
         },
