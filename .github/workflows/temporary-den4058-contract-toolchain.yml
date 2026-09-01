@@ -11,6 +11,9 @@ on:
       - scripts/project-pre-interest-contract.test.mjs
       - route-maps/api.route-map.json
       - tests/interface-conformance/fixtures.mjs
+      - src/generate.mjs
+      - src/generate.test.mjs
+      - src/enum-symbols.test.mjs
       - package.json
       - .zpkg.toml
       - .github/workflows/pre-interest-contract.yml
@@ -54,15 +57,78 @@ jobs:
           version: "1.72.0"
           github_token: ${{ github.token }}
 
-      - name: Extend the exact generated-type inventory
+      - name: Harden portable enum symbols and generated-type inventory
         shell: bash
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
 
-          path = Path("src/generate.test.mjs")
-          text = path.read_text(encoding="utf-8")
+          generator = Path("src/generate.mjs")
+          text = generator.read_text(encoding="utf-8")
+          old_pascal = 'const pascal = (s) => s.split(/[_\\-\\s]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");'
+          new_pascal = '''const pascal = (value) => {
+            const words = String(value).match(/[A-Za-z0-9]+/g) || [];
+            let symbol = words
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join("");
+            if (!symbol) {
+              fail(`cannot derive a portable identifier from ${JSON.stringify(value)}`);
+            }
+            if (/^[0-9]/.test(symbol)) symbol = `Value${symbol}`;
+            if (!/^[A-Za-z][A-Za-z0-9]*$/.test(symbol)) {
+              fail(`cannot derive a portable identifier from ${JSON.stringify(value)}`);
+            }
+            return symbol;
+          };'''
+          if text.count(old_pascal) != 1:
+              raise SystemExit("unexpected pascal helper shape")
+          text = text.replace(old_pascal, new_pascal, 1)
+
+          old_collect = '''function collectEnums(types) {
+            const enums = new Map();
+            for (const t of types) {
+              for (const p of t.props) {
+                if (isStringEnum(p.schema)) {
+                  const enumName = enumTypeName(t.name, p.name);
+                  enums.set(enumName, p.schema.enum);
+                }
+              }
+            }
+            return enums;
+          }'''
+          new_collect = '''function collectEnums(types) {
+            const enums = new Map();
+            for (const t of types) {
+              for (const p of t.props) {
+                if (!isStringEnum(p.schema)) continue;
+                const enumName = enumTypeName(t.name, p.name);
+                const values = p.schema.enum.slice();
+                const symbols = new Map();
+                for (const value of values) {
+                  if (typeof value !== "string") {
+                    fail(`${enumName}: string enum contains a non-string value`);
+                  }
+                  const symbol = pascal(value);
+                  const previous = symbols.get(symbol);
+                  if (previous !== undefined) {
+                    fail(
+                      `${enumName}: enum values ${JSON.stringify(previous)} and ${JSON.stringify(value)} both map to portable enum symbol "${symbol}"`,
+                    );
+                  }
+                  symbols.set(symbol, value);
+                }
+                enums.set(enumName, values);
+              }
+            }
+            return enums;
+          }'''
+          if text.count(old_collect) != 1:
+              raise SystemExit("unexpected collectEnums helper shape")
+          generator.write_text(text.replace(old_collect, new_collect, 1), encoding="utf-8")
+
+          inventory = Path("src/generate.test.mjs")
+          inventory_text = inventory.read_text(encoding="utf-8")
           old = "    'MutationResult',\n    'QuoteDetail',"
           new = (
               "    'MutationResult',\n"
@@ -71,10 +137,10 @@ jobs:
               "    'PreInterestRegistrationResponse',\n"
               "    'QuoteDetail',"
           )
-          if text.count(new) == 1 and text.count(old) == 0:
+          if inventory_text.count(new) == 1 and inventory_text.count(old) == 0:
               pass
-          elif text.count(old) == 1 and text.count(new) == 0:
-              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          elif inventory_text.count(old) == 1 and inventory_text.count(new) == 0:
+              inventory.write_text(inventory_text.replace(old, new, 1), encoding="utf-8")
           else:
               raise SystemExit("unexpected generated-type inventory shape")
           PY
