@@ -1,0 +1,122 @@
+[
+  {
+    "name": "organization name is required",
+    "value": {
+      "requestId": "9f1c7237-1f42-4c0c-95d2-8ca7c3a4de50",
+      "email": "security@example.org",
+      "partyType": "organization",
+      "organizationName": null,
+      "interestAreas": [
+        "iso_27001",
+        "nist"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:31:00Z",
+      "sourceHost": "org.canonical.plus"
+    }
+  },
+  {
+    "name": "individual cannot carry organization name",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026",
+      "organizationName": "Should not be here"
+    }
+  },
+  {
+    "name": "party and host must agree",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "org.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026"
+    }
+  },
+  {
+    "name": "unknown fields are rejected",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026",
+      "notes": "free form is forbidden"
+    }
+  },
+  {
+    "name": "request id must be an opaque uuid",
+    "value": {
+      "requestId": "person@example.com",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026"
+    }
+  },
+  {
+    "name": "email is bounded and structured",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "not-an-email",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026"
+    }
+  },
+  {
+    "name": "interests are unique",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "soc2",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026"
+    }
+  }
+]

@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://interfaces.canonical.plus/pre-interest/v1/pre-interest.schema.json",
+  "title": "CanonicalPreInterestV1",
+  "description": "Privacy-minimized public pre-interest registration contracts. Registration never creates an account, quote, role, grant, or entitlement.",
+  "$defs": {
+    "PartyType": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "organization"
+      ]
+    },
+    "InterestArea": {
+      "type": "string",
+      "enum": [
+        "readiness_assessment",
+        "soc2",
+        "iso_27001",
+        "hipaa",
+        "pci_dss_4",
+        "fedramp",
+        "nist",
+        "gdpr",
+        "cmmc"
+      ]
+    },
+    "PreInterestRegistrationRequest": {
+      "type": "object",
+      "description": "Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.",
+      "required": [
+        "requestId",
+        "email",
+        "partyType",
+        "interestAreas",
+        "consentRevision",
+        "consentedAt",
+        "sourceHost"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "requestId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$",
+          "description": "Opaque client-generated idempotency UUID; it must not contain or derive from contact data."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 3,
+          "maxLength": 320,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "partyType": {
+          "$ref": "#/$defs/PartyType"
+        },
+        "organizationName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "interestAreas": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 9,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/InterestArea"
+          }
+        },
+        "consentRevision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        },
+        "consentedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceHost": {
+          "type": "string",
+          "enum": [
+            "user.canonical.plus",
+            "org.canonical.plus"
+          ]
+        },
+        "locale": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 35,
+          "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$"
+        },
+        "referralCode": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "partyType": {
+                "const": "individual"
+              }
+            },
+            "required": [
+              "partyType"
+            ]
+          },
+          "then": {
+            "properties": {
+              "sourceHost": {
+                "const": "user.canonical.plus"
+              }
+            },
+            "not": {
+              "required": [
+                "organizationName"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "partyType": {
+                "const": "organization"
+              }
+            },
+            "required": [
+              "partyType"
+            ]
+          },
+          "then": {
+            "required": [
+              "organizationName"
+            ],
+            "properties": {
+              "sourceHost": {
+                "const": "org.canonical.plus"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PreInterestRegistrationResponse": {
+      "type": "object",
+      "description": "Uniform response for newly created, duplicate-request, and already-known email aliases.",
+      "required": [
+        "receiptId",
+        "status",
+        "acceptedAt",
+        "nextStepUrl"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "receiptId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
+        },
+        "status": {
+          "type": "string",
+          "const": "accepted"
+        },
+        "acceptedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextStepUrl": {
+          "type": "string",
+          "maxLength": 2048,
+          "pattern": "^https://(?:user|org)\\.canonical\\.plus/"
+        }
+      }
+    },
+    "PreInterestProblem": {
+      "type": "object",
+      "description": "Safe bounded error that never echoes contact data.",
+      "required": [
+        "code",
+        "message",
+        "requestId"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_request",
+            "rate_limited",
+            "verification_required",
+            "storage_unavailable",
+            "internal"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "requestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

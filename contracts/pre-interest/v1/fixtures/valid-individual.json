@@ -1,0 +1,14 @@
+{
+  "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+  "email": "person@example.com",
+  "partyType": "individual",
+  "interestAreas": [
+    "readiness_assessment",
+    "soc2"
+  ],
+  "consentRevision": "pre-interest-v1",
+  "consentedAt": "2026-09-01T15:30:00Z",
+  "sourceHost": "user.canonical.plus",
+  "locale": "en-US",
+  "referralCode": "launch-2026"
+}
