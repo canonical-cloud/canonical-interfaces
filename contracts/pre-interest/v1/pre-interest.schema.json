@@ -35,7 +35,9 @@
         "interestAreas",
         "consentRevision",
         "consentedAt",
-        "sourceHost"
+        "sourceHost",
+        "registrationConsent",
+        "marketingConsent"
       ],
       "additionalProperties": false,
       "properties": {
@@ -109,6 +111,19 @@
           "minLength": 9,
           "maxLength": 2048,
           "pattern": "^https://[^\\s]+$"
+        },
+        "registrationConsent": {
+          "type": "boolean",
+          "const": true
+        },
+        "marketingConsent": {
+          "type": "boolean"
+        },
+        "marketingConsentRevision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"
         }
       },
       "allOf": [
@@ -155,6 +170,42 @@
               "sourceHost": {
                 "const": "org.canonical.plus"
               }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "marketingConsent": {
+                "const": true
+              }
+            },
+            "required": [
+              "marketingConsent"
+            ]
+          },
+          "then": {
+            "required": [
+              "marketingConsentRevision"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "marketingConsent": {
+                "const": false
+              }
+            },
+            "required": [
+              "marketingConsent"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "marketingConsentRevision"
+              ]
             }
           }
         }
