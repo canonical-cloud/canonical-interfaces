@@ -278,3 +278,36 @@ export function mutationsForFixture(fixture, definition, name) {
   }
   return mutations;
 }
+
+export function buildFixtures(registry) {
+  const fixtures = {};
+  for (const entry of registry) {
+    if (Object.hasOwn(fixtures, entry.name)) {
+      throw new Error(`duplicate schema definition ${entry.name}`);
+    }
+    fixtures[entry.name] = fixtureForDefinition(entry.definition, entry.name);
+  }
+  return fixtures;
+}
+
+export const expectedKeys = Object.freeze([
+  "ApiError",
+  "AssessmentEvidence",
+  "AssessmentRequest",
+  "MutationResult",
+  "PreInterestProblem",
+  "PreInterestRegistrationRequest",
+  "PreInterestRegistrationResponse",
+  "QuoteDetail",
+  "QuoteEvent",
+  "QuoteListResponse",
+  "QuoteRequest",
+  "QuoteRetry",
+  "QuoteSchema",
+  "ReadinessFramework",
+  "ReadinessFrameworkList",
+  "SyncChange",
+  "SyncChangesResponse",
+  "SyncMutation",
+  "SyncMutationBatch",
+]);
