@@ -66,12 +66,11 @@ jobs:
 
           generator = Path("src/generate.mjs")
           text = generator.read_text(encoding="utf-8")
-          old_pascal = '''const pascal = (s) =>
-            s
-              .split(/[_\\-\\s]+/)
-              .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
-              .join("");'''
-          new_pascal = '''const pascal = (value) => {
+
+          if "cannot derive a portable identifier" not in text:
+              start = text.index("const pascal =")
+              end = text.index("\nconst snake =", start)
+              replacement = '''const pascal = (value) => {
             const words = String(value).match(/[A-Za-z0-9]+/g) || [];
             let symbol = words
               .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -85,24 +84,12 @@ jobs:
             }
             return symbol;
           };'''
-          if text.count(old_pascal) != 1:
-              raise SystemExit("unexpected pascal helper shape")
-          text = text.replace(old_pascal, new_pascal, 1)
+              text = text[:start] + replacement + text[end:]
 
-          old_collect = '''function collectEnums(types) {
-            const enums = new Map();
-            for (const t of types) {
-              for (const p of t.props) {
-                // Only string enum — booleans/integers never become language enums.
-                if (isStringEnum(p.schema)) {
-                  const enumName = enumTypeName(t.name, p.name);
-                  if (!enums.has(enumName)) enums.set(enumName, p.schema.enum);
-                }
-              }
-            }
-            return enums;
-          }'''
-          new_collect = '''function collectEnums(types) {
+          if "both map to portable enum symbol" not in text:
+              start = text.index("function collectEnums(types) {")
+              end = text.index("\n\n// --- per-language scalar resolvers", start)
+              replacement = '''function collectEnums(types) {
             const enums = new Map();
             for (const t of types) {
               for (const p of t.props) {
@@ -136,15 +123,9 @@ jobs:
             }
             return enums;
           }'''
-          if text.count(old_collect) != 1:
-              raise SystemExit("unexpected collectEnums helper shape")
-          text = text.replace(old_collect, new_collect, 1)
+              text = text[:start] + replacement + text[end:]
 
-          old_exports = "export { loadTypes, isNullable, isStringEnum };"
-          new_exports = "export { build, collectEnums, loadTypes, isNullable, isStringEnum, pascal };"
-          if text.count(old_exports) != 1:
-              raise SystemExit("unexpected generator export shape")
-          generator.write_text(text.replace(old_exports, new_exports, 1), encoding="utf-8")
+          generator.write_text(text, encoding="utf-8")
 
           inventory = Path("src/generate.test.mjs")
           inventory_text = inventory.read_text(encoding="utf-8")
@@ -156,34 +137,26 @@ jobs:
               "    'PreInterestRegistrationResponse',\n"
               "    'QuoteDetail',"
           )
-          if inventory_text.count(new) == 1 and inventory_text.count(old) == 0:
-              pass
-          elif inventory_text.count(old) == 1 and inventory_text.count(new) == 0:
+          if new not in inventory_text:
+              if inventory_text.count(old) != 1:
+                  raise SystemExit("unexpected generated-type inventory shape")
               inventory.write_text(inventory_text.replace(old, new, 1), encoding="utf-8")
-          else:
-              raise SystemExit("unexpected generated-type inventory shape")
           PY
 
       - name: Compile TypeSpec and Protobuf sources
         shell: bash
         run: |
           set -euo pipefail
-          npm install --prefix "$RUNNER_TEMP/typespec" \
-            --ignore-scripts --no-audit --no-fund \
-            @typespec/compiler@1.14.0
-          "$RUNNER_TEMP/typespec/node_modules/.bin/tsp" compile \
-            contracts/pre-interest/v1/main.tsp --no-emit
+          npm install --prefix "$RUNNER_TEMP/typespec" --ignore-scripts --no-audit --no-fund @typespec/compiler@1.14.0
+          "$RUNNER_TEMP/typespec/node_modules/.bin/tsp" compile contracts/pre-interest/v1/main.tsp --no-emit
           buf format -w contracts/pre-interest/v1/pre_interest.proto
           buf format -w contracts/pre-interest/v1/baseline/pre_interest.proto
           buf lint contracts/pre-interest/v1
           buf lint contracts/pre-interest/v1/baseline
-          buf build contracts/pre-interest/v1 \
-            -o "$RUNNER_TEMP/pre_interest.descriptor.binpb"
-          buf breaking contracts/pre-interest/v1 \
-            --against contracts/pre-interest/v1/baseline
+          buf build contracts/pre-interest/v1 -o "$RUNNER_TEMP/pre_interest.descriptor.binpb"
+          buf breaking contracts/pre-interest/v1 --against contracts/pre-interest/v1/baseline
           hash="$(sha256sum "$RUNNER_TEMP/pre_interest.descriptor.binpb" | awk '{print $1}')"
-          printf '%s  pre_interest.descriptor.binpb\n' "$hash" \
-            > contracts/pre-interest/v1/pre_interest.descriptor.sha256
+          printf '%s  pre_interest.descriptor.binpb\n' "$hash" > contracts/pre-interest/v1/pre_interest.descriptor.sha256
 
       - name: Generate all language and HTTP-route projections
         shell: bash
@@ -191,34 +164,23 @@ jobs:
           set -euo pipefail
           node scripts/project-pre-interest-contract.mjs --write
           npm run generate
-          python3 scripts/generate-routes.py \
-            --map route-maps/api.route-map.json \
-            --out generated/routes
+          python3 scripts/generate-routes.py --map route-maps/api.route-map.json --out generated/routes
 
       - name: Validate exact generated state
         shell: bash
         run: |
           set -euo pipefail
           npm test
-          python3 scripts/generate-routes.py \
-            --map route-maps/api.route-map.json \
-            --out generated/routes \
-            --check
+          python3 scripts/generate-routes.py --map route-maps/api.route-map.json --out generated/routes --check
           git diff --check
 
       - name: Retire carrier, push review content, and verify remote head
         shell: bash
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          Path(".github/workflows/temporary-den4058-contract-toolchain.yml").unlink()
-          PY
+          rm .github/workflows/temporary-den4058-contract-toolchain.yml
           git add -A
-          git diff --cached --quiet && {
-            echo "expected generated or carrier-retirement changes"
-            exit 1
-          }
+          git diff --cached --quiet && { echo "expected generated or carrier-retirement changes"; exit 1; }
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "chore(DEN-4058): generate pre-interest contract adapters"
