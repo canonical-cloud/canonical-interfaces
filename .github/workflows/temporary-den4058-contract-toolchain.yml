@@ -10,6 +10,7 @@ on:
       - scripts/project-pre-interest-contract.mjs
       - scripts/project-pre-interest-contract.test.mjs
       - route-maps/api.route-map.json
+      - tests/interface-conformance/fixtures.mjs
       - package.json
       - .zpkg.toml
       - .github/workflows/pre-interest-contract.yml
@@ -36,7 +37,7 @@ jobs:
           fetch-depth: 2
 
       - name: Install Node 22
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "22"
           package-manager-cache: false
