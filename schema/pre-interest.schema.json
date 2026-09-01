@@ -49,10 +49,10 @@
         },
         "organizationDomain": {
           "type": "string",
-          "minLength": 1,
+          "minLength": 2,
           "maxLength": 253,
-          "pattern": "^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$",
-          "description": "Optional lower-case DNS domain normalized by the server; no scheme, port, path, or credentials."
+          "pattern": "^[a-z0-9][a-z0-9.-]{0,251}[a-z0-9]$",
+          "description": "Optional lower-case DNS domain normalized and strictly validated by the server; no scheme, port, path, or credentials."
         },
         "role": {
           "type": "string",
