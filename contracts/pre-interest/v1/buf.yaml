@@ -8,6 +8,12 @@ lint:
     - STANDARD
   except:
     - PACKAGE_DIRECTORY_MATCH
+    # TypeSpec, JSON Schema, Protobuf, Rust, Dart, and TypeScript deliberately
+    # share the public model names below. The RPC name is already scoped by its
+    # service/package, so renaming only the Protobuf projection would create a
+    # false cross-representation drift.
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
 breaking:
   use:
     - FILE
