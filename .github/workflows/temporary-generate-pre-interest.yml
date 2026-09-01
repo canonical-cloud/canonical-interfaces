@@ -10,6 +10,7 @@ on:
       - route-maps/api.route-map.json
       - fixtures/pre-interest/**
       - src/pre-interest-contract.test.mjs
+      - docs/pre-interest-v1.md
       - .github/workflows/temporary-generate-pre-interest.yml
 
 permissions:
