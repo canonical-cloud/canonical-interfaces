@@ -11,13 +11,13 @@ const readme = fs.readFileSync(
   "utf8",
 );
 
-const API_ROUTE = "POST /api/v1/pre-interest/registrations";
+const API_ROUTE = "POST /v1/pre-interest-registrations";
 const BFF_ROUTE = "POST /forms/pre-interest";
 
 test("the public-intake contract has one exact versioned API route", () => {
   assert.equal(readme.split(API_ROUTE).length - 1, 1);
-  assert.doesNotMatch(readme, /POST \/v1\/pre-interest-registrations/);
-  assert.doesNotMatch(readme, /POST \/api\/v1\/pre-interest(?:\s|`|$)/);
+  assert.doesNotMatch(readme, /POST \/api\/v1\/pre-interest\/registrations/);
+  assert.doesNotMatch(readme, /POST \/v1\/pre-interest(?:\s|`|$)/);
 });
 
 test("browser forms terminate at the same-origin BFF", () => {

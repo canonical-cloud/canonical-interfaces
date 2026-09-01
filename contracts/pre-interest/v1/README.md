@@ -49,9 +49,10 @@ identity and generated adapter targets.
 
 ## HTTP/RPC boundary
 
-The reviewed HTTP route is exactly `POST /api/v1/pre-interest/registrations` on
-`api.canonical.plus`. No unversioned route, legacy `/v1` alias, collection read,
-update, delete, or browser-facing redirect endpoint is part of this contract.
+The reviewed HTTP route is exactly `POST /v1/pre-interest-registrations` on
+`api.canonical.plus`. No unversioned route, `/api/v1/pre-interest/registrations`
+alias, collection read, update, delete, or browser-facing redirect endpoint is
+part of this contract.
 
 Public HTML forms submit only to the same-origin BFF route
 `POST /forms/pre-interest` on `user.canonical.plus` or `org.canonical.plus`.

@@ -268,9 +268,13 @@ test("the accepted response is enumeration resistant and cannot imply account or
   assert.match(text, /never creates an account, quote, role, grant, or entitlement/);
 });
 
-test("candidate artifacts are never represented as generated output", () => {
+test("generated projections are indexed and guarded by the contract toolchain", () => {
   const readme = fs.readFileSync(path.join(contract, "README.md"), "utf8");
-  assert.match(readme, /outside `schema\/index\.json`/);
-  assert.match(readme, /Nothing in this directory is represented as\s+generated output/);
-  assert.match(readme, /Buf lint\/breaking/);
+  const index = JSON.parse(
+    fs.readFileSync(path.join(root, "schema", "index.json"), "utf8"),
+  );
+  assert.ok(index.schemas.includes("pre-interest.schema.json"));
+  assert.match(readme, /authoritative multi-representation contract bundle/);
+  assert.match(readme, /Generated Rust, Rust\/WASM, TypeScript, Python, Go, and Dart adapters/);
+  assert.match(readme, /Buf must format, lint,/);
 });
