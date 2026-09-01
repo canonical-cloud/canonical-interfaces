@@ -6,6 +6,44 @@
   "description": "Typed route map for github.com/canonical-cloud. Keys compile in Rust/TS/Dart; opto-sync distributes this document (scope ores.api-docs.route-map).",
   "map": {
     "healthz": "/healthz",
+    "register_pre_interest": {
+      "path": "/api/v1/pre-interest/registrations",
+      "methods": ["POST"],
+      "summary": "Public write-only, enumeration-resistant pre-interest registration. No public list, read, update, or delete operation exists.",
+      "request_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requestId", "email", "partyType", "interestAreas", "consentRevision", "consentedAt", "sourceHost", "registrationConsent", "marketingConsent"],
+        "properties": {
+          "requestId": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 320 },
+          "partyType": { "type": "string", "enum": ["individual", "organization"] },
+          "organizationName": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "interestAreas": { "type": "array", "minItems": 1, "maxItems": 9, "uniqueItems": true, "items": { "type": "string", "enum": ["readiness_assessment", "soc2", "iso_27001", "hipaa", "pci_dss_4", "fedramp", "nist", "gdpr", "cmmc"] } },
+          "consentRevision": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "consentedAt": { "type": "string", "format": "date-time" },
+          "sourceHost": { "type": "string", "enum": ["user.canonical.plus", "org.canonical.plus"] },
+          "locale": { "type": "string", "minLength": 2, "maxLength": 35 },
+          "referralCode": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "websiteUrl": { "type": "string", "format": "uri", "minLength": 9, "maxLength": 2048 },
+          "registrationConsent": { "type": "boolean" },
+          "marketingConsent": { "type": "boolean" },
+          "marketingConsentRevision": { "type": "string", "minLength": 1, "maxLength": 64 }
+        }
+      },
+      "response_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receiptId", "status", "acceptedAt", "nextStepUrl"],
+        "properties": {
+          "receiptId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["accepted"] },
+          "acceptedAt": { "type": "string", "format": "date-time" },
+          "nextStepUrl": { "type": "string", "maxLength": 2048 }
+        }
+      }
+    },
     "list_quotes": {
       "path": "/api/v1/quotes",
       "methods": ["GET"],
@@ -52,9 +90,7 @@
       "path_params": {
         "type": "object",
         "required": ["quoteId"],
-        "properties": {
-          "quoteId": { "type": "string", "format": "uuid" }
-        }
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
       }
     },
     "retry_quote": {
@@ -63,9 +99,7 @@
       "path_params": {
         "type": "object",
         "required": ["quoteId"],
-        "properties": {
-          "quoteId": { "type": "string", "format": "uuid" }
-        }
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
       }
     },
     "quote_events": {
@@ -74,9 +108,7 @@
       "path_params": {
         "type": "object",
         "required": ["quoteId"],
-        "properties": {
-          "quoteId": { "type": "string", "format": "uuid" }
-        }
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
       }
     },
     "list_readiness_frameworks": "/api/v1/readiness/frameworks",
@@ -86,28 +118,18 @@
       "path_params": {
         "type": "object",
         "required": ["frameworkId"],
-        "properties": {
-          "frameworkId": { "type": "string", "minLength": 1 }
-        }
+        "properties": { "frameworkId": { "type": "string", "minLength": 1 } }
       }
     },
-    "list_readiness_assessments": {
-      "path": "/api/v1/readiness/assessments",
-      "methods": ["GET"]
-    },
-    "create_readiness_assessment": {
-      "path": "/api/v1/readiness/assessments",
-      "methods": ["POST"]
-    },
+    "list_readiness_assessments": { "path": "/api/v1/readiness/assessments", "methods": ["GET"] },
+    "create_readiness_assessment": { "path": "/api/v1/readiness/assessments", "methods": ["POST"] },
     "get_readiness_assessment": {
       "path": "/api/v1/readiness/assessments/{assessmentId}",
       "methods": ["GET"],
       "path_params": {
         "type": "object",
         "required": ["assessmentId"],
-        "properties": {
-          "assessmentId": { "type": "string", "format": "uuid" }
-        }
+        "properties": { "assessmentId": { "type": "string", "format": "uuid" } }
       }
     },
     "sync_changes": {
@@ -130,9 +152,7 @@
       "request_schema": {
         "type": "object",
         "required": ["operations"],
-        "properties": {
-          "operations": { "type": "array", "minItems": 1, "maxItems": 50 }
-        }
+        "properties": { "operations": { "type": "array", "minItems": 1, "maxItems": 50 } }
       }
     }
   }
