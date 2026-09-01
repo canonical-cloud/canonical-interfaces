@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package canonical.pre_interest.v1;
+
+option go_package = "github.com/canonical-cloud/canonical-interfaces/generated/go/preinterest/v1;preinterestv1";
+
+enum PartyType {
+  PARTY_TYPE_UNSPECIFIED = 0;
+  PARTY_TYPE_INDIVIDUAL = 1;
+  PARTY_TYPE_ORGANIZATION = 2;
+}
+
+enum InterestArea {
+  INTEREST_AREA_UNSPECIFIED = 0;
+  INTEREST_AREA_READINESS_ASSESSMENT = 1;
+  INTEREST_AREA_SOC2 = 2;
+  INTEREST_AREA_ISO_27001 = 3;
+  INTEREST_AREA_HIPAA = 4;
+  INTEREST_AREA_PCI_DSS_4 = 5;
+  INTEREST_AREA_FEDRAMP = 6;
+  INTEREST_AREA_NIST = 7;
+  INTEREST_AREA_GDPR = 8;
+  INTEREST_AREA_CMMC = 9;
+}
+
+message PreInterestRegistrationRequest {
+  string request_id = 1;
+  string email = 2;
+  PartyType party_type = 3;
+  optional string organization_name = 4;
+  repeated InterestArea interest_areas = 5;
+  string consent_revision = 6;
+  string consented_at = 7;
+  string source_host = 8;
+  optional string locale = 9;
+  optional string referral_code = 10;
+  optional string display_name = 11;
+  optional string website_url = 12;
+  bool registration_consent = 13;
+  bool marketing_consent = 14;
+  optional string marketing_consent_revision = 15;
+}
+
+message PreInterestRegistrationResponse {
+  string receipt_id = 1;
+  string status = 2;
+  string accepted_at = 3;
+  string next_step_url = 4;
+}
+
+message PreInterestProblem {
+  string code = 1;
+  string message = 2;
+  string request_id = 3;
+}
+
+service PreInterestRegistrationService {
+  rpc Register(PreInterestRegistrationRequest)
+      returns (PreInterestRegistrationResponse);
+}
