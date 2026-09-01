@@ -25,6 +25,8 @@ const expectedFields = [
   "sourceHost",
   "locale",
   "referralCode",
+  "displayName",
+  "websiteUrl",
 ];
 
 const protoFields = [
@@ -38,6 +40,8 @@ const protoFields = [
   ["source_host", 8],
   ["locale", 9],
   ["referral_code", 10],
+  ["display_name", 11],
+  ["website_url", 12],
 ];
 
 function isUuid(value) {
@@ -111,16 +115,38 @@ function validateRequest(value) {
     }
   }
 
-  for (const [key, max] of [["locale", 35], ["referralCode", 64]]) {
-    if (key in value && (typeof value[key] !== "string" || value[key].length < 1 || value[key].length > max)) {
+  for (const [key, max] of [
+    ["locale", 35],
+    ["referralCode", 64],
+    ["displayName", 120],
+    ["websiteUrl", 2048],
+  ]) {
+    if (
+      key in value &&
+      (typeof value[key] !== "string" ||
+        value[key].length < 1 ||
+        value[key].length > max)
+    ) {
       errors.push(`invalid ${key}`);
     }
   }
-  if ("locale" in value && !/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(value.locale)) {
+  if (
+    "locale" in value &&
+    !/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(value.locale)
+  ) {
     errors.push("invalid locale");
   }
-  if ("referralCode" in value && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(value.referralCode)) {
+  if (
+    "referralCode" in value &&
+    !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(value.referralCode)
+  ) {
     errors.push("invalid referralCode");
+  }
+  if (
+    "websiteUrl" in value &&
+    (value.websiteUrl.length < 9 || !/^https:\/\/[^\s]+$/.test(value.websiteUrl))
+  ) {
+    errors.push("invalid websiteUrl");
   }
 
   return errors;
@@ -146,8 +172,8 @@ test("protobuf field numbers are unique, contiguous, and stable", () => {
       /^\s*(?:optional\s+|repeated\s+)?[\w.<>]+\s+\w+\s*=\s*(\d+)\s*;/gm,
     ),
   ].map((match) => Number(match[1]));
-  const requestTags = tags.slice(0, 10);
-  assert.deepEqual(requestTags, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  const requestTags = tags.slice(0, 12);
+  assert.deepEqual(requestTags, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
   assert.equal(new Set(requestTags).size, requestTags.length);
 });
 
@@ -188,7 +214,7 @@ test("reviewed negative fixtures are rejected", () => {
   const cases = JSON.parse(
     fs.readFileSync(path.join(contract, "fixtures", "invalid.json"), "utf8"),
   );
-  assert.ok(cases.length >= 7);
+  assert.ok(cases.length >= 9);
   for (const fixture of cases) {
     assert.ok(validateRequest(fixture.value).length > 0, fixture.name);
   }
