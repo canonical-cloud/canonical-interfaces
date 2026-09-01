@@ -42,15 +42,18 @@ payloads never enter URLs, Cloudflare headers, logs, metrics, traces,
 idempotency keys, or error bodies.
 
 New registrations, duplicate requests, and already-known email aliases receive
-the same response shape and status. Registration records immutable consent
-evidence, but does not create an account, session, quote, role, grant, or
-entitlement. A quote link is an explicit next step only.
+the same response shape and status. `registrationConsent` must be affirmatively
+true. `marketingConsent` is a separate explicit choice and requires its own
+reviewed revision only when granted. Neither permission creates an account,
+session, quote, role, grant, or entitlement. A quote link is an explicit next
+step only.
 
 ## Stable Protobuf tags
 
-`PreInterestRegistrationRequest` uses tags 1 through 12 exactly as reviewed in
+`PreInterestRegistrationRequest` uses tags 1 through 15 exactly as reviewed in
 `pre_interest.proto`. Existing tags 1 through 10 retain their original meaning;
-the optional contact-name and website fields append tags 11 and 12. Removed
-fields must be reserved rather than renumbered. Optional string presence is
-significant for organization name, locale, referral code, display name, and
-website URL.
+the optional contact-name and website fields append tags 11 and 12. Explicit
+registration consent, explicit marketing consent, and the optional marketing
+consent revision append tags 13 through 15. Removed fields must be reserved
+rather than renumbered. Optional string presence is significant for organization
+name, locale, referral code, display name, website URL, and marketing revision.
