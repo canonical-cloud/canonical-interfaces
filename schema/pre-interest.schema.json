@@ -130,7 +130,7 @@
         "registrationId",
         "status",
         "acceptedAt",
-        "nextPath",
+        "nextStep",
         "message"
       ],
       "additionalProperties": false,
@@ -155,11 +155,10 @@
           "format": "date-time",
           "description": "RFC 3339 server acceptance time."
         },
-        "nextPath": {
+        "nextStep": {
           "type": "string",
-          "enum": ["/pre-interest", "/u/quote"],
-          "maxLength": 32,
-          "description": "Same-site next step selected by registration kind and feature readiness."
+          "enum": ["pre_interest", "quote"],
+          "description": "Type-safe next action. The browser maps it to a reviewed same-site route instead of following a server-supplied URL."
         },
         "message": {
           "type": "string",

@@ -6,6 +6,8 @@ The API derives the accepted source host, request correlation, network metadata,
 
 Browser entry points are owned by `user.canonical.plus` and `org.canonical.plus`. `api.canonical.plus` owns the write endpoint. `admin.canonical.plus` and `api-admin.canonical.plus` remain separately deployed, AAL2/role-gated staff surfaces; this contract does not expose staff reads through the public API. `app.canonical.plus` and `account.canonical.plus` remain compatibility aliases pending a separately reviewed cutover.
 
+The uniform receipt returns a type-safe `nextStep` of `pre_interest` or `quote`. The browser maps that value to its own reviewed same-site route. The API never supplies an arbitrary redirect URL or path.
+
 The request intentionally excludes passwords, credentials, regulated records, customer datasets, IP addresses, forwarded headers, risk scores, account state, and quote results. `notes` is capped at 1,000 characters and must not contain sensitive material.
 
 This schema and its generated adapters are source readiness only. It does not apply a database migration, create Cloudflare DNS records, bind Worker routes, provision secrets, or activate production traffic.

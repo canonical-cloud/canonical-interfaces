@@ -65,10 +65,13 @@ test("interest vocabulary and safe fixtures remain exact", () => {
 test("receipt is uniform and cannot disclose new-versus-existing state", () => {
   assert.equal(receipt.additionalProperties, false);
   assert.equal(receipt.properties.status.pattern, "^accepted$");
+  assert.deepEqual(receipt.properties.nextStep.enum, ["pre_interest", "quote"]);
+  assert.equal(receipt.properties.nextPath, undefined);
   assert.equal(receipt.properties.message.maxLength, 240);
   const accepted = fixture("accepted-receipt.json");
   assert.equal(accepted.status, "accepted");
-  for (const field of ["alreadyRegistered", "isNew", "accountExists", "emailExists"]) {
+  assert.equal(accepted.nextStep, "quote");
+  for (const field of ["alreadyRegistered", "isNew", "accountExists", "emailExists", "nextPath", "redirectUrl"]) {
     assert.equal(receipt.properties[field], undefined);
     assert.equal(accepted[field], undefined);
   }
@@ -83,6 +86,8 @@ test("route map exposes exactly one write-only public pre-interest operation", (
     typeof value === "object" && value.path?.includes("/pre-interest"));
   assert.deepEqual(related.map(([key]) => key), ["register_pre_interest"]);
   assert.equal(registration.request_schema.additionalProperties, false);
+  assert.deepEqual(registration.response_schema.properties.nextStep.enum, ["pre_interest", "quote"]);
+  assert.equal(registration.response_schema.properties.nextPath, undefined);
 });
 
 test("schema index includes pre-interest after existing public contracts", () => {
