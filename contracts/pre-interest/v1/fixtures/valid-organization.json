@@ -11,5 +11,8 @@
   "consentedAt": "2026-09-01T15:31:00Z",
   "sourceHost": "org.canonical.plus",
   "displayName": "Security Lead",
-  "websiteUrl": "https://example.org"
+  "websiteUrl": "https://example.org",
+  "registrationConsent": true,
+  "marketingConsent": true,
+  "marketingConsentRevision": "marketing-v1"
 }
