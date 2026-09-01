@@ -12,7 +12,9 @@
       ],
       "consentRevision": "pre-interest-v1",
       "consentedAt": "2026-09-01T15:31:00Z",
-      "sourceHost": "org.canonical.plus"
+      "sourceHost": "org.canonical.plus",
+      "displayName": "Security Lead",
+      "websiteUrl": "https://example.org"
     }
   },
   {
@@ -30,6 +32,8 @@
       "sourceHost": "user.canonical.plus",
       "locale": "en-US",
       "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com",
       "organizationName": "Should not be here"
     }
   },
@@ -47,7 +51,9 @@
       "consentedAt": "2026-09-01T15:30:00Z",
       "sourceHost": "org.canonical.plus",
       "locale": "en-US",
-      "referralCode": "launch-2026"
+      "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com"
     }
   },
   {
@@ -65,6 +71,8 @@
       "sourceHost": "user.canonical.plus",
       "locale": "en-US",
       "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com",
       "notes": "free form is forbidden"
     }
   },
@@ -82,7 +90,9 @@
       "consentedAt": "2026-09-01T15:30:00Z",
       "sourceHost": "user.canonical.plus",
       "locale": "en-US",
-      "referralCode": "launch-2026"
+      "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com"
     }
   },
   {
@@ -99,7 +109,9 @@
       "consentedAt": "2026-09-01T15:30:00Z",
       "sourceHost": "user.canonical.plus",
       "locale": "en-US",
-      "referralCode": "launch-2026"
+      "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com"
     }
   },
   {
@@ -116,7 +128,46 @@
       "consentedAt": "2026-09-01T15:30:00Z",
       "sourceHost": "user.canonical.plus",
       "locale": "en-US",
-      "referralCode": "launch-2026"
+      "referralCode": "launch-2026",
+      "displayName": "Example Person",
+      "websiteUrl": "https://person.example.com"
+    }
+  },
+  {
+    "name": "website must use public https",
+    "value": {
+      "requestId": "9f1c7237-1f42-4c0c-95d2-8ca7c3a4de50",
+      "email": "security@example.org",
+      "partyType": "organization",
+      "organizationName": "Example Security",
+      "interestAreas": [
+        "iso_27001",
+        "nist"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:31:00Z",
+      "sourceHost": "org.canonical.plus",
+      "displayName": "Security Lead",
+      "websiteUrl": "javascript:alert(1)"
+    }
+  },
+  {
+    "name": "display name is bounded",
+    "value": {
+      "requestId": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+      "email": "person@example.com",
+      "partyType": "individual",
+      "interestAreas": [
+        "readiness_assessment",
+        "soc2"
+      ],
+      "consentRevision": "pre-interest-v1",
+      "consentedAt": "2026-09-01T15:30:00Z",
+      "sourceHost": "user.canonical.plus",
+      "locale": "en-US",
+      "referralCode": "launch-2026",
+      "displayName": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "websiteUrl": "https://person.example.com"
     }
   }
 ]
