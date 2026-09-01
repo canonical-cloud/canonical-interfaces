@@ -32,6 +32,8 @@ message PreInterestRegistrationRequest {
   string source_host = 8;
   optional string locale = 9;
   optional string referral_code = 10;
+  optional string display_name = 11;
+  optional string website_url = 12;
 }
 
 message PreInterestRegistrationResponse {
