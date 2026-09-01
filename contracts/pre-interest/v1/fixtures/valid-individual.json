@@ -12,5 +12,7 @@
   "locale": "en-US",
   "referralCode": "launch-2026",
   "displayName": "Example Person",
-  "websiteUrl": "https://person.example.com"
+  "websiteUrl": "https://person.example.com",
+  "registrationConsent": true,
+  "marketingConsent": false
 }
