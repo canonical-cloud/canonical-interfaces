@@ -64,6 +64,17 @@ model PreInterestRegistrationRequest {
   @minLength(1)
   @maxLength(64)
   referralCode?: string;
+
+  @doc("Optional contact name. It is contact data, never an identity assertion.")
+  @minLength(1)
+  @maxLength(120)
+  displayName?: string;
+
+  @doc("Optional public HTTPS website supplied by the registrant.")
+  @format("uri")
+  @minLength(9)
+  @maxLength(2048)
+  websiteUrl?: string;
 }
 
 @doc("Enumeration-resistant response returned for new, duplicate, and already-known email aliases.")
