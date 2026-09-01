@@ -1,0 +1,133 @@
+name: Generate DEN-4058 pre-interest projections once
+# dd:execution-carrier owner=DEN-4058 expires=2026-09-04
+
+on:
+  push:
+    branches: [DEN-4058/pre-interest-contract-v1]
+    paths:
+      - contracts/pre-interest/v1/**
+      - schema/index.json
+      - scripts/project-pre-interest-contract.mjs
+      - scripts/project-pre-interest-contract.test.mjs
+      - route-maps/api.route-map.json
+      - package.json
+      - .zpkg.toml
+      - .github/workflows/pre-interest-contract.yml
+      - .github/workflows/temporary-den4058-contract-toolchain.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: den-4058-pre-interest-generation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generate-and-retire:
+    if: github.actor == 'ORESoftware'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out the exact feature branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: DEN-4058/pre-interest-contract-v1
+          persist-credentials: true
+          fetch-depth: 2
+
+      - name: Install Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Install Buf 1.72.0
+        uses: bufbuild/buf-setup-action@a47c93e0b1648d5651a065437926377d060baa99 # v1.50.0
+        with:
+          version: "1.72.0"
+          github_token: ${{ github.token }}
+
+      - name: Extend the exact generated-type inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("src/generate.test.mjs")
+          text = path.read_text(encoding="utf-8")
+          old = "    'MutationResult',\n    'QuoteDetail',"
+          new = (
+              "    'MutationResult',\n"
+              "    'PreInterestProblem',\n"
+              "    'PreInterestRegistrationRequest',\n"
+              "    'PreInterestRegistrationResponse',\n"
+              "    'QuoteDetail',"
+          )
+          if text.count(new) == 1 and text.count(old) == 0:
+              pass
+          elif text.count(old) == 1 and text.count(new) == 0:
+              path.write_text(text.replace(old, new, 1), encoding="utf-8")
+          else:
+              raise SystemExit("unexpected generated-type inventory shape")
+          PY
+
+      - name: Compile TypeSpec and Protobuf sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/typespec" \
+            --ignore-scripts --no-audit --no-fund \
+            @typespec/compiler@1.14.0
+          "$RUNNER_TEMP/typespec/node_modules/.bin/tsp" compile \
+            contracts/pre-interest/v1/main.tsp --no-emit
+          buf format -w contracts/pre-interest/v1/pre_interest.proto
+          buf format -w contracts/pre-interest/v1/baseline/pre_interest.proto
+          buf lint contracts/pre-interest/v1
+          buf lint contracts/pre-interest/v1/baseline
+          buf build contracts/pre-interest/v1 \
+            -o "$RUNNER_TEMP/pre_interest.descriptor.binpb"
+          buf breaking contracts/pre-interest/v1 \
+            --against contracts/pre-interest/v1/baseline
+          hash="$(sha256sum "$RUNNER_TEMP/pre_interest.descriptor.binpb" | awk '{print $1}')"
+          printf '%s  pre_interest.descriptor.binpb\n' "$hash" \
+            > contracts/pre-interest/v1/pre_interest.descriptor.sha256
+
+      - name: Generate all language and HTTP-route projections
+        shell: bash
+        run: |
+          set -euo pipefail
+          node scripts/project-pre-interest-contract.mjs --write
+          npm run generate
+          python3 scripts/generate-routes.py \
+            --map route-maps/api.route-map.json \
+            --out generated/routes
+
+      - name: Validate exact generated state
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
+          python3 scripts/generate-routes.py \
+            --map route-maps/api.route-map.json \
+            --out generated/routes \
+            --check
+          git diff --check
+
+      - name: Retire carrier and push review content
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          Path(".github/workflows/temporary-den4058-contract-toolchain.yml").unlink()
+          PY
+          git add -A
+          git diff --cached --quiet && {
+            echo "expected generated or carrier-retirement changes"
+            exit 1
+          }
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(DEN-4058): generate pre-interest contract adapters"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
