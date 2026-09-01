@@ -203,3 +203,30 @@ class QuoteRetryResponse:
     status: Literal["queued"]
     streamUrl: str
     updatedAt: str
+
+@dataclass
+class PreInterestRegistrationRequest:
+    """Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server."""
+    requestVersion: int
+    registrationKind: str
+    contactEmail: str
+    interestAreas: List[str]
+    privacyVersion: str
+    contactConsent: bool
+    displayName: Optional[str] = None
+    organizationName: Optional[str] = None
+    organizationDomain: Optional[str] = None
+    role: Optional[str] = None
+    website: Optional[str] = None
+    notes: Optional[str] = None
+    sourcePath: Optional[str] = None
+
+@dataclass
+class PreInterestRegistrationReceipt:
+    """Uniform accepted receipt returned for both new and idempotently repeated registrations."""
+    requestId: str
+    registrationId: str
+    status: str
+    acceptedAt: str
+    nextStep: Literal["pre_interest", "quote"]
+    message: str

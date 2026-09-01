@@ -19,6 +19,7 @@ class RouteMeta {
 
 abstract final class Routes {
   static const healthz = RouteMeta(key: "healthz", path: "/healthz", methods: ["GET"]);
+  static const register_pre_interest = RouteMeta(key: "register_pre_interest", path: "/api/v1/pre-interest/registrations", methods: ["POST"]);
   static const list_quotes = RouteMeta(key: "list_quotes", path: "/api/v1/quotes", methods: ["GET"]);
   static const create_quote = RouteMeta(key: "create_quote", path: "/api/v1/quotes", methods: ["POST"]);
   static const get_quote = RouteMeta(key: "get_quote", path: "/api/v1/quotes/{quoteId}", methods: ["GET"]);
@@ -34,6 +35,7 @@ abstract final class Routes {
 
   static const Map<String, RouteMeta> byKey = {
     "healthz": healthz,
+    "register_pre_interest": register_pre_interest,
     "list_quotes": list_quotes,
     "create_quote": create_quote,
     "get_quote": get_quote,

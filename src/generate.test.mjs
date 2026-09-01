@@ -28,6 +28,8 @@ test('schema declares the expected canonical.cloud types', () => {
     'MutationRequest',
     'MutationResponse',
     'MutationResult',
+    'PreInterestRegistrationReceipt',
+    'PreInterestRegistrationRequest',
     'QuoteDetail',
     'QuoteEstimate',
     'QuoteListQuery',

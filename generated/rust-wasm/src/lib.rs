@@ -125,6 +125,14 @@ pub enum QuoteRetryResponseStatus {
     Queued,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum PreInterestRegistrationReceiptNextStep {
+    #[serde(rename = "pre_interest")]
+    PreInterest,
+    #[serde(rename = "quote")]
+    Quote,
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
 pub struct HealthStatus {
@@ -529,4 +537,73 @@ pub struct QuoteRetryResponse {
     /// RFC 3339 retry acceptance timestamp.
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
+}
+
+/// Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct PreInterestRegistrationRequest {
+    /// Public registration contract version; only version 1 is accepted.
+    #[serde(rename = "requestVersion")]
+    pub request_version: i64,
+    /// Whether the prospect is registering as an individual or for an organization.
+    #[serde(rename = "registrationKind")]
+    pub registration_kind: String,
+    /// Business contact email normalized by the server. A receipt never reveals whether it was already registered.
+    #[serde(rename = "contactEmail")]
+    pub contact_email: String,
+    /// Optional contact name.
+    #[serde(rename = "displayName")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
+    /// Organization name; required for organization registrations.
+    #[serde(rename = "organizationName")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub organization_name: Option<String>,
+    /// Optional lower-case DNS domain normalized and strictly validated by the server; no scheme, port, path, or credentials.
+    #[serde(rename = "organizationDomain")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub organization_domain: Option<String>,
+    /// Optional role or team for follow-up context.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub role: Option<String>,
+    /// Optional public HTTPS organization website.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
+    /// Bounded products or programs the prospect wants to discuss.
+    #[serde(rename = "interestAreas")]
+    pub interest_areas: Vec<String>,
+    /// Optional bounded context. Secrets, credentials, regulated records, and customer datasets must not be submitted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub notes: Option<String>,
+    /// Versioned privacy notice acknowledged by the registrant.
+    #[serde(rename = "privacyVersion")]
+    pub privacy_version: String,
+    /// Explicit consent to receive follow-up about the selected interests.
+    #[serde(rename = "contactConsent")]
+    pub contact_consent: bool,
+    /// Optional same-site path attribution. The source host is always derived from the accepted request host.
+    #[serde(rename = "sourcePath")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_path: Option<String>,
+}
+
+/// Uniform accepted receipt returned for both new and idempotently repeated registrations.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct PreInterestRegistrationReceipt {
+    /// Request correlation identifier.
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+    /// Opaque registration receipt identifier; it is not an authorization credential.
+    #[serde(rename = "registrationId")]
+    pub registration_id: String,
+    /// Uniform public status that does not reveal prior registration state.
+    pub status: String,
+    /// RFC 3339 server acceptance time.
+    #[serde(rename = "acceptedAt")]
+    pub accepted_at: String,
+    /// Type-safe next action. The browser maps it to a reviewed same-site route instead of following a server-supplied URL.
+    #[serde(rename = "nextStep")]
+    pub next_step: PreInterestRegistrationReceiptNextStep,
+    /// Safe public confirmation text with no account or duplication disclosure.
+    pub message: String,
 }

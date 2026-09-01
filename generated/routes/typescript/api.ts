@@ -11,6 +11,12 @@ export const Routes = {
     methods: ["GET"] as const,
     buildPath: undefined as ((p: Record<string, never>) => string) | undefined,
   },
+  "register_pre_interest": {
+    key: "register_pre_interest",
+    path: "/api/v1/pre-interest/registrations" as const,
+    methods: ["POST"] as const,
+    buildPath: undefined as ((p: Record<string, never>) => string) | undefined,
+  },
   "list_quotes": {
     key: "list_quotes",
     path: "/api/v1/quotes" as const,
@@ -89,6 +95,7 @@ export type RouteName = keyof typeof Routes;
 
 export interface RouteTypes {
   "healthz": { path: Record<string, never>; query: Record<string, never>; body: void; response: unknown };
+  "register_pre_interest": { path: Record<string, never>; query: Record<string, never>; body: { "requestVersion": number; "registrationKind": "user" | "organization"; "contactEmail": string; "displayName"?: string; "organizationName"?: string; "organizationDomain"?: string; "role"?: string; "website"?: string; "interestAreas": Array<string>; "notes"?: string; "privacyVersion": string; "contactConsent": boolean; "sourcePath"?: string }; response: { "requestId": string; "registrationId": string; "status": "accepted"; "acceptedAt": string; "nextStep": "pre_interest" | "quote"; "message": string } };
   "list_quotes": { path: Record<string, never>; query: { "cursor"?: string; "limit"?: number }; body: void; response: { "quotes": Array<unknown>; "nextCursor"?: string } };
   "create_quote": { path: Record<string, never>; query: Record<string, never>; body: { "organizationName": string; "contactEmail": string }; response: { "quoteId": string; "status": string } };
   "get_quote": { path: { "quoteId": string }; query: Record<string, never>; body: void; response: unknown };

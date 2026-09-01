@@ -313,3 +313,49 @@ export type QuoteRetryResponse = {
   /** RFC 3339 retry acceptance timestamp. */
   updatedAt: string;
 };
+
+/** Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server. */
+export type PreInterestRegistrationRequest = {
+  /** Public registration contract version; only version 1 is accepted. */
+  requestVersion: number;
+  /** Whether the prospect is registering as an individual or for an organization. */
+  registrationKind: string;
+  /** Business contact email normalized by the server. A receipt never reveals whether it was already registered. */
+  contactEmail: string;
+  /** Optional contact name. */
+  displayName?: string;
+  /** Organization name; required for organization registrations. */
+  organizationName?: string;
+  /** Optional lower-case DNS domain normalized and strictly validated by the server; no scheme, port, path, or credentials. */
+  organizationDomain?: string;
+  /** Optional role or team for follow-up context. */
+  role?: string;
+  /** Optional public HTTPS organization website. */
+  website?: string;
+  /** Bounded products or programs the prospect wants to discuss. */
+  interestAreas: string[];
+  /** Optional bounded context. Secrets, credentials, regulated records, and customer datasets must not be submitted. */
+  notes?: string;
+  /** Versioned privacy notice acknowledged by the registrant. */
+  privacyVersion: string;
+  /** Explicit consent to receive follow-up about the selected interests. */
+  contactConsent: boolean;
+  /** Optional same-site path attribution. The source host is always derived from the accepted request host. */
+  sourcePath?: string;
+};
+
+/** Uniform accepted receipt returned for both new and idempotently repeated registrations. */
+export type PreInterestRegistrationReceipt = {
+  /** Request correlation identifier. */
+  requestId: string;
+  /** Opaque registration receipt identifier; it is not an authorization credential. */
+  registrationId: string;
+  /** Uniform public status that does not reveal prior registration state. */
+  status: string;
+  /** RFC 3339 server acceptance time. */
+  acceptedAt: string;
+  /** Type-safe next action. The browser maps it to a reviewed same-site route instead of following a server-supplied URL. */
+  nextStep: "pre_interest" | "quote";
+  /** Safe public confirmation text with no account or duplication disclosure. */
+  message: string;
+};

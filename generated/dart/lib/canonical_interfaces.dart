@@ -94,6 +94,13 @@ abstract final class QuoteRetryResponseStatus {
   static const List<String> values = <String>["queued"];
 }
 
+/// Permitted wire values for the fields typed as `PreInterestRegistrationReceiptNextStep`.
+abstract final class PreInterestRegistrationReceiptNextStep {
+  static const String preInterest = "pre_interest";
+  static const String quote = "quote";
+  static const List<String> values = <String>["pre_interest", "quote"];
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 final class HealthStatus {
   const HealthStatus({required this.status, required this.service});
@@ -807,5 +814,105 @@ final class QuoteRetryResponse {
     "status": status,
     "streamUrl": streamUrl,
     "updatedAt": updatedAt,
+  };
+}
+
+/// Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server.
+final class PreInterestRegistrationRequest {
+  const PreInterestRegistrationRequest({required this.requestVersion, required this.registrationKind, required this.contactEmail, this.displayName, this.organizationName, this.organizationDomain, this.role, this.website, required this.interestAreas, this.notes, required this.privacyVersion, required this.contactConsent, this.sourcePath});
+
+  /// Public registration contract version; only version 1 is accepted.
+  final int requestVersion;
+  /// Whether the prospect is registering as an individual or for an organization.
+  final String registrationKind;
+  /// Business contact email normalized by the server. A receipt never reveals whether it was already registered.
+  final String contactEmail;
+  /// Optional contact name.
+  final String? displayName;
+  /// Organization name; required for organization registrations.
+  final String? organizationName;
+  /// Optional lower-case DNS domain normalized and strictly validated by the server; no scheme, port, path, or credentials.
+  final String? organizationDomain;
+  /// Optional role or team for follow-up context.
+  final String? role;
+  /// Optional public HTTPS organization website.
+  final String? website;
+  /// Bounded products or programs the prospect wants to discuss.
+  final List<String> interestAreas;
+  /// Optional bounded context. Secrets, credentials, regulated records, and customer datasets must not be submitted.
+  final String? notes;
+  /// Versioned privacy notice acknowledged by the registrant.
+  final String privacyVersion;
+  /// Explicit consent to receive follow-up about the selected interests.
+  final bool contactConsent;
+  /// Optional same-site path attribution. The source host is always derived from the accepted request host.
+  final String? sourcePath;
+
+  factory PreInterestRegistrationRequest.fromJson(Map<String, Object?> json) => PreInterestRegistrationRequest(
+    requestVersion: json["requestVersion"] as int,
+    registrationKind: json["registrationKind"] as String,
+    contactEmail: json["contactEmail"] as String,
+    displayName: json["displayName"] == null ? null : json["displayName"] as String,
+    organizationName: json["organizationName"] == null ? null : json["organizationName"] as String,
+    organizationDomain: json["organizationDomain"] == null ? null : json["organizationDomain"] as String,
+    role: json["role"] == null ? null : json["role"] as String,
+    website: json["website"] == null ? null : json["website"] as String,
+    interestAreas: (json["interestAreas"] as List).cast<String>(),
+    notes: json["notes"] == null ? null : json["notes"] as String,
+    privacyVersion: json["privacyVersion"] as String,
+    contactConsent: json["contactConsent"] as bool,
+    sourcePath: json["sourcePath"] == null ? null : json["sourcePath"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "requestVersion": requestVersion,
+    "registrationKind": registrationKind,
+    "contactEmail": contactEmail,
+    if (displayName != null) "displayName": displayName,
+    if (organizationName != null) "organizationName": organizationName,
+    if (organizationDomain != null) "organizationDomain": organizationDomain,
+    if (role != null) "role": role,
+    if (website != null) "website": website,
+    "interestAreas": interestAreas,
+    if (notes != null) "notes": notes,
+    "privacyVersion": privacyVersion,
+    "contactConsent": contactConsent,
+    if (sourcePath != null) "sourcePath": sourcePath,
+  };
+}
+
+/// Uniform accepted receipt returned for both new and idempotently repeated registrations.
+final class PreInterestRegistrationReceipt {
+  const PreInterestRegistrationReceipt({required this.requestId, required this.registrationId, required this.status, required this.acceptedAt, required this.nextStep, required this.message});
+
+  /// Request correlation identifier.
+  final String requestId;
+  /// Opaque registration receipt identifier; it is not an authorization credential.
+  final String registrationId;
+  /// Uniform public status that does not reveal prior registration state.
+  final String status;
+  /// RFC 3339 server acceptance time.
+  final String acceptedAt;
+  /// Type-safe next action. The browser maps it to a reviewed same-site route instead of following a server-supplied URL. (one of: pre_interest, quote)
+  final String nextStep;
+  /// Safe public confirmation text with no account or duplication disclosure.
+  final String message;
+
+  factory PreInterestRegistrationReceipt.fromJson(Map<String, Object?> json) => PreInterestRegistrationReceipt(
+    requestId: json["requestId"] as String,
+    registrationId: json["registrationId"] as String,
+    status: json["status"] as String,
+    acceptedAt: json["acceptedAt"] as String,
+    nextStep: json["nextStep"] as String,
+    message: json["message"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "requestId": requestId,
+    "registrationId": registrationId,
+    "status": status,
+    "acceptedAt": acceptedAt,
+    "nextStep": nextStep,
+    "message": message,
   };
 }

@@ -315,3 +315,49 @@ type QuoteRetryResponse struct {
 	// RFC 3339 retry acceptance timestamp.
 	UpdatedAt string `json:"updatedAt"`
 }
+
+// PreInterestRegistrationRequest: Enumeration-resistant public registration request. Identity, source host, network metadata, and idempotency are derived or accepted separately by the server.
+type PreInterestRegistrationRequest struct {
+	// Public registration contract version; only version 1 is accepted.
+	RequestVersion int64 `json:"requestVersion"`
+	// Whether the prospect is registering as an individual or for an organization.
+	RegistrationKind string `json:"registrationKind"`
+	// Business contact email normalized by the server. A receipt never reveals whether it was already registered.
+	ContactEmail string `json:"contactEmail"`
+	// Optional contact name.
+	DisplayName *string `json:"displayName,omitempty"`
+	// Organization name; required for organization registrations.
+	OrganizationName *string `json:"organizationName,omitempty"`
+	// Optional lower-case DNS domain normalized and strictly validated by the server; no scheme, port, path, or credentials.
+	OrganizationDomain *string `json:"organizationDomain,omitempty"`
+	// Optional role or team for follow-up context.
+	Role *string `json:"role,omitempty"`
+	// Optional public HTTPS organization website.
+	Website *string `json:"website,omitempty"`
+	// Bounded products or programs the prospect wants to discuss.
+	InterestAreas []string `json:"interestAreas"`
+	// Optional bounded context. Secrets, credentials, regulated records, and customer datasets must not be submitted.
+	Notes *string `json:"notes,omitempty"`
+	// Versioned privacy notice acknowledged by the registrant.
+	PrivacyVersion string `json:"privacyVersion"`
+	// Explicit consent to receive follow-up about the selected interests.
+	ContactConsent bool `json:"contactConsent"`
+	// Optional same-site path attribution. The source host is always derived from the accepted request host.
+	SourcePath *string `json:"sourcePath,omitempty"`
+}
+
+// PreInterestRegistrationReceipt: Uniform accepted receipt returned for both new and idempotently repeated registrations.
+type PreInterestRegistrationReceipt struct {
+	// Request correlation identifier.
+	RequestId string `json:"requestId"`
+	// Opaque registration receipt identifier; it is not an authorization credential.
+	RegistrationId string `json:"registrationId"`
+	// Uniform public status that does not reveal prior registration state.
+	Status string `json:"status"`
+	// RFC 3339 server acceptance time.
+	AcceptedAt string `json:"acceptedAt"`
+	// Type-safe next action. The browser maps it to a reviewed same-site route instead of following a server-supplied URL. (one of: pre_interest, quote)
+	NextStep string `json:"nextStep"`
+	// Safe public confirmation text with no account or duplication disclosure.
+	Message string `json:"message"`
+}
