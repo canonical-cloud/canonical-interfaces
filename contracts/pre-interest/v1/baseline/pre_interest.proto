@@ -55,6 +55,5 @@ message PreInterestProblem {
 }
 
 service PreInterestRegistrationService {
-  rpc Register(PreInterestRegistrationRequest)
-      returns (PreInterestRegistrationResponse);
+  rpc Register(PreInterestRegistrationRequest) returns (PreInterestRegistrationResponse);
 }

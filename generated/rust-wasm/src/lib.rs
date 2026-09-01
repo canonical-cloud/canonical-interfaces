@@ -125,6 +125,42 @@ pub enum QuoteRetryResponseStatus {
     Queued,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum PreInterestRegistrationRequestPartyType {
+    #[serde(rename = "individual")]
+    Individual,
+    #[serde(rename = "organization")]
+    Organization,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum PreInterestRegistrationRequestSourceHost {
+    #[serde(rename = "user.canonical.plus")]
+    UserCanonicalPlus,
+    #[serde(rename = "org.canonical.plus")]
+    OrgCanonicalPlus,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum PreInterestRegistrationResponseStatus {
+    #[serde(rename = "accepted")]
+    Accepted,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Tsify)]
+pub enum PreInterestProblemCode {
+    #[serde(rename = "invalid_request")]
+    InvalidRequest,
+    #[serde(rename = "rate_limited")]
+    RateLimited,
+    #[serde(rename = "verification_required")]
+    VerificationRequired,
+    #[serde(rename = "storage_unavailable")]
+    StorageUnavailable,
+    #[serde(rename = "internal")]
+    Internal,
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 #[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
 pub struct HealthStatus {
@@ -529,4 +565,65 @@ pub struct QuoteRetryResponse {
     /// RFC 3339 retry acceptance timestamp.
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
+}
+
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct PreInterestRegistrationRequest {
+    /// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+    pub email: String,
+    #[serde(rename = "partyType")]
+    pub party_type: PreInterestRegistrationRequestPartyType,
+    #[serde(rename = "organizationName")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub organization_name: Option<String>,
+    #[serde(rename = "interestAreas")]
+    pub interest_areas: Vec<String>,
+    #[serde(rename = "consentRevision")]
+    pub consent_revision: String,
+    #[serde(rename = "consentedAt")]
+    pub consented_at: String,
+    #[serde(rename = "sourceHost")]
+    pub source_host: PreInterestRegistrationRequestSourceHost,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub locale: Option<String>,
+    #[serde(rename = "referralCode")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub referral_code: Option<String>,
+    #[serde(rename = "displayName")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub display_name: Option<String>,
+    #[serde(rename = "websiteUrl")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub website_url: Option<String>,
+    #[serde(rename = "registrationConsent")]
+    pub registration_consent: bool,
+    #[serde(rename = "marketingConsent")]
+    pub marketing_consent: bool,
+    #[serde(rename = "marketingConsentRevision")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub marketing_consent_revision: Option<String>,
+}
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct PreInterestRegistrationResponse {
+    #[serde(rename = "receiptId")]
+    pub receipt_id: String,
+    pub status: PreInterestRegistrationResponseStatus,
+    #[serde(rename = "acceptedAt")]
+    pub accepted_at: String,
+    #[serde(rename = "nextStepUrl")]
+    pub next_step_url: String,
+}
+
+/// Safe bounded error that never echoes contact data.
+#[derive(Debug, Clone, Serialize, Deserialize, Tsify)]
+pub struct PreInterestProblem {
+    pub code: PreInterestProblemCode,
+    pub message: String,
+    #[serde(rename = "requestId")]
+    pub request_id: String,
 }

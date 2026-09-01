@@ -313,3 +313,38 @@ export type QuoteRetryResponse = {
   /** RFC 3339 retry acceptance timestamp. */
   updatedAt: string;
 };
+
+/** Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key. */
+export type PreInterestRegistrationRequest = {
+  /** Opaque client-generated idempotency UUID; it must not contain or derive from contact data. */
+  requestId: string;
+  email: string;
+  partyType: "individual" | "organization";
+  organizationName?: string;
+  interestAreas: string[];
+  consentRevision: string;
+  consentedAt: string;
+  sourceHost: "user.canonical.plus" | "org.canonical.plus";
+  locale?: string;
+  referralCode?: string;
+  displayName?: string;
+  websiteUrl?: string;
+  registrationConsent: boolean;
+  marketingConsent: boolean;
+  marketingConsentRevision?: string;
+};
+
+/** Uniform response for newly created, duplicate-request, and already-known email aliases. */
+export type PreInterestRegistrationResponse = {
+  receiptId: string;
+  status: "accepted";
+  acceptedAt: string;
+  nextStepUrl: string;
+};
+
+/** Safe bounded error that never echoes contact data. */
+export type PreInterestProblem = {
+  code: "invalid_request" | "rate_limited" | "verification_required" | "storage_unavailable" | "internal";
+  message: string;
+  requestId: string;
+};
