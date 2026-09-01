@@ -66,7 +66,11 @@ jobs:
 
           generator = Path("src/generate.mjs")
           text = generator.read_text(encoding="utf-8")
-          old_pascal = 'const pascal = (s) => s.split(/[_\\-\\s]+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");'
+          old_pascal = '''const pascal = (s) =>
+            s
+              .split(/[_\\-\\s]+/)
+              .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : ""))
+              .join("");'''
           new_pascal = '''const pascal = (value) => {
             const words = String(value).match(/[A-Za-z0-9]+/g) || [];
             let symbol = words
@@ -89,9 +93,10 @@ jobs:
             const enums = new Map();
             for (const t of types) {
               for (const p of t.props) {
+                // Only string enum — booleans/integers never become language enums.
                 if (isStringEnum(p.schema)) {
                   const enumName = enumTypeName(t.name, p.name);
-                  enums.set(enumName, p.schema.enum);
+                  if (!enums.has(enumName)) enums.set(enumName, p.schema.enum);
                 }
               }
             }
@@ -101,6 +106,7 @@ jobs:
             const enums = new Map();
             for (const t of types) {
               for (const p of t.props) {
+                // Only string enum — booleans/integers never become language enums.
                 if (!isStringEnum(p.schema)) continue;
                 const enumName = enumTypeName(t.name, p.name);
                 const values = p.schema.enum.slice();
@@ -118,6 +124,13 @@ jobs:
                   }
                   symbols.set(symbol, value);
                 }
+                const existing = enums.get(enumName);
+                if (existing !== undefined) {
+                  if (JSON.stringify(existing) !== JSON.stringify(values)) {
+                    fail(`${enumName}: incompatible enum definitions share one generated type name`);
+                  }
+                  continue;
+                }
                 enums.set(enumName, values);
               }
             }
@@ -125,7 +138,13 @@ jobs:
           }'''
           if text.count(old_collect) != 1:
               raise SystemExit("unexpected collectEnums helper shape")
-          generator.write_text(text.replace(old_collect, new_collect, 1), encoding="utf-8")
+          text = text.replace(old_collect, new_collect, 1)
+
+          old_exports = "export { loadTypes, isNullable, isStringEnum };"
+          new_exports = "export { build, collectEnums, loadTypes, isNullable, isStringEnum, pascal };"
+          if text.count(old_exports) != 1:
+              raise SystemExit("unexpected generator export shape")
+          generator.write_text(text.replace(old_exports, new_exports, 1), encoding="utf-8")
 
           inventory = Path("src/generate.test.mjs")
           inventory_text = inventory.read_text(encoding="utf-8")
