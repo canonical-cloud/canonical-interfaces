@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package canonical.pre_interest.v1;
 
+option go_package = "github.com/canonical-cloud/canonical-interfaces/generated/go/preinterest/v1;preinterestv1";
+
 enum PartyType {
   PARTY_TYPE_UNSPECIFIED = 0;
   PARTY_TYPE_INDIVIDUAL = 1;
