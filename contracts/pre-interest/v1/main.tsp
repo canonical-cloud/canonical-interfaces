@@ -75,6 +75,17 @@ model PreInterestRegistrationRequest {
   @minLength(9)
   @maxLength(2048)
   websiteUrl?: string;
+
+  @doc("Explicit affirmative consent to submit this registration. The value must be true.")
+  registrationConsent: boolean;
+
+  @doc("Separate optional marketing permission. It is never implied by registration consent.")
+  marketingConsent: boolean;
+
+  @doc("Required only when marketingConsent is true and forbidden when it is false.")
+  @minLength(1)
+  @maxLength(64)
+  marketingConsentRevision?: string;
 }
 
 @doc("Enumeration-resistant response returned for new, duplicate, and already-known email aliases.")
