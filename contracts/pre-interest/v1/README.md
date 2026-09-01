@@ -22,16 +22,22 @@ adapters without hand-editing `generated/`.
 
 ## HTTP/RPC boundary
 
-The reviewed HTTP route is `POST /v1/pre-interest-registrations` on
-`api.canonical.plus`. `user.canonical.plus` may submit only `partyType =
-individual`; `org.canonical.plus` may submit only `partyType = organization`.
-The origin re-derives the source host from the verified request host and never
-trusts a caller-supplied forwarding or classification header.
+The reviewed HTTP route is exactly `POST /api/v1/pre-interest/registrations` on
+`api.canonical.plus`. No unversioned route, legacy `/v1` alias, collection read,
+update, delete, or browser-facing redirect endpoint is part of this contract.
 
-`requestId` is the body-level idempotency identity for HTTP and RPC clients.
-It is an opaque UUID and must never contain or be derived from an email address.
-The server binds it to a canonical request digest atomically. Reuse with a
-different canonical request is rejected.
+Public HTML forms submit only to the same-origin BFF route
+`POST /forms/pre-interest` on `user.canonical.plus` or `org.canonical.plus`.
+The BFF derives `requestId`, `partyType`, `consentedAt`, and `sourceHost` from
+trusted server context before calling the dedicated API. The API revalidates
+that metadata at its authenticated BFF/edge boundary; it never trusts arbitrary
+browser forwarding or classification headers.
+
+`user.canonical.plus` may submit only `partyType = individual`;
+`org.canonical.plus` may submit only `partyType = organization`.
+`requestId` is an opaque server-generated idempotency UUID and must never
+contain or be derived from an email address. The API binds it to a canonical
+request digest atomically. Reuse with a different canonical request is rejected.
 
 ## Privacy and enumeration resistance
 
@@ -46,7 +52,8 @@ the same response shape and status. `registrationConsent` must be affirmatively
 true. `marketingConsent` is a separate explicit choice and requires its own
 reviewed revision only when granted. Neither permission creates an account,
 session, quote, role, grant, or entitlement. A quote link is an explicit next
-step only.
+step only and must be allow-listed by the BFF rather than followed as an open
+redirect.
 
 ## Stable Protobuf tags
 
