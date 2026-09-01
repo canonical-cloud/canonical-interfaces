@@ -2,23 +2,50 @@
 
 Tracking: **DEN-4058**.
 
-This directory is the reviewable, compiler-ready contract bundle for public
-pre-interest registration. It intentionally lives outside `schema/index.json`
-until the TypeSpec, Protobuf, and generated-adapter toolchains are pinned and
-run on the same reviewed head. Nothing in this directory is represented as
-generated output.
+This directory is the authoritative multi-representation contract bundle for
+public pre-interest registration. TypeSpec, Protobuf, and independently authored
+Draft 2020-12 JSON Schema are reviewed together. The repository-wide generator
+consumes the deterministic object-only projection at
+`schema/pre-interest.schema.json`; that projection is produced by
+`scripts/project-pre-interest-contract.mjs` and must never be hand-edited.
 
 ## Authority and projections
 
-- `main.tsp` is the candidate API-model source.
-- `pre_interest.proto` is the stable RPC/wire projection.
-- `pre-interest.schema.json` is the independently authored Draft 2020-12
-  validation and closed-object veto.
-- Fixtures exercise semantic invariants shared by all three representations.
+- `main.tsp` is the candidate API-model source and must compile with the pinned
+  TypeSpec compiler.
+- `pre_interest.proto` is the stable RPC/wire projection. Buf must format, lint,
+  build a descriptor set, and pass breaking comparison against `baseline/`.
+- `pre-interest.schema.json` is the independent validation and closed-object
+  veto.
+- `schema/pre-interest.schema.json` is a deterministic generator-compatible
+  projection that inlines only the two enum references and contains the request,
+  response, and problem object definitions.
+- Generated Rust, Rust/WASM, TypeScript, Python, Go, and Dart adapters are
+  produced by the existing repository generator from `schema/index.json`.
+- The HTTP route projection is generated from
+  `route-maps/api.route-map.json`.
 
-Promotion requires compiling TypeSpec, compiling a Protobuf descriptor set,
-running Buf lint/breaking checks, and generating Rust, Dart, and TypeScript
-adapters without hand-editing `generated/`.
+The immutable `baseline/` snapshot establishes the initial Protobuf v1
+compatibility boundary. Additive changes must pass `buf breaking`; removing or
+renumbering a field requires a new contract version rather than editing the
+baseline to make a breaking check pass.
+
+## Local checks
+
+```sh
+npm test
+node scripts/project-pre-interest-contract.mjs --check
+buf format --diff --exit-code contracts/pre-interest/v1
+buf lint contracts/pre-interest/v1
+buf build contracts/pre-interest/v1
+buf breaking contracts/pre-interest/v1 \
+  --against contracts/pre-interest/v1/baseline
+tsp compile contracts/pre-interest/v1/main.tsp --no-emit
+```
+
+The PR workflow pins the TypeSpec compiler and Buf release and independently
+checks the committed descriptor digest. Zed continues to own repository package
+identity and generated adapter targets.
 
 ## HTTP/RPC boundary
 
@@ -42,10 +69,10 @@ request digest atomically. Reuse with a different canonical request is rejected.
 ## Privacy and enumeration resistance
 
 The service stores a dedicated HMAC alias for normalized email lookup and keeps
-raw contact data encrypted under a separate field-level key. Raw email,
-display name, organization name, website URL, referral code, and free-form
-payloads never enter URLs, Cloudflare headers, logs, metrics, traces,
-idempotency keys, or error bodies.
+raw contact data encrypted under a separate field-level key. Raw email, display
+name, organization name, website URL, referral code, and free-form payloads
+never enter URLs, Cloudflare headers, logs, metrics, traces, idempotency keys,
+or error bodies.
 
 New registrations, duplicate requests, and already-known email aliases receive
 the same response shape and status. `registrationConsent` must be affirmatively
@@ -64,3 +91,7 @@ registration consent, explicit marketing consent, and the optional marketing
 consent revision append tags 13 through 15. Removed fields must be reserved
 rather than renumbered. Optional string presence is significant for organization
 name, locale, referral code, display name, website URL, and marketing revision.
+
+This contract and its generated adapters are source readiness only. They do not
+apply a database migration, deploy an API, create Cloudflare DNS records, bind
+Worker routes, provision secrets, or activate production traffic.
