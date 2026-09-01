@@ -66,7 +66,7 @@ test("route map exposes one exact write-only public registration operation", () 
     ),
   );
   const operation = routeMap.map.register_pre_interest;
-  assert.equal(operation.path, "/api/v1/pre-interest/registrations");
+  assert.equal(operation.path, "/v1/pre-interest-registrations");
   assert.deepEqual(operation.methods, ["POST"]);
   assert.equal(operation.request_schema.additionalProperties, false);
   assert.deepEqual(
