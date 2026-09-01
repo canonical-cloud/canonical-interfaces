@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { build, pascal } from "./generate.mjs";
+import { build, collectEnums, pascal } from "./generate.mjs";
 
 test("wire literals become portable PascalCase symbols without changing their values", () => {
   assert.equal(pascal("user.canonical.plus"), "UserCanonicalPlus");
@@ -26,10 +26,24 @@ test("generated Rust keeps exact host wire values and emits valid enum variants"
 });
 
 test("enum symbol collisions fail before any language adapter is emitted", () => {
-  const original = structuredClone;
-  assert.equal(typeof original, "function");
-  // Collision detection is exercised indirectly by the generator's schema load.
-  // The implementation rejects values such as `foo-bar` and `foo_bar` because
-  // both map to `FooBar`; this assertion keeps the normalization rule explicit.
-  assert.equal(pascal("foo-bar"), pascal("foo_bar"));
+  const collidingTypes = [
+    {
+      name: "CollisionProbe",
+      source: "enum-symbols.test.mjs",
+      props: [
+        {
+          name: "status",
+          schema: {
+            type: "string",
+            enum: ["foo-bar", "foo_bar"],
+          },
+        },
+      ],
+    },
+  ];
+
+  assert.throws(
+    () => collectEnums(collidingTypes),
+    /both map to portable enum symbol "FooBar"/,
+  );
 });
