@@ -10,8 +10,12 @@ const readme = fs.readFileSync(
   path.join(root, "contracts", "pre-interest", "v1", "README.md"),
   "utf8",
 );
+const routeMap = JSON.parse(
+  fs.readFileSync(path.join(root, "route-maps", "api.route-map.json"), "utf8"),
+);
 
 const API_ROUTE = "POST /v1/pre-interest-registrations";
+const API_PATH = "/v1/pre-interest-registrations";
 const BFF_ROUTE = "POST /forms/pre-interest";
 
 test("the public-intake contract has one exact versioned API route", () => {
@@ -20,11 +24,26 @@ test("the public-intake contract has one exact versioned API route", () => {
   assert.doesNotMatch(readme, /POST \/v1\/pre-interest(?:\s|`|$)/);
 });
 
+test("the generated route map preserves the write-only contract", () => {
+  const operation = routeMap.map.register_pre_interest;
+  assert.deepEqual(operation.methods, ["POST"]);
+  assert.equal(operation.path, API_PATH);
+  assert.equal(operation.request_schema.additionalProperties, false);
+  assert.equal(operation.response_schema.additionalProperties, false);
+  assert.equal(routeMap.map.get_pre_interest, undefined);
+  assert.equal(routeMap.map.list_pre_interest, undefined);
+  assert.equal(routeMap.map.update_pre_interest, undefined);
+  assert.equal(routeMap.map.delete_pre_interest, undefined);
+});
+
 test("browser forms terminate at the same-origin BFF", () => {
   assert.equal(readme.split(BFF_ROUTE).length - 1, 1);
   assert.match(readme, /user\.canonical\.plus/);
   assert.match(readme, /org\.canonical\.plus/);
-  assert.match(readme, /BFF derives `requestId`, `partyType`, `consentedAt`, and `sourceHost`/);
+  assert.match(
+    readme,
+    /BFF derives `requestId`, `partyType`, `consentedAt`, and `sourceHost`/,
+  );
 });
 
 test("registration cannot imply account or quote creation", () => {
