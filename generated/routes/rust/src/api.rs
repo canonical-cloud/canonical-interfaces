@@ -7,6 +7,7 @@ pub const SERVICE: &str = "canonical-api-server";
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum RouteKey {
     Healthz,
+    RegisterPreInterest,
     ListQuotes,
     CreateQuote,
     GetQuote,
@@ -22,12 +23,13 @@ pub enum RouteKey {
 }
 
 impl RouteKey {
-    pub const ALL: &'static [Self] = &[Self::Healthz, Self::ListQuotes, Self::CreateQuote, Self::GetQuote, Self::RetryQuote, Self::QuoteEvents, Self::ListReadinessFrameworks, Self::GetReadinessFramework, Self::ListReadinessAssessments, Self::CreateReadinessAssessment, Self::GetReadinessAssessment, Self::SyncChanges, Self::SyncMutations];
+    pub const ALL: &'static [Self] = &[Self::Healthz, Self::RegisterPreInterest, Self::ListQuotes, Self::CreateQuote, Self::GetQuote, Self::RetryQuote, Self::QuoteEvents, Self::ListReadinessFrameworks, Self::GetReadinessFramework, Self::ListReadinessAssessments, Self::CreateReadinessAssessment, Self::GetReadinessAssessment, Self::SyncChanges, Self::SyncMutations];
 
     #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Healthz => "healthz",
+            Self::RegisterPreInterest => "register_pre_interest",
             Self::ListQuotes => "list_quotes",
             Self::CreateQuote => "create_quote",
             Self::GetQuote => "get_quote",
@@ -47,6 +49,7 @@ impl RouteKey {
     pub fn parse(key: &str) -> Option<Self> {
         match key {
             "healthz" => Some(Self::Healthz),
+            "register_pre_interest" => Some(Self::RegisterPreInterest),
             "list_quotes" => Some(Self::ListQuotes),
             "create_quote" => Some(Self::CreateQuote),
             "get_quote" => Some(Self::GetQuote),
@@ -67,6 +70,7 @@ impl RouteKey {
     pub fn path(self) -> &'static str {
         match self {
             Self::Healthz => "/healthz",
+            Self::RegisterPreInterest => "/v1/pre-interest-registrations",
             Self::ListQuotes => "/api/v1/quotes",
             Self::CreateQuote => "/api/v1/quotes",
             Self::GetQuote => "/api/v1/quotes/{quoteId}",
@@ -86,6 +90,7 @@ impl RouteKey {
     pub fn methods(self) -> &'static [&'static str] {
         match self {
             Self::Healthz => &["GET"],
+            Self::RegisterPreInterest => &["POST"],
             Self::ListQuotes => &["GET"],
             Self::CreateQuote => &["POST"],
             Self::GetQuote => &["GET"],
@@ -100,6 +105,49 @@ impl RouteKey {
             Self::SyncMutations => &["POST"],
         }
     }
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct RegisterPreInterestRequest {
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+    pub email: String,
+    #[serde(rename = "partyType")]
+    pub party_type: String,
+    #[serde(rename = "organizationName")]
+    pub organization_name: Option<String>,
+    #[serde(rename = "interestAreas")]
+    pub interest_areas: Vec<String>,
+    #[serde(rename = "consentRevision")]
+    pub consent_revision: String,
+    #[serde(rename = "consentedAt")]
+    pub consented_at: String,
+    #[serde(rename = "sourceHost")]
+    pub source_host: String,
+    pub locale: Option<String>,
+    #[serde(rename = "referralCode")]
+    pub referral_code: Option<String>,
+    #[serde(rename = "displayName")]
+    pub display_name: Option<String>,
+    #[serde(rename = "websiteUrl")]
+    pub website_url: Option<String>,
+    #[serde(rename = "registrationConsent")]
+    pub registration_consent: bool,
+    #[serde(rename = "marketingConsent")]
+    pub marketing_consent: bool,
+    #[serde(rename = "marketingConsentRevision")]
+    pub marketing_consent_revision: Option<String>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct RegisterPreInterestResponse {
+    #[serde(rename = "receiptId")]
+    pub receipt_id: String,
+    pub status: String,
+    #[serde(rename = "acceptedAt")]
+    pub accepted_at: String,
+    #[serde(rename = "nextStepUrl")]
+    pub next_step_url: String,
 }
 
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]

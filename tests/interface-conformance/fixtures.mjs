@@ -8,9 +8,9 @@
 //            explicitly null. This is the shape that caught the Dart emitter
 //            casting `null as String`.
 //
-// Values are derived from the schema (const, enum, format, bounds) so the
-// fixtures stay valid as the schema evolves, and are fully deterministic so a
-// diff between two runs means a real change.
+// Values are derived from the schema (const, enum, examples, format, bounds) so
+// the fixtures stay valid as the schema evolves, and are fully deterministic so
+// a diff between two runs means a real change.
 
 import { loadTypes, isNullable, isStringEnum } from "../../src/generate.mjs";
 
@@ -83,6 +83,7 @@ export function satisfyPattern(pattern, fieldName) {
 
 function stringValue(schema, fieldName) {
   if (Array.isArray(schema.enum) && schema.enum.length) return schema.enum[0];
+  if (Array.isArray(schema.examples) && schema.examples.length) return schema.examples[0];
   switch (schema.format) {
     case "uuid": return "00000000-0000-4000-8000-000000000000";
     case "date": return "2026-01-02";
