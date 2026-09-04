@@ -130,14 +130,34 @@ type AuditEngagement struct {
 	TargetReportDate *string `json:"target_report_date,omitempty"`
 }
 
+// QuoteContactSelectionRequest: Explicit consent to use the caller's currently verified Shared Auth email and phone for one quote submission.
+type QuoteContactSelectionRequest struct {
+	// The user actively confirmed the displayed verified email as a desired contact method.
+	EmailConfirmed bool `json:"emailConfirmed"`
+	// The user actively confirmed the displayed verified phone as a desired contact method.
+	PhoneConfirmed bool `json:"phoneConfirmed"`
+}
+
+// QuoteContactSelection: Short-lived, owner-bound contact selection created from live Shared Auth verification facts. Only masked values are returned.
+type QuoteContactSelection struct {
+	// Opaque selection identifier accepted by QuoteRequest.
+	ContactSelectionId string `json:"contactSelectionId"`
+	// Masked verified email shown for confirmation receipts.
+	EmailMasked string `json:"emailMasked"`
+	// Masked verified E.164 phone shown for confirmation receipts.
+	PhoneMasked string `json:"phoneMasked"`
+	// Selection expiry; a quote must be submitted before this time.
+	ExpiresAt string `json:"expiresAt"`
+}
+
 // QuoteRequest: Authenticated request to generate a bounded compliance-services quote.
 type QuoteRequest struct {
 	// Legal or commonly used organization name.
 	OrganizationName string `json:"organizationName"`
 	// Primary contact for the quote.
 	ContactName string `json:"contactName"`
-	// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
-	ContactEmail string `json:"contactEmail"`
+	// Server-issued, owner-bound selection of one verified email and one verified phone explicitly confirmed for this quote. Raw contact values are not accepted as verification authority.
+	ContactSelectionId string `json:"contactSelectionId"`
 	// Optional public organization website.
 	Website *string `json:"website,omitempty"`
 	// Approximate number of employees and long-term contractors.
@@ -176,10 +196,14 @@ type QuoteRequest struct {
 type QuoteSubmissionResponse struct {
 	// Server-generated quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Immutable submitted revision currently being processed.
+	Revision int64 `json:"revision"`
 	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
 	Status string `json:"status"`
 	// Authenticated WebSocket URL or relative path for quote progress.
 	StreamUrl string `json:"streamUrl"`
+	// Expiration of the revocable quote-scoped permalink. The capability token itself is never returned in this payload.
+	AccessLinkExpiresAt string `json:"accessLinkExpiresAt"`
 	// RFC 3339 creation timestamp.
 	CreatedAt string `json:"createdAt"`
 }
@@ -188,6 +212,8 @@ type QuoteSubmissionResponse struct {
 type QuoteEstimate struct {
 	// Quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Immutable quote revision used to produce this estimate.
+	Revision int64 `json:"revision"`
 	// Terminal estimate status.
 	Status string `json:"status"`
 	// ISO 4217 currency code, initially USD.
@@ -220,10 +246,12 @@ type QuoteEstimate struct {
 	CreatedAt string `json:"createdAt"`
 }
 
-// QuoteStatusEvent: Authenticated WebSocket progress message for one quote.
+// QuoteStatusEvent: Authenticated WebSocket progress message for one quote revision.
 type QuoteStatusEvent struct {
 	// Quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Revision whose processing produced this event.
+	Revision int64 `json:"revision"`
 	// Monotonic decimal-string event sequence.
 	Sequence string `json:"sequence"`
 	// Bounded processing stage. (one of: queued, loading_context, analyzing, validating, ready, failed)
@@ -254,6 +282,8 @@ type QuoteProblem struct {
 type QuoteSummary struct {
 	// Server-generated quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Current immutable revision.
+	Revision int64 `json:"revision"`
 	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
 	Status string `json:"status"`
 	// Organization name from the accepted request.
@@ -272,12 +302,16 @@ type QuoteSummary struct {
 type QuoteDetail struct {
 	// Server-generated quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Current immutable revision.
+	Revision int64 `json:"revision"`
 	// Current asynchronous quote state. (one of: queued, analyzing, ready, failed)
 	Status string `json:"status"`
 	// Normalized accepted questionnaire.
 	Request QuoteRequest `json:"request"`
 	// Authenticated WebSocket URL or relative path for persisted status events.
 	EventsUrl string `json:"eventsUrl"`
+	// Expiration of the current revocable quote-scoped permalink.
+	AccessLinkExpiresAt string `json:"accessLinkExpiresAt"`
 	// RFC 3339 creation timestamp.
 	CreatedAt string `json:"createdAt"`
 	// RFC 3339 last-status timestamp.
@@ -304,14 +338,32 @@ type QuoteListResponse struct {
 	NextCursor *string `json:"nextCursor,omitempty"`
 }
 
-// QuoteRetryResponse: Accepted response after retrying a failed quote.
+// QuoteRetryResponse: Accepted response after retrying a failed quote revision.
 type QuoteRetryResponse struct {
 	// Quote identifier.
 	QuoteId string `json:"quoteId"`
+	// Existing immutable revision being retried.
+	Revision int64 `json:"revision"`
 	// A successful retry requeues the quote. (one of: queued)
 	Status string `json:"status"`
 	// Authenticated WebSocket URL or relative path for quote progress.
 	StreamUrl string `json:"streamUrl"`
 	// RFC 3339 retry acceptance timestamp.
+	UpdatedAt string `json:"updatedAt"`
+}
+
+// QuoteResubmissionResponse: Accepted response after editing a quote and submitting a new immutable revision.
+type QuoteResubmissionResponse struct {
+	// Stable quote identifier.
+	QuoteId string `json:"quoteId"`
+	// New immutable revision queued for analysis.
+	Revision int64 `json:"revision"`
+	// A successful resubmission queues the new revision. (one of: queued)
+	Status string `json:"status"`
+	// Authenticated WebSocket URL or relative path for quote progress.
+	StreamUrl string `json:"streamUrl"`
+	// Unchanged expiration of the current quote-scoped permalink unless it was explicitly rotated.
+	AccessLinkExpiresAt string `json:"accessLinkExpiresAt"`
+	// RFC 3339 resubmission timestamp.
 	UpdatedAt string `json:"updatedAt"`
 }

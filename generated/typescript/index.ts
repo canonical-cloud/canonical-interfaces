@@ -128,14 +128,34 @@ export type AuditEngagement = {
   target_report_date?: string;
 };
 
+/** Explicit consent to use the caller's currently verified Shared Auth email and phone for one quote submission. */
+export type QuoteContactSelectionRequest = {
+  /** The user actively confirmed the displayed verified email as a desired contact method. */
+  emailConfirmed: boolean;
+  /** The user actively confirmed the displayed verified phone as a desired contact method. */
+  phoneConfirmed: boolean;
+};
+
+/** Short-lived, owner-bound contact selection created from live Shared Auth verification facts. Only masked values are returned. */
+export type QuoteContactSelection = {
+  /** Opaque selection identifier accepted by QuoteRequest. */
+  contactSelectionId: string;
+  /** Masked verified email shown for confirmation receipts. */
+  emailMasked: string;
+  /** Masked verified E.164 phone shown for confirmation receipts. */
+  phoneMasked: string;
+  /** Selection expiry; a quote must be submitted before this time. */
+  expiresAt: string;
+};
+
 /** Authenticated request to generate a bounded compliance-services quote. */
 export type QuoteRequest = {
   /** Legal or commonly used organization name. */
   organizationName: string;
   /** Primary contact for the quote. */
   contactName: string;
-  /** Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field. */
-  contactEmail: string;
+  /** Server-issued, owner-bound selection of one verified email and one verified phone explicitly confirmed for this quote. Raw contact values are not accepted as verification authority. */
+  contactSelectionId: string;
   /** Optional public organization website. */
   website?: string;
   /** Approximate number of employees and long-term contractors. */
@@ -174,10 +194,14 @@ export type QuoteRequest = {
 export type QuoteSubmissionResponse = {
   /** Server-generated quote identifier. */
   quoteId: string;
+  /** Immutable submitted revision currently being processed. */
+  revision: number;
   /** Current asynchronous quote state. */
   status: "queued" | "analyzing" | "ready" | "failed";
   /** Authenticated WebSocket URL or relative path for quote progress. */
   streamUrl: string;
+  /** Expiration of the revocable quote-scoped permalink. The capability token itself is never returned in this payload. */
+  accessLinkExpiresAt: string;
   /** RFC 3339 creation timestamp. */
   createdAt: string;
 };
@@ -186,6 +210,8 @@ export type QuoteSubmissionResponse = {
 export type QuoteEstimate = {
   /** Quote identifier. */
   quoteId: string;
+  /** Immutable quote revision used to produce this estimate. */
+  revision: number;
   /** Terminal estimate status. */
   status: string;
   /** ISO 4217 currency code, initially USD. */
@@ -218,10 +244,12 @@ export type QuoteEstimate = {
   createdAt: string;
 };
 
-/** Authenticated WebSocket progress message for one quote. */
+/** Authenticated WebSocket progress message for one quote revision. */
 export type QuoteStatusEvent = {
   /** Quote identifier. */
   quoteId: string;
+  /** Revision whose processing produced this event. */
+  revision: number;
   /** Monotonic decimal-string event sequence. */
   sequence: string;
   /** Bounded processing stage. */
@@ -252,6 +280,8 @@ export type QuoteProblem = {
 export type QuoteSummary = {
   /** Server-generated quote identifier. */
   quoteId: string;
+  /** Current immutable revision. */
+  revision: number;
   /** Current asynchronous quote state. */
   status: "queued" | "analyzing" | "ready" | "failed";
   /** Organization name from the accepted request. */
@@ -270,12 +300,16 @@ export type QuoteSummary = {
 export type QuoteDetail = {
   /** Server-generated quote identifier. */
   quoteId: string;
+  /** Current immutable revision. */
+  revision: number;
   /** Current asynchronous quote state. */
   status: "queued" | "analyzing" | "ready" | "failed";
   /** Normalized accepted questionnaire. */
   request: QuoteRequest;
   /** Authenticated WebSocket URL or relative path for persisted status events. */
   eventsUrl: string;
+  /** Expiration of the current revocable quote-scoped permalink. */
+  accessLinkExpiresAt: string;
   /** RFC 3339 creation timestamp. */
   createdAt: string;
   /** RFC 3339 last-status timestamp. */
@@ -302,14 +336,32 @@ export type QuoteListResponse = {
   nextCursor?: string;
 };
 
-/** Accepted response after retrying a failed quote. */
+/** Accepted response after retrying a failed quote revision. */
 export type QuoteRetryResponse = {
   /** Quote identifier. */
   quoteId: string;
+  /** Existing immutable revision being retried. */
+  revision: number;
   /** A successful retry requeues the quote. */
   status: "queued";
   /** Authenticated WebSocket URL or relative path for quote progress. */
   streamUrl: string;
   /** RFC 3339 retry acceptance timestamp. */
+  updatedAt: string;
+};
+
+/** Accepted response after editing a quote and submitting a new immutable revision. */
+export type QuoteResubmissionResponse = {
+  /** Stable quote identifier. */
+  quoteId: string;
+  /** New immutable revision queued for analysis. */
+  revision: number;
+  /** A successful resubmission queues the new revision. */
+  status: "queued";
+  /** Authenticated WebSocket URL or relative path for quote progress. */
+  streamUrl: string;
+  /** Unchanged expiration of the current quote-scoped permalink unless it was explicitly rotated. */
+  accessLinkExpiresAt: string;
+  /** RFC 3339 resubmission timestamp. */
   updatedAt: string;
 };

@@ -1,7 +1,7 @@
 {
   "organizationName": "Example Company",
   "contactName": "Taylor Example",
-  "contactEmail": "security@example.com",
+  "contactSelectionId": "22222222-2222-4222-8222-222222222222",
   "website": "https://example.com",
   "employeeCount": 120,
   "annualRevenueBand": "10m_50m",

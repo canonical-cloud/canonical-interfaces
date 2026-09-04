@@ -7,8 +7,11 @@ const schema = JSON.parse(await readFile(new URL("schema/quote.schema.json", roo
 const docs = await readFile(new URL("docs/quote-api-v1.md", root), "utf8");
 
 const fixtures = {
+  QuoteContactSelectionRequest: "contact-selection-request.json",
+  QuoteContactSelection: "contact-selection.json",
   QuoteRequest: "create-request.json",
   QuoteSubmissionResponse: "submission-response.json",
+  QuoteResubmissionResponse: "resubmission-response.json",
   QuoteDetail: "detail-ready.json",
   QuoteListResponse: "list-response.json",
   QuoteStatusEvent: "status-event.json",
@@ -89,6 +92,8 @@ test("framework and status wire names are exact and shared", () => {
     assert.deepEqual(schema.$defs[type].properties.status.enum, expectedStatuses, type);
   }
   assert.equal(schema.$defs.QuoteRequest.properties.contextKey.default, "quote-analysis");
+  assert.ok(schema.$defs.QuoteRequest.required.includes("contactSelectionId"));
+  assert.equal(schema.$defs.QuoteRequest.properties.contactEmail, undefined);
 });
 
 test("the auth and route matrix rejects identity ambiguity", () => {
@@ -96,10 +101,13 @@ test("the auth and route matrix rejects identity ambiguity", () => {
     "POST` | `/api/v1/quotes`",
     "GET` | `/api/v1/quotes/{quoteId}`",
     "POST` | `/api/v1/quotes/{quoteId}/retry`",
+    "POST` | `/api/v1/quotes/{quoteId}/submissions`",
     "`/api/v1/quotes/{quoteId}/events`",
   ]) assert.match(docs, new RegExp(route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(docs, /x-canonical-internal-token/);
   assert.match(docs, /x-canonical-subject/);
   assert.match(docs, /never accepts `x-canonical-user-id`/);
   assert.match(docs, /Query-string bearer tokens are prohibited/);
+  assert.match(docs, /verified email and verified phone/);
+  assert.match(docs, /25 days/);
 });

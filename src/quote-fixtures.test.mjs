@@ -96,6 +96,8 @@ test("golden fixtures conform to the public quote definitions", async () => {
   assert.ok(estimate.durationWeeksLow <= estimate.durationWeeksHigh);
   assert.equal(event.quoteId, submission.quoteId);
   assert.equal(estimate.quoteId, submission.quoteId);
+  assert.equal(event.revision, submission.revision);
+  assert.equal(estimate.revision, submission.revision);
 });
 
 test("golden request rejects legacy transport names", async () => {
@@ -108,9 +110,11 @@ test("golden request rejects legacy transport names", async () => {
     "cloud_providers",
     "handles_phi",
     "employee_count",
+    "contactEmail",
   ]) {
     assert.ok(!Object.hasOwn(request, legacy), `legacy field ${legacy} reappeared`);
   }
   assert.ok(Object.hasOwn(request, "organizationName"));
   assert.ok(Object.hasOwn(request, "frameworks"));
+  assert.ok(Object.hasOwn(request, "contactSelectionId"));
 });

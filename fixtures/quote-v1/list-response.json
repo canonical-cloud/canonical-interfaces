@@ -2,6 +2,7 @@
   "quotes": [
     {
       "quoteId": "018f47c4-32a9-7c31-8f27-f3357f781001",
+      "revision": 1,
       "status": "ready",
       "organizationName": "Example Incorporated",
       "frameworks": ["soc2_type_2", "hipaa"],

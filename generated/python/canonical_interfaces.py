@@ -92,11 +92,25 @@ class AuditEngagement:
     target_report_date: Optional[str] = None
 
 @dataclass
+class QuoteContactSelectionRequest:
+    """Explicit consent to use the caller's currently verified Shared Auth email and phone for one quote submission."""
+    emailConfirmed: bool
+    phoneConfirmed: bool
+
+@dataclass
+class QuoteContactSelection:
+    """Short-lived, owner-bound contact selection created from live Shared Auth verification facts. Only masked values are returned."""
+    contactSelectionId: str
+    emailMasked: str
+    phoneMasked: str
+    expiresAt: str
+
+@dataclass
 class QuoteRequest:
     """Authenticated request to generate a bounded compliance-services quote."""
     organizationName: str
     contactName: str
-    contactEmail: str
+    contactSelectionId: str
     employeeCount: int
     frameworks: List[str]
     currentStage: str
@@ -118,14 +132,17 @@ class QuoteRequest:
 class QuoteSubmissionResponse:
     """Accepted response from POST /api/v1/quotes."""
     quoteId: str
+    revision: int
     status: Literal["queued", "analyzing", "ready", "failed"]
     streamUrl: str
+    accessLinkExpiresAt: str
     createdAt: str
 
 @dataclass
 class QuoteEstimate:
     """Structured Gemini-assisted estimate persisted after server-side validation."""
     quoteId: str
+    revision: int
     status: str
     currency: str
     lowerBoundCents: int
@@ -144,8 +161,9 @@ class QuoteEstimate:
 
 @dataclass
 class QuoteStatusEvent:
-    """Authenticated WebSocket progress message for one quote."""
+    """Authenticated WebSocket progress message for one quote revision."""
     quoteId: str
+    revision: int
     sequence: str
     stage: Literal["queued", "loading_context", "analyzing", "validating", "ready", "failed"]
     message: str
@@ -165,6 +183,7 @@ class QuoteProblem:
 class QuoteSummary:
     """Owner-scoped list item for a compliance quote."""
     quoteId: str
+    revision: int
     status: Literal["queued", "analyzing", "ready", "failed"]
     organizationName: str
     frameworks: List[str]
@@ -176,9 +195,11 @@ class QuoteSummary:
 class QuoteDetail:
     """Owner-scoped authoritative REST representation of one quote."""
     quoteId: str
+    revision: int
     status: Literal["queued", "analyzing", "ready", "failed"]
     request: QuoteRequest
     eventsUrl: str
+    accessLinkExpiresAt: str
     createdAt: str
     updatedAt: str
     estimate: Optional[QuoteEstimate] = None
@@ -198,8 +219,19 @@ class QuoteListResponse:
 
 @dataclass
 class QuoteRetryResponse:
-    """Accepted response after retrying a failed quote."""
+    """Accepted response after retrying a failed quote revision."""
     quoteId: str
+    revision: int
     status: Literal["queued"]
     streamUrl: str
+    updatedAt: str
+
+@dataclass
+class QuoteResubmissionResponse:
+    """Accepted response after editing a quote and submitting a new immutable revision."""
+    quoteId: str
+    revision: int
+    status: Literal["queued"]
+    streamUrl: str
+    accessLinkExpiresAt: str
     updatedAt: str

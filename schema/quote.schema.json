@@ -3,13 +3,29 @@
   "title": "CanonicalQuote",
   "description": "Typed request, asynchronous status, and estimate payloads for the canonical.plus compliance quote workflow.",
   "$defs": {
+    "QuoteContactSelectionRequest": {
+      "type":"object","description":"Explicit consent to use the caller's currently verified Shared Auth email and phone for one quote submission.","required":["emailConfirmed","phoneConfirmed"],"additionalProperties":false,
+      "properties": {
+        "emailConfirmed":{"type":"boolean","const":true,"description":"The user actively confirmed the displayed verified email as a desired contact method."},
+        "phoneConfirmed":{"type":"boolean","const":true,"description":"The user actively confirmed the displayed verified phone as a desired contact method."}
+      }
+    },
+    "QuoteContactSelection": {
+      "type":"object","description":"Short-lived, owner-bound contact selection created from live Shared Auth verification facts. Only masked values are returned.","required":["contactSelectionId","emailMasked","phoneMasked","expiresAt"],"additionalProperties":false,
+      "properties": {
+        "contactSelectionId":{"type":"string","format":"uuid","description":"Opaque selection identifier accepted by QuoteRequest."},
+        "emailMasked":{"type":"string","minLength":3,"maxLength":320,"description":"Masked verified email shown for confirmation receipts."},
+        "phoneMasked":{"type":"string","minLength":4,"maxLength":32,"description":"Masked verified E.164 phone shown for confirmation receipts."},
+        "expiresAt":{"type":"string","format":"date-time","description":"Selection expiry; a quote must be submitted before this time."}
+      }
+    },
     "QuoteRequest": {
       "type": "object",
       "description": "Authenticated request to generate a bounded compliance-services quote.",
       "required": [
         "organizationName",
         "contactName",
-        "contactEmail",
+        "contactSelectionId",
         "employeeCount",
         "frameworks",
         "currentStage",
@@ -26,7 +42,7 @@
       "properties": {
         "organizationName": {"type":"string","minLength":1,"maxLength":200,"description":"Legal or commonly used organization name."},
         "contactName": {"type":"string","minLength":1,"maxLength":160,"description":"Primary contact for the quote."},
-        "contactEmail": {"type":"string","format":"email","maxLength":320,"description":"Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field."},
+        "contactSelectionId": {"type":"string","format":"uuid","description":"Server-issued, owner-bound selection of one verified email and one verified phone explicitly confirmed for this quote. Raw contact values are not accepted as verification authority."},
         "website": {"type":"string","format":"uri","maxLength":2048,"description":"Optional public organization website."},
         "employeeCount": {"type":"integer","minimum":1,"maximum":1000000,"description":"Approximate number of employees and long-term contractors."},
         "annualRevenueBand": {"type":"string","pattern":"^(pre_revenue|under_1m|1m_10m|10m_50m|50m_250m|over_250m|prefer_not_to_say)$","description":"Optional bounded annual-revenue band used only for scoping."},
@@ -46,18 +62,21 @@
       }
     },
     "QuoteSubmissionResponse": {
-      "type":"object","description":"Accepted response from POST /api/v1/quotes.","required":["quoteId","status","streamUrl","createdAt"],"additionalProperties":false,
+      "type":"object","description":"Accepted response from POST /api/v1/quotes.","required":["quoteId","revision","status","streamUrl","accessLinkExpiresAt","createdAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Immutable submitted revision currently being processed."},
         "status":{"type":"string","enum":["queued","analyzing","ready","failed"],"description":"Current asynchronous quote state."},
         "streamUrl":{"type":"string","format":"uri-reference","maxLength":2048,"description":"Authenticated WebSocket URL or relative path for quote progress."},
+        "accessLinkExpiresAt":{"type":"string","format":"date-time","description":"Expiration of the revocable quote-scoped permalink. The capability token itself is never returned in this payload."},
         "createdAt":{"type":"string","format":"date-time","description":"RFC 3339 creation timestamp."}
       }
     },
     "QuoteEstimate": {
-      "type":"object","description":"Structured Gemini-assisted estimate persisted after server-side validation.","required":["quoteId","status","currency","lowerBoundCents","upperBoundCents","durationWeeksLow","durationWeeksHigh","confidence","summary","assumptions","gaps","nextSteps","frameworks","model","contextVersion","createdAt"],"additionalProperties":false,
+      "type":"object","description":"Structured Gemini-assisted estimate persisted after server-side validation.","required":["quoteId","revision","status","currency","lowerBoundCents","upperBoundCents","durationWeeksLow","durationWeeksHigh","confidence","summary","assumptions","gaps","nextSteps","frameworks","model","contextVersion","createdAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Immutable quote revision used to produce this estimate."},
         "status":{"type":"string","pattern":"^ready$","description":"Terminal estimate status."},
         "currency":{"type":"string","pattern":"^[A-Z]{3}$","description":"ISO 4217 currency code, initially USD."},
         "lowerBoundCents":{"type":"integer","minimum":0,"maximum":100000000000,"description":"Inclusive lower estimate bound in minor currency units."},
@@ -76,9 +95,10 @@
       }
     },
     "QuoteStatusEvent": {
-      "type":"object","description":"Authenticated WebSocket progress message for one quote.","required":["quoteId","sequence","stage","message","terminal","occurredAt"],"additionalProperties":false,
+      "type":"object","description":"Authenticated WebSocket progress message for one quote revision.","required":["quoteId","revision","sequence","stage","message","terminal","occurredAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Revision whose processing produced this event."},
         "sequence":{"type":"string","pattern":"^(0|[1-9][0-9]{0,18})$","description":"Monotonic decimal-string event sequence."},
         "stage":{"type":"string","enum":["queued","loading_context","analyzing","validating","ready","failed"],"description":"Bounded processing stage."},
         "message":{"type":"string","maxLength":1000,"description":"Human-readable progress summary without sensitive prompt content."},
@@ -97,9 +117,10 @@
       }
     },
     "QuoteSummary": {
-      "type":"object","description":"Owner-scoped list item for a compliance quote.","required":["quoteId","status","organizationName","frameworks","createdAt","updatedAt"],"additionalProperties":false,
+      "type":"object","description":"Owner-scoped list item for a compliance quote.","required":["quoteId","revision","status","organizationName","frameworks","createdAt","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Current immutable revision."},
         "status":{"type":"string","enum":["queued","analyzing","ready","failed"],"description":"Current asynchronous quote state."},
         "organizationName":{"type":"string","minLength":1,"maxLength":200,"description":"Organization name from the accepted request."},
         "frameworks":{"type":"array","minItems":1,"maxItems":12,"uniqueItems":true,"items":{"type":"string","enum":["soc2_type_1","soc2_type_2","nist_csf_2","nist_800_53","hipaa","iso_27001","pci_dss_4","fedramp","gdpr","custom"]},"description":"Frameworks included in the request."},
@@ -109,12 +130,14 @@
       }
     },
     "QuoteDetail": {
-      "type":"object","description":"Owner-scoped authoritative REST representation of one quote.","required":["quoteId","status","request","eventsUrl","createdAt","updatedAt"],"additionalProperties":false,
+      "type":"object","description":"Owner-scoped authoritative REST representation of one quote.","required":["quoteId","revision","status","request","eventsUrl","accessLinkExpiresAt","createdAt","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Current immutable revision."},
         "status":{"type":"string","enum":["queued","analyzing","ready","failed"],"description":"Current asynchronous quote state."},
         "request":{"$ref":"#/$defs/QuoteRequest","description":"Normalized accepted questionnaire."},
         "eventsUrl":{"type":"string","format":"uri-reference","maxLength":2048,"description":"Authenticated WebSocket URL or relative path for persisted status events."},
+        "accessLinkExpiresAt":{"type":"string","format":"date-time","description":"Expiration of the current revocable quote-scoped permalink."},
         "createdAt":{"type":"string","format":"date-time","description":"RFC 3339 creation timestamp."},
         "updatedAt":{"type":"string","format":"date-time","description":"RFC 3339 last-status timestamp."},
         "estimate":{"$ref":"#/$defs/QuoteEstimate","description":"Present only when the quote is ready."},
@@ -136,12 +159,24 @@
       }
     },
     "QuoteRetryResponse": {
-      "type":"object","description":"Accepted response after retrying a failed quote.","required":["quoteId","status","streamUrl","updatedAt"],"additionalProperties":false,
+      "type":"object","description":"Accepted response after retrying a failed quote revision.","required":["quoteId","revision","status","streamUrl","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},
+        "revision":{"type":"integer","minimum":1,"maximum":2147483647,"description":"Existing immutable revision being retried."},
         "status":{"type":"string","enum":["queued"],"description":"A successful retry requeues the quote."},
         "streamUrl":{"type":"string","format":"uri-reference","maxLength":2048,"description":"Authenticated WebSocket URL or relative path for quote progress."},
         "updatedAt":{"type":"string","format":"date-time","description":"RFC 3339 retry acceptance timestamp."}
+      }
+    },
+    "QuoteResubmissionResponse": {
+      "type":"object","description":"Accepted response after editing a quote and submitting a new immutable revision.","required":["quoteId","revision","status","streamUrl","accessLinkExpiresAt","updatedAt"],"additionalProperties":false,
+      "properties": {
+        "quoteId":{"type":"string","format":"uuid","description":"Stable quote identifier."},
+        "revision":{"type":"integer","minimum":2,"maximum":2147483647,"description":"New immutable revision queued for analysis."},
+        "status":{"type":"string","enum":["queued"],"description":"A successful resubmission queues the new revision."},
+        "streamUrl":{"type":"string","format":"uri-reference","maxLength":2048,"description":"Authenticated WebSocket URL or relative path for quote progress."},
+        "accessLinkExpiresAt":{"type":"string","format":"date-time","description":"Unchanged expiration of the current quote-scoped permalink unless it was explicitly rotated."},
+        "updatedAt":{"type":"string","format":"date-time","description":"RFC 3339 resubmission timestamp."}
       }
     }
   }

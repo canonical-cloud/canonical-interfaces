@@ -26,6 +26,8 @@ test('schema declares the expected canonical.cloud types', () => {
     'ChangesQuery',
     'ChangesResponse',
     'AuditEngagement',
+    'QuoteContactSelectionRequest',
+    'QuoteContactSelection',
     'QuoteRequest',
     'QuoteSubmissionResponse',
     'QuoteEstimate',
@@ -36,6 +38,7 @@ test('schema declares the expected canonical.cloud types', () => {
     'QuoteListQuery',
     'QuoteListResponse',
     'QuoteRetryResponse',
+    'QuoteResubmissionResponse',
   ]);
 });
 

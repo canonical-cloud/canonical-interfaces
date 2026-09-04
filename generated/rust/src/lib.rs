@@ -124,6 +124,12 @@ pub enum QuoteRetryResponseStatus {
     Queued,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum QuoteResubmissionResponseStatus {
+    #[serde(rename = "queued")]
+    Queued,
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HealthStatus {
@@ -280,6 +286,34 @@ pub struct AuditEngagement {
     pub target_report_date: Option<String>,
 }
 
+/// Explicit consent to use the caller's currently verified Shared Auth email and phone for one quote submission.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteContactSelectionRequest {
+    /// The user actively confirmed the displayed verified email as a desired contact method.
+    #[serde(rename = "emailConfirmed")]
+    pub email_confirmed: bool,
+    /// The user actively confirmed the displayed verified phone as a desired contact method.
+    #[serde(rename = "phoneConfirmed")]
+    pub phone_confirmed: bool,
+}
+
+/// Short-lived, owner-bound contact selection created from live Shared Auth verification facts. Only masked values are returned.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteContactSelection {
+    /// Opaque selection identifier accepted by QuoteRequest.
+    #[serde(rename = "contactSelectionId")]
+    pub contact_selection_id: String,
+    /// Masked verified email shown for confirmation receipts.
+    #[serde(rename = "emailMasked")]
+    pub email_masked: String,
+    /// Masked verified E.164 phone shown for confirmation receipts.
+    #[serde(rename = "phoneMasked")]
+    pub phone_masked: String,
+    /// Selection expiry; a quote must be submitted before this time.
+    #[serde(rename = "expiresAt")]
+    pub expires_at: String,
+}
+
 /// Authenticated request to generate a bounded compliance-services quote.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuoteRequest {
@@ -289,9 +323,9 @@ pub struct QuoteRequest {
     /// Primary contact for the quote.
     #[serde(rename = "contactName")]
     pub contact_name: String,
-    /// Verified follow-up email. Authentication and owner identity are derived from the accepted credential, not this field.
-    #[serde(rename = "contactEmail")]
-    pub contact_email: String,
+    /// Server-issued, owner-bound selection of one verified email and one verified phone explicitly confirmed for this quote. Raw contact values are not accepted as verification authority.
+    #[serde(rename = "contactSelectionId")]
+    pub contact_selection_id: String,
     /// Optional public organization website.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
@@ -349,11 +383,16 @@ pub struct QuoteSubmissionResponse {
     /// Server-generated quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Immutable submitted revision currently being processed.
+    pub revision: i64,
     /// Current asynchronous quote state.
     pub status: QuoteSubmissionResponseStatus,
     /// Authenticated WebSocket URL or relative path for quote progress.
     #[serde(rename = "streamUrl")]
     pub stream_url: String,
+    /// Expiration of the revocable quote-scoped permalink. The capability token itself is never returned in this payload.
+    #[serde(rename = "accessLinkExpiresAt")]
+    pub access_link_expires_at: String,
     /// RFC 3339 creation timestamp.
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -365,6 +404,8 @@ pub struct QuoteEstimate {
     /// Quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Immutable quote revision used to produce this estimate.
+    pub revision: i64,
     /// Terminal estimate status.
     pub status: String,
     /// ISO 4217 currency code, initially USD.
@@ -404,12 +445,14 @@ pub struct QuoteEstimate {
     pub created_at: String,
 }
 
-/// Authenticated WebSocket progress message for one quote.
+/// Authenticated WebSocket progress message for one quote revision.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuoteStatusEvent {
     /// Quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Revision whose processing produced this event.
+    pub revision: i64,
     /// Monotonic decimal-string event sequence.
     pub sequence: String,
     /// Bounded processing stage.
@@ -447,6 +490,8 @@ pub struct QuoteSummary {
     /// Server-generated quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Current immutable revision.
+    pub revision: i64,
     /// Current asynchronous quote state.
     pub status: QuoteSummaryStatus,
     /// Organization name from the accepted request.
@@ -471,6 +516,8 @@ pub struct QuoteDetail {
     /// Server-generated quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Current immutable revision.
+    pub revision: i64,
     /// Current asynchronous quote state.
     pub status: QuoteDetailStatus,
     /// Normalized accepted questionnaire.
@@ -478,6 +525,9 @@ pub struct QuoteDetail {
     /// Authenticated WebSocket URL or relative path for persisted status events.
     #[serde(rename = "eventsUrl")]
     pub events_url: String,
+    /// Expiration of the current revocable quote-scoped permalink.
+    #[serde(rename = "accessLinkExpiresAt")]
+    pub access_link_expires_at: String,
     /// RFC 3339 creation timestamp.
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -514,18 +564,41 @@ pub struct QuoteListResponse {
     pub next_cursor: Option<String>,
 }
 
-/// Accepted response after retrying a failed quote.
+/// Accepted response after retrying a failed quote revision.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QuoteRetryResponse {
     /// Quote identifier.
     #[serde(rename = "quoteId")]
     pub quote_id: String,
+    /// Existing immutable revision being retried.
+    pub revision: i64,
     /// A successful retry requeues the quote.
     pub status: QuoteRetryResponseStatus,
     /// Authenticated WebSocket URL or relative path for quote progress.
     #[serde(rename = "streamUrl")]
     pub stream_url: String,
     /// RFC 3339 retry acceptance timestamp.
+    #[serde(rename = "updatedAt")]
+    pub updated_at: String,
+}
+
+/// Accepted response after editing a quote and submitting a new immutable revision.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QuoteResubmissionResponse {
+    /// Stable quote identifier.
+    #[serde(rename = "quoteId")]
+    pub quote_id: String,
+    /// New immutable revision queued for analysis.
+    pub revision: i64,
+    /// A successful resubmission queues the new revision.
+    pub status: QuoteResubmissionResponseStatus,
+    /// Authenticated WebSocket URL or relative path for quote progress.
+    #[serde(rename = "streamUrl")]
+    pub stream_url: String,
+    /// Unchanged expiration of the current quote-scoped permalink unless it was explicitly rotated.
+    #[serde(rename = "accessLinkExpiresAt")]
+    pub access_link_expires_at: String,
+    /// RFC 3339 resubmission timestamp.
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
 }

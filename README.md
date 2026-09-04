@@ -51,18 +51,20 @@ decimal strings, not JavaScript numbers. Mutation results are `applied`,
 `conflict`, `gone`, `invalid`, or `idempotency_key_reused`. REST pull is
 authoritative; WebSocket invalidations only wake the pull loop.
 
-The signed-in quote contract (`schema/quote.schema.json`):
+The verified-contact quote contract (`schema/quote.schema.json`):
 
-- **`QuoteRequest`** — the normalized questionnaire; contact fields are follow-up metadata, never identity authority.
-- **`QuoteSubmissionResponse`**, **`QuoteDetail`**, **`QuoteSummary`**, **`QuoteListResponse`**, and **`QuoteRetryResponse`** — the authoritative REST wire shapes.
-- **`QuoteStatusEvent`** — persisted progress events delivered through the authenticated WebSocket route.
+- **`QuoteContactSelectionRequest`** and **`QuoteContactSelection`** — explicit product consent for the caller's live Shared Auth-verified email and phone; only a short-lived owner-bound selection ID enters the quote request.
+- **`QuoteRequest`** — the normalized questionnaire and contact-selection reference; raw contact values are never accepted as verification authority.
+- **`QuoteSubmissionResponse`**, **`QuoteResubmissionResponse`**, **`QuoteDetail`**, **`QuoteSummary`**, **`QuoteListResponse`**, and **`QuoteRetryResponse`** — revision-aware authoritative REST wire shapes.
+- **`QuoteStatusEvent`** — persisted, revision-scoped progress events delivered through the authenticated WebSocket route.
 - **`QuoteEstimate`** and **`QuoteProblem`** — bounded public estimate and error payloads.
 
 The exact route, authentication, idempotency, state-machine, privacy, and
 internal-header decisions are documented in [`docs/quote-api-v1.md`](docs/quote-api-v1.md).
 Golden cross-language examples live in [`fixtures/quote-v1`](fixtures/quote-v1).
-The public paths are `/api/v1/quotes`, `/api/v1/quotes/{quoteId}`,
-`/api/v1/quotes/{quoteId}/retry`, and `/api/v1/quotes/{quoteId}/events`.
+The public paths include `/api/v1/quote-contact-selections`, `/api/v1/quotes`,
+`/api/v1/quotes/{quoteId}`, `/api/v1/quotes/{quoteId}/retry`,
+`/api/v1/quotes/{quoteId}/submissions`, and `/api/v1/quotes/{quoteId}/events`.
 
 The compliance domain (`schema/compliance.schema.json`, mirrored by
 `sql/schema.sql`):
