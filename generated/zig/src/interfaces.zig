@@ -245,3 +245,50 @@ pub const QuoteRetryResponse = struct {
     /// Permitted values for `status`.
     pub const status_values = [_][]const u8{ "queued" };
 };
+
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+pub const PreInterestRegistrationRequest = struct {
+    /// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+    request_id: []const u8,
+    email: []const u8,
+    party_type: []const u8,
+    organization_name: ?[]const u8 = null,
+    interest_areas: []const []const u8,
+    consent_revision: []const u8,
+    consented_at: []const u8,
+    source_host: []const u8,
+    locale: ?[]const u8 = null,
+    referral_code: ?[]const u8 = null,
+    display_name: ?[]const u8 = null,
+    website_url: ?[]const u8 = null,
+    registration_consent: bool,
+    marketing_consent: bool,
+    marketing_consent_revision: ?[]const u8 = null,
+
+    /// Permitted values for `party_type`.
+    pub const party_type_values = [_][]const u8{ "individual", "organization" };
+
+    /// Permitted values for `source_host`.
+    pub const source_host_values = [_][]const u8{ "user.canonical.plus", "org.canonical.plus" };
+};
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+pub const PreInterestRegistrationResponse = struct {
+    receipt_id: []const u8,
+    status: []const u8,
+    accepted_at: []const u8,
+    next_step_url: []const u8,
+
+    /// Permitted values for `status`.
+    pub const status_values = [_][]const u8{ "accepted" };
+};
+
+/// Safe bounded error that never echoes contact data.
+pub const PreInterestProblem = struct {
+    code: []const u8,
+    message: []const u8,
+    request_id: []const u8,
+
+    /// Permitted values for `code`.
+    pub const code_values = [_][]const u8{ "invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal" };
+};

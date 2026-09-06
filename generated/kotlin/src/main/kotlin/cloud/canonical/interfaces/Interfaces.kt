@@ -273,3 +273,56 @@ data class QuoteRetryResponse(
 
 /** Permitted values for [QuoteRetryResponse.status]. */
 val QUOTE_RETRY_RESPONSE_STATUS_VALUES: List<String> = listOf("queued")
+
+/**
+ * Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+ */
+data class PreInterestRegistrationRequest(
+    /** Opaque client-generated idempotency UUID; it must not contain or derive from contact data. */
+    val requestId: String,
+    val email: String,
+    val partyType: String,
+    val organizationName: String? = null,
+    val interestAreas: List<String>,
+    val consentRevision: String,
+    val consentedAt: String,
+    val sourceHost: String,
+    val locale: String? = null,
+    val referralCode: String? = null,
+    val displayName: String? = null,
+    val websiteUrl: String? = null,
+    val registrationConsent: Boolean,
+    val marketingConsent: Boolean,
+    val marketingConsentRevision: String? = null
+)
+
+/** Permitted values for [PreInterestRegistrationRequest.partyType]. */
+val PRE_INTEREST_REGISTRATION_REQUEST_PARTY_TYPE_VALUES: List<String> = listOf("individual", "organization")
+
+/** Permitted values for [PreInterestRegistrationRequest.sourceHost]. */
+val PRE_INTEREST_REGISTRATION_REQUEST_SOURCE_HOST_VALUES: List<String> = listOf("user.canonical.plus", "org.canonical.plus")
+
+/**
+ * Uniform response for newly created, duplicate-request, and already-known email aliases.
+ */
+data class PreInterestRegistrationResponse(
+    val receiptId: String,
+    val status: String,
+    val acceptedAt: String,
+    val nextStepUrl: String
+)
+
+/** Permitted values for [PreInterestRegistrationResponse.status]. */
+val PRE_INTEREST_REGISTRATION_RESPONSE_STATUS_VALUES: List<String> = listOf("accepted")
+
+/**
+ * Safe bounded error that never echoes contact data.
+ */
+data class PreInterestProblem(
+    val code: String,
+    val message: String,
+    val requestId: String
+)
+
+/** Permitted values for [PreInterestProblem.code]. */
+val PRE_INTEREST_PROBLEM_CODE_VALUES: List<String> = listOf("invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal")

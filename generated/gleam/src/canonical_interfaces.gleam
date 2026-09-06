@@ -180,3 +180,51 @@ pub type QuoteRetryResponse {
 }
 
 pub const quote_retry_response_status_values: List(String) = ["queued"]
+
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+pub type PreInterestRegistrationRequest {
+  PreInterestRegistrationRequest(
+    request_id: String,
+    email: String,
+    party_type: String,
+    organization_name: Option(String),
+    interest_areas: List(String),
+    consent_revision: String,
+    consented_at: String,
+    source_host: String,
+    locale: Option(String),
+    referral_code: Option(String),
+    display_name: Option(String),
+    website_url: Option(String),
+    registration_consent: Bool,
+    marketing_consent: Bool,
+    marketing_consent_revision: Option(String),
+  )
+}
+
+pub const pre_interest_registration_request_party_type_values: List(String) = ["individual", "organization"]
+
+pub const pre_interest_registration_request_source_host_values: List(String) = ["user.canonical.plus", "org.canonical.plus"]
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+pub type PreInterestRegistrationResponse {
+  PreInterestRegistrationResponse(
+    receipt_id: String,
+    status: String,
+    accepted_at: String,
+    next_step_url: String,
+  )
+}
+
+pub const pre_interest_registration_response_status_values: List(String) = ["accepted"]
+
+/// Safe bounded error that never echoes contact data.
+pub type PreInterestProblem {
+  PreInterestProblem(
+    code: String,
+    message: String,
+    request_id: String,
+  )
+}
+
+pub const pre_interest_problem_code_values: List(String) = ["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"]

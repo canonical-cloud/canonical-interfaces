@@ -77,6 +77,25 @@ module CanonicalInterfaces
     STATUS_VALUES = ["queued"].freeze
   end
 
+  # Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+  PreInterestRegistrationRequest = Struct.new(:request_id, :email, :party_type, :organization_name, :interest_areas, :consent_revision, :consented_at, :source_host, :locale, :referral_code, :display_name, :website_url, :registration_consent, :marketing_consent, :marketing_consent_revision, keyword_init: true) do
+    # Wire field order: requestId, email, partyType, organizationName, interestAreas, consentRevision, consentedAt, sourceHost, locale, referralCode, displayName, websiteUrl, registrationConsent, marketingConsent, marketingConsentRevision
+    PARTY_TYPE_VALUES = ["individual", "organization"].freeze
+    SOURCE_HOST_VALUES = ["user.canonical.plus", "org.canonical.plus"].freeze
+  end
+
+  # Uniform response for newly created, duplicate-request, and already-known email aliases.
+  PreInterestRegistrationResponse = Struct.new(:receipt_id, :status, :accepted_at, :next_step_url, keyword_init: true) do
+    # Wire field order: receiptId, status, acceptedAt, nextStepUrl
+    STATUS_VALUES = ["accepted"].freeze
+  end
+
+  # Safe bounded error that never echoes contact data.
+  PreInterestProblem = Struct.new(:code, :message, :request_id, keyword_init: true) do
+    # Wire field order: code, message, requestId
+    CODE_VALUES = ["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"].freeze
+  end
+
   # Sealed: the first-party sync payloads are reachable from inside the gem
   # and raise NameError for anyone outside it.
   private_constant :Internal

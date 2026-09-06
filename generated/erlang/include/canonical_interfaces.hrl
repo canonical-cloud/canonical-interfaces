@@ -148,4 +148,42 @@
 }).
 
 -define(QUOTE_RETRY_RESPONSE_STATUS_VALUES, [<<"queued">>]).
+%% Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+-record(pre_interest_registration_request, {
+    request_id :: binary(),
+    email :: binary(),
+    party_type :: binary(),
+    organization_name :: binary() | undefined,
+    interest_areas :: list(),
+    consent_revision :: binary(),
+    consented_at :: binary(),
+    source_host :: binary(),
+    locale :: binary() | undefined,
+    referral_code :: binary() | undefined,
+    display_name :: binary() | undefined,
+    website_url :: binary() | undefined,
+    registration_consent :: boolean(),
+    marketing_consent :: boolean(),
+    marketing_consent_revision :: binary() | undefined
+}).
+
+-define(PRE_INTEREST_REGISTRATION_REQUEST_PARTY_TYPE_VALUES, [<<"individual">>, <<"organization">>]).
+-define(PRE_INTEREST_REGISTRATION_REQUEST_SOURCE_HOST_VALUES, [<<"user.canonical.plus">>, <<"org.canonical.plus">>]).
+%% Uniform response for newly created, duplicate-request, and already-known email aliases.
+-record(pre_interest_registration_response, {
+    receipt_id :: binary(),
+    status :: binary(),
+    accepted_at :: binary(),
+    next_step_url :: binary()
+}).
+
+-define(PRE_INTEREST_REGISTRATION_RESPONSE_STATUS_VALUES, [<<"accepted">>]).
+%% Safe bounded error that never echoes contact data.
+-record(pre_interest_problem, {
+    code :: binary(),
+    message :: binary(),
+    request_id :: binary()
+}).
+
+-define(PRE_INTEREST_PROBLEM_CODE_VALUES, [<<"invalid_request">>, <<"rate_limited">>, <<"verification_required">>, <<"storage_unavailable">>, <<"internal">>]).
 -endif.

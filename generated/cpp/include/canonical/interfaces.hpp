@@ -256,4 +256,51 @@ struct QuoteRetryResponse {
 /// Permitted values for QuoteRetryResponse::status.
 inline constexpr std::string_view quote_retry_response_status_values[] = {"queued"};
 
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+struct PreInterestRegistrationRequest {
+    /// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+    std::string request_id;
+    std::string email;
+    std::string party_type;
+    std::optional<std::string> organization_name;
+    std::vector<std::string> interest_areas;
+    std::string consent_revision;
+    std::string consented_at;
+    std::string source_host;
+    std::optional<std::string> locale;
+    std::optional<std::string> referral_code;
+    std::optional<std::string> display_name;
+    std::optional<std::string> website_url;
+    bool registration_consent;
+    bool marketing_consent;
+    std::optional<std::string> marketing_consent_revision;
+};
+
+/// Permitted values for PreInterestRegistrationRequest::party_type.
+inline constexpr std::string_view pre_interest_registration_request_party_type_values[] = {"individual", "organization"};
+
+/// Permitted values for PreInterestRegistrationRequest::source_host.
+inline constexpr std::string_view pre_interest_registration_request_source_host_values[] = {"user.canonical.plus", "org.canonical.plus"};
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+struct PreInterestRegistrationResponse {
+    std::string receipt_id;
+    std::string status;
+    std::string accepted_at;
+    std::string next_step_url;
+};
+
+/// Permitted values for PreInterestRegistrationResponse::status.
+inline constexpr std::string_view pre_interest_registration_response_status_values[] = {"accepted"};
+
+/// Safe bounded error that never echoes contact data.
+struct PreInterestProblem {
+    std::string code;
+    std::string message;
+    std::string request_id;
+};
+
+/// Permitted values for PreInterestProblem::code.
+inline constexpr std::string_view pre_interest_problem_code_values[] = {"invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"};
+
 }  // namespace canonical::interfaces

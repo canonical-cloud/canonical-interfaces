@@ -256,3 +256,50 @@ public struct QuoteRetryResponse: Codable, Sendable {
     /// Permitted values for `status`.
     public static let statusValues: [String] = ["queued"]
 }
+
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+public struct PreInterestRegistrationRequest: Codable, Sendable {
+    /// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+    public var requestId: String
+    public var email: String
+    public var partyType: String
+    public var organizationName: String?
+    public var interestAreas: [String]
+    public var consentRevision: String
+    public var consentedAt: String
+    public var sourceHost: String
+    public var locale: String?
+    public var referralCode: String?
+    public var displayName: String?
+    public var websiteUrl: String?
+    public var registrationConsent: Bool
+    public var marketingConsent: Bool
+    public var marketingConsentRevision: String?
+
+    /// Permitted values for `partyType`.
+    public static let partyTypeValues: [String] = ["individual", "organization"]
+
+    /// Permitted values for `sourceHost`.
+    public static let sourceHostValues: [String] = ["user.canonical.plus", "org.canonical.plus"]
+}
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+public struct PreInterestRegistrationResponse: Codable, Sendable {
+    public var receiptId: String
+    public var status: String
+    public var acceptedAt: String
+    public var nextStepUrl: String
+
+    /// Permitted values for `status`.
+    public static let statusValues: [String] = ["accepted"]
+}
+
+/// Safe bounded error that never echoes contact data.
+public struct PreInterestProblem: Codable, Sendable {
+    public var code: String
+    public var message: String
+    public var requestId: String
+
+    /// Permitted values for `code`.
+    public static let codeValues: [String] = ["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"]
+}

@@ -321,4 +321,70 @@ static const char *const canonical_quote_retry_response_status_values[] = {
     "queued"
 };
 
+/* Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key. */
+struct canonical_pre_interest_registration_request {
+    /* Opaque client-generated idempotency UUID; it must not contain or derive from contact data. */
+    const char *request_id;
+    const char *email;
+    const char *party_type;
+    const char *organization_name;
+    const char *const *interest_areas;
+    size_t interest_areas_len;
+    const char *consent_revision;
+    const char *consented_at;
+    const char *source_host;
+    const char *locale;
+    const char *referral_code;
+    const char *display_name;
+    const char *website_url;
+    bool registration_consent;
+    bool marketing_consent;
+    const char *marketing_consent_revision;
+};
+
+/* Permitted values for pre_interest_registration_request.party_type. */
+#define CANONICAL_PRE_INTEREST_REGISTRATION_REQUEST_PARTY_TYPE_COUNT 2
+static const char *const canonical_pre_interest_registration_request_party_type_values[] = {
+    "individual",
+    "organization"
+};
+
+/* Permitted values for pre_interest_registration_request.source_host. */
+#define CANONICAL_PRE_INTEREST_REGISTRATION_REQUEST_SOURCE_HOST_COUNT 2
+static const char *const canonical_pre_interest_registration_request_source_host_values[] = {
+    "user.canonical.plus",
+    "org.canonical.plus"
+};
+
+/* Uniform response for newly created, duplicate-request, and already-known email aliases. */
+struct canonical_pre_interest_registration_response {
+    const char *receipt_id;
+    const char *status;
+    const char *accepted_at;
+    const char *next_step_url;
+};
+
+/* Permitted values for pre_interest_registration_response.status. */
+#define CANONICAL_PRE_INTEREST_REGISTRATION_RESPONSE_STATUS_COUNT 1
+static const char *const canonical_pre_interest_registration_response_status_values[] = {
+    "accepted"
+};
+
+/* Safe bounded error that never echoes contact data. */
+struct canonical_pre_interest_problem {
+    const char *code;
+    const char *message;
+    const char *request_id;
+};
+
+/* Permitted values for pre_interest_problem.code. */
+#define CANONICAL_PRE_INTEREST_PROBLEM_CODE_COUNT 5
+static const char *const canonical_pre_interest_problem_code_values[] = {
+    "invalid_request",
+    "rate_limited",
+    "verification_required",
+    "storage_unavailable",
+    "internal"
+};
+
 #endif /* CANONICAL_INTERFACES_H */

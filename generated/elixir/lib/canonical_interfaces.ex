@@ -118,3 +118,35 @@ defmodule CanonicalInterfaces.QuoteRetryResponse do
   @status_values ["queued"]
   def status_values, do: @status_values
 end
+
+defmodule CanonicalInterfaces.PreInterestRegistrationRequest do
+  @moduledoc """
+  Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+  """
+  @enforce_keys [:request_id, :email, :party_type, :interest_areas, :consent_revision, :consented_at, :source_host, :registration_consent, :marketing_consent]
+  defstruct [:request_id, :email, :party_type, :organization_name, :interest_areas, :consent_revision, :consented_at, :source_host, :locale, :referral_code, :display_name, :website_url, :registration_consent, :marketing_consent, :marketing_consent_revision]
+  @party_type_values ["individual", "organization"]
+  def party_type_values, do: @party_type_values
+  @source_host_values ["user.canonical.plus", "org.canonical.plus"]
+  def source_host_values, do: @source_host_values
+end
+
+defmodule CanonicalInterfaces.PreInterestRegistrationResponse do
+  @moduledoc """
+  Uniform response for newly created, duplicate-request, and already-known email aliases.
+  """
+  @enforce_keys [:receipt_id, :status, :accepted_at, :next_step_url]
+  defstruct [:receipt_id, :status, :accepted_at, :next_step_url]
+  @status_values ["accepted"]
+  def status_values, do: @status_values
+end
+
+defmodule CanonicalInterfaces.PreInterestProblem do
+  @moduledoc """
+  Safe bounded error that never echoes contact data.
+  """
+  @enforce_keys [:code, :message, :request_id]
+  defstruct [:code, :message, :request_id]
+  @code_values ["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"]
+  def code_values, do: @code_values
+end

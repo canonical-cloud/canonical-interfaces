@@ -329,3 +329,68 @@ final class QuoteRetryResponse
     ) {
     }
 }
+
+/**
+ * Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+ */
+final class PreInterestRegistrationRequest
+{
+    /** Permitted values for $partyType. */
+    public const PARTY_TYPE_VALUES = ['individual', 'organization'];
+
+    /** Permitted values for $sourceHost. */
+    public const SOURCE_HOST_VALUES = ['user.canonical.plus', 'org.canonical.plus'];
+
+    public function __construct(
+        /** Opaque client-generated idempotency UUID; it must not contain or derive from contact data. */
+        public readonly string $requestId,
+        public readonly string $email,
+        public readonly string $partyType,
+        public readonly ?string $organizationName = null,
+        public readonly array $interestAreas,
+        public readonly string $consentRevision,
+        public readonly string $consentedAt,
+        public readonly string $sourceHost,
+        public readonly ?string $locale = null,
+        public readonly ?string $referralCode = null,
+        public readonly ?string $displayName = null,
+        public readonly ?string $websiteUrl = null,
+        public readonly bool $registrationConsent,
+        public readonly bool $marketingConsent,
+        public readonly ?string $marketingConsentRevision = null,
+    ) {
+    }
+}
+
+/**
+ * Uniform response for newly created, duplicate-request, and already-known email aliases.
+ */
+final class PreInterestRegistrationResponse
+{
+    /** Permitted values for $status. */
+    public const STATUS_VALUES = ['accepted'];
+
+    public function __construct(
+        public readonly string $receiptId,
+        public readonly string $status,
+        public readonly string $acceptedAt,
+        public readonly string $nextStepUrl,
+    ) {
+    }
+}
+
+/**
+ * Safe bounded error that never echoes contact data.
+ */
+final class PreInterestProblem
+{
+    /** Permitted values for $code. */
+    public const CODE_VALUES = ['invalid_request', 'rate_limited', 'verification_required', 'storage_unavailable', 'internal'];
+
+    public function __construct(
+        public readonly string $code,
+        public readonly string $message,
+        public readonly string $requestId,
+    ) {
+    }
+}
