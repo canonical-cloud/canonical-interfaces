@@ -5,6 +5,7 @@
   "schemas": [
     "api.schema.json",
     "compliance.schema.json",
-    "quote.schema.json"
+    "quote.schema.json",
+    "pre-interest.schema.json"
   ]
 }
