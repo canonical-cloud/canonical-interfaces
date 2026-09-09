@@ -75,7 +75,7 @@ enum TrainingState {
 model ReportCounts {
   passed: int64;
   failed: int64;
-  unknown: int64;
+  unknownCount: int64;
   highOrCriticalFailures: int64;
 }
 
@@ -141,7 +141,7 @@ model FrameworkCoverage {
   catalogVersion: string;
   satisfied: int64;
   failed: int64;
-  unknown: int64;
+  unknownCount: int64;
   notApplicableApproved: int64;
   total: int64;
   readinessBasisPoints: int64;
