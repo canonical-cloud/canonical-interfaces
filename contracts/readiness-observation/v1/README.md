@@ -16,4 +16,4 @@ Evidence may be referenced from several framework assertions, but applicability,
 
 ## Validate
 
-The repository workflow pins the validator to commit `03ccc0ecdfc70f9198c3ccf80718910961d3fde1` and retains the parity receipt, SARIF, generated comparison witness and admissible Contract IR.
+The repository workflow pins the validator to commit `3171025cbe03a7026a71ce94eea18c910e1431b2`, the same immutable revision used by the repository's green peer-authority admission canary. It retains the parity receipt, SARIF, generated comparison witness and admissible Contract IR.
