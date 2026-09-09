@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.readiness-workspace.v1.authored.schema.json",
+  "$defs": {
+    "ReadinessOutcome": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReadinessOutcome","type":"string","enum":["ready","attention-required","evidence-incomplete"]},
+    "ChecklistState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ChecklistState","type":"string","enum":["not-started","in-progress","needs-review","compliant"]},
+    "RecommendationPriority": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RecommendationPriority","type":"string","enum":["urgent","high","medium","low"]},
+    "RecommendationState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RecommendationState","type":"string","enum":["open","in-progress","resolved","accepted-risk"]},
+    "EvidenceFreshness": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"EvidenceFreshness","type":"string","enum":["current","expiring","expired"]},
+    "FormSubmissionState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FormSubmissionState","type":"string","enum":["submitted","superseded"]},
+    "RiskState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RiskState","type":"string","enum":["open","mitigating","accepted","closed"]},
+    "IncidentState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"IncidentState","type":"string","enum":["open","contained","resolved","postmortem-complete"]},
+    "TrainingState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"TrainingState","type":"string","enum":["assigned","in-progress","completed","expired"]},
+    "ReportCounts": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportCounts","type":"object",
+      "properties":{"passed":{"type":"integer"},"failed":{"type":"integer"},"unknown":{"type":"integer"},"highOrCriticalFailures":{"type":"integer"}},
+      "required":["passed","failed","unknown","highOrCriticalFailures"],"unevaluatedProperties":false
+    },
+    "ReportArtifact": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportArtifact","type":"object",
+      "properties":{
+        "specVersion":{"type":"string","const":"canonical.readiness.report-artifact.v1"},
+        "tenantUuid":{"type":"string"},"reportUuid":{"type":"string"},"assessmentReportId":{"type":"string"},"scopeId":{"type":"string"},"createdAt":{"type":"string"},"category":{"type":"string"},
+        "frameworkIds":{"type":"array","items":{"type":"string"}},"outcome":{"$ref":"ReadinessOutcome"},"scoreBasisPoints":{"type":"integer"},"counts":{"$ref":"ReportCounts"},
+        "bucket":{"type":"string"},"objectKey":{"type":"string"},"contentSha256":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"}
+      },
+      "required":["specVersion","tenantUuid","reportUuid","assessmentReportId","scopeId","createdAt","category","frameworkIds","outcome","counts","bucket","objectKey","contentSha256","contentType","sizeBytes"],
+      "unevaluatedProperties":false
+    },
+    "ReportIndexRecord": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportIndexRecord","type":"object",
+      "properties":{
+        "specVersion":{"type":"string","const":"canonical.readiness.report-index.v1"},
+        "tenantUuid":{"type":"string"},"reportUuid":{"type":"string"},"assessmentReportId":{"type":"string"},"scopeId":{"type":"string"},"createdAt":{"type":"string"},"category":{"type":"string"},
+        "frameworkIds":{"type":"array","items":{"type":"string"}},"outcome":{"$ref":"ReadinessOutcome"},"scoreBasisPoints":{"type":"integer"},"counts":{"$ref":"ReportCounts"},
+        "bucket":{"type":"string"},"objectKey":{"type":"string"},"contentSha256":{"type":"string"},
+        "resourceKinds":{"type":"array","items":{"type":"string"}},"checkIds":{"type":"array","items":{"type":"string"}},"problemCodes":{"type":"array","items":{"type":"string"}},"tags":{"type":"array","items":{"type":"string"}}
+      },
+      "required":["specVersion","tenantUuid","reportUuid","assessmentReportId","scopeId","createdAt","category","frameworkIds","outcome","counts","bucket","objectKey","contentSha256","resourceKinds","checkIds","problemCodes","tags"],
+      "unevaluatedProperties":false
+    },
+    "ControlCrosswalk": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ControlCrosswalk","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.control-crosswalk.v1"},"mappingId":{"type":"string"},"evidenceCapabilityId":{"type":"string"},"frameworkId":{"type":"string"},"controlId":{"type":"string"},"testId":{"type":"string"},"catalogVersion":{"type":"string"}},
+      "required":["specVersion","mappingId","evidenceCapabilityId","frameworkId","controlId","testId","catalogVersion"],"unevaluatedProperties":false
+    },
+    "FrameworkCoverage": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FrameworkCoverage","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.framework-coverage.v1"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"frameworkId":{"type":"string"},"catalogVersion":{"type":"string"},"satisfied":{"type":"integer"},"failed":{"type":"integer"},"unknown":{"type":"integer"},"notApplicableApproved":{"type":"integer"},"total":{"type":"integer"},"readinessBasisPoints":{"type":"integer"},"calculatedAt":{"type":"string"}},
+      "required":["specVersion","tenantUuid","scopeId","frameworkId","catalogVersion","satisfied","failed","unknown","notApplicableApproved","total","readinessBasisPoints","calculatedAt"],"unevaluatedProperties":false
+    },
+    "ChecklistItem": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ChecklistItem","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.checklist-item.v1"},"checklistItemUuid":{"type":"string"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"frameworkIds":{"type":"array","items":{"type":"string"}},"controlIds":{"type":"array","items":{"type":"string"}},"title":{"type":"string"},"state":{"$ref":"ChecklistState"},"ownerId":{"type":"string"},"evidenceIds":{"type":"array","items":{"type":"string"}},"recommendationIds":{"type":"array","items":{"type":"string"}},"updatedAt":{"type":"string"},"version":{"type":"integer"}},
+      "required":["specVersion","checklistItemUuid","tenantUuid","scopeId","frameworkIds","controlIds","title","state","evidenceIds","recommendationIds","updatedAt","version"],"unevaluatedProperties":false
+    },
+    "Recommendation": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"Recommendation","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.recommendation.v1"},"recommendationUuid":{"type":"string"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"sourceFindingIds":{"type":"array","items":{"type":"string"}},"priority":{"$ref":"RecommendationPriority"},"state":{"$ref":"RecommendationState"},"title":{"type":"string"},"summary":{"type":"string"},"runbookRef":{"type":"string"},"ticketRef":{"type":"string"},"dueAt":{"type":"string"},"updatedAt":{"type":"string"}},
+      "required":["specVersion","recommendationUuid","tenantUuid","scopeId","sourceFindingIds","priority","state","title","summary","updatedAt"],"unevaluatedProperties":false
+    },
+    "FormDefinition": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FormDefinition","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.form-definition.v1"},"formUuid":{"type":"string"},"tenantUuid":{"type":"string"},"version":{"type":"integer"},"title":{"type":"string"},"schemaObjectKey":{"type":"string"},"schemaSha256":{"type":"string"},"active":{"type":"boolean"},"createdAt":{"type":"string"}},
+      "required":["specVersion","formUuid","tenantUuid","version","title","schemaObjectKey","schemaSha256","active","createdAt"],"unevaluatedProperties":false
+    },
+    "FormSubmission": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FormSubmission","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.form-submission.v1"},"submissionUuid":{"type":"string"},"formUuid":{"type":"string"},"formVersion":{"type":"integer"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"submittedBy":{"type":"string"},"submittedAt":{"type":"string"},"sourceIpToken":{"type":"string"},"payloadObjectKey":{"type":"string"},"payloadSha256":{"type":"string"},"state":{"$ref":"FormSubmissionState"}},
+      "required":["specVersion","submissionUuid","formUuid","formVersion","tenantUuid","scopeId","submittedBy","submittedAt","sourceIpToken","payloadObjectKey","payloadSha256","state"],"unevaluatedProperties":false
+    },
+    "EvidenceExpiry": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"EvidenceExpiry","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.evidence-expiry.v1"},"tenantUuid":{"type":"string"},"evidenceId":{"type":"string"},"validUntil":{"type":"string"},"freshness":{"$ref":"EvidenceFreshness"},"renewalTicketRef":{"type":"string"},"updatedAt":{"type":"string"}},
+      "required":["specVersion","tenantUuid","evidenceId","validUntil","freshness","updatedAt"],"unevaluatedProperties":false
+    },
+    "RiskRegisterEntry": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RiskRegisterEntry","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.risk-entry.v1"},"riskUuid":{"type":"string"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"title":{"type":"string"},"ownerId":{"type":"string"},"state":{"$ref":"RiskState"},"rationaleSha256":{"type":"string"},"acceptedBy":{"type":"string"},"acceptedAt":{"type":"string"},"acceptedUntil":{"type":"string"},"updatedAt":{"type":"string"}},
+      "required":["specVersion","riskUuid","tenantUuid","scopeId","title","ownerId","state","rationaleSha256","updatedAt"],"unevaluatedProperties":false
+    },
+    "IncidentRecord": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"IncidentRecord","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.incident-record.v1"},"incidentUuid":{"type":"string"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"detectedAt":{"type":"string"},"state":{"$ref":"IncidentState"},"severity":{"type":"string"},"summary":{"type":"string"},"postmortemObjectKey":{"type":"string"},"postmortemSha256":{"type":"string"},"resolvedAt":{"type":"string"},"updatedAt":{"type":"string"}},
+      "required":["specVersion","incidentUuid","tenantUuid","scopeId","detectedAt","state","severity","summary","updatedAt"],"unevaluatedProperties":false
+    },
+    "TrainingAssignment": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"TrainingAssignment","type":"object",
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.training-assignment.v1"},"assignmentUuid":{"type":"string"},"tenantUuid":{"type":"string"},"subjectId":{"type":"string"},"courseId":{"type":"string"},"dueAt":{"type":"string"},"state":{"$ref":"TrainingState"},"completedAt":{"type":"string"},"evidenceId":{"type":"string"},"updatedAt":{"type":"string"}},
+      "required":["specVersion","assignmentUuid","tenantUuid","subjectId","courseId","dueAt","state","updatedAt"],"unevaluatedProperties":false
+    }
+  }
+}
