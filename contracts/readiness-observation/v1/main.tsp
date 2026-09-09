@@ -9,7 +9,7 @@ enum ReportedStatus {
   notObserved: "not-observed",
   exception: "exception",
   notApplicableRequested: "not-applicable-requested",
-  unknown: "unknown",
+  unknownValue: "unknown",
 }
 
 @id("ObservationReceiptStatus")
