@@ -88,7 +88,7 @@
         "collectedAt": {"type": "string"},
         "locator": {"type": "string"},
         "contentType": {"type": "string"},
-        "sizeBytes": {"type": "integer", "format": "int64"}
+        "sizeBytes": {"type": "integer"}
       },
       "required": ["evidenceId", "kind", "sha256", "collectedAt"],
       "unevaluatedProperties": false
@@ -104,7 +104,7 @@
         },
         "eventId": {"type": "string"},
         "sourceId": {"type": "string"},
-        "sourceSequence": {"type": "integer", "format": "int64"},
+        "sourceSequence": {"type": "integer"},
         "organization": {"type": "string"},
         "observedAt": {"type": "string"},
         "assertions": {
@@ -140,7 +140,7 @@
         "receiptId": {"type": "string"},
         "eventId": {"type": "string"},
         "sourceId": {"type": "string"},
-        "sourceSequence": {"type": "integer", "format": "int64"},
+        "sourceSequence": {"type": "integer"},
         "status": {"$ref": "ObservationReceiptStatus"},
         "duplicate": {"type": "boolean"},
         "payloadSha256": {"type": "string"},
