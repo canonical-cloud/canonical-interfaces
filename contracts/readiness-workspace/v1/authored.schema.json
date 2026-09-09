@@ -13,8 +13,8 @@
     "TrainingState": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"TrainingState","type":"string","enum":["assigned","in-progress","completed","expired"]},
     "ReportCounts": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportCounts","type":"object",
-      "properties":{"passed":{"type":"integer"},"failed":{"type":"integer"},"unknown":{"type":"integer"},"highOrCriticalFailures":{"type":"integer"}},
-      "required":["passed","failed","unknown","highOrCriticalFailures"],"unevaluatedProperties":false
+      "properties":{"passed":{"type":"integer"},"failed":{"type":"integer"},"unknownCount":{"type":"integer"},"highOrCriticalFailures":{"type":"integer"}},
+      "required":["passed","failed","unknownCount","highOrCriticalFailures"],"unevaluatedProperties":false
     },
     "ReportArtifact": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportArtifact","type":"object",
@@ -46,8 +46,8 @@
     },
     "FrameworkCoverage": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FrameworkCoverage","type":"object",
-      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.framework-coverage.v1"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"frameworkId":{"type":"string"},"catalogVersion":{"type":"string"},"satisfied":{"type":"integer"},"failed":{"type":"integer"},"unknown":{"type":"integer"},"notApplicableApproved":{"type":"integer"},"total":{"type":"integer"},"readinessBasisPoints":{"type":"integer"},"calculatedAt":{"type":"string"}},
-      "required":["specVersion","tenantUuid","scopeId","frameworkId","catalogVersion","satisfied","failed","unknown","notApplicableApproved","total","readinessBasisPoints","calculatedAt"],"unevaluatedProperties":false
+      "properties":{"specVersion":{"type":"string","const":"canonical.readiness.framework-coverage.v1"},"tenantUuid":{"type":"string"},"scopeId":{"type":"string"},"frameworkId":{"type":"string"},"catalogVersion":{"type":"string"},"satisfied":{"type":"integer"},"failed":{"type":"integer"},"unknownCount":{"type":"integer"},"notApplicableApproved":{"type":"integer"},"total":{"type":"integer"},"readinessBasisPoints":{"type":"integer"},"calculatedAt":{"type":"string"}},
+      "required":["specVersion","tenantUuid","scopeId","frameworkId","catalogVersion","satisfied","failed","unknownCount","notApplicableApproved","total","readinessBasisPoints","calculatedAt"],"unevaluatedProperties":false
     },
     "ChecklistItem": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ChecklistItem","type":"object",
