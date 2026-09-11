@@ -1,308 +1,159 @@
 {
-  "schema_version": "2.0.0",
+  "schema_version": "1.0.0",
   "service": "canonical-api-server",
-  "title": "Canonical Cloud Quote API",
+  "title": "Canonical Cloud API",
   "version": "0.1.0",
-  "description": "Typed route map for canonical-api-server.rs. Keys are operations; values are typed routes. Wire field names are the exact JSON keys produced by canonical-interfaces (camelCase) and by the server's own local response structs. /v1/* is a compatibility alias of /api/v1/* registered by the same handlers.",
-  "types": {
-    "QuoteId": {
-      "kind": "scalar",
-      "base": "Uuid",
-      "doc": "Server-minted quote identifier. Path segments are parsed with `Path<Uuid>`; on the wire it is the UUID's string form."
-    },
-
-    "QuoteSubmissionStatus": {
-      "kind": "enum",
-      "variants": ["queued", "analyzing", "ready", "failed"],
-      "doc": "canonical-interfaces QuoteSubmissionResponseStatus."
-    },
-    "QuoteSummaryStatus": {
-      "kind": "enum",
-      "variants": ["queued", "analyzing", "ready", "failed"]
-    },
-    "QuoteDetailStatus": {
-      "kind": "enum",
-      "variants": ["queued", "analyzing", "ready", "failed"]
-    },
-    "QuoteRetryStatus": {
-      "kind": "enum",
-      "variants": ["queued"],
-      "doc": "A successful retry only ever requeues; the server has no other terminal value here."
-    },
-    "QuoteStage": {
-      "kind": "enum",
-      "variants": ["queued", "loading_context", "analyzing", "validating", "ready", "failed"],
-      "doc": "canonical-interfaces QuoteStatusEventStage."
-    },
-
-    "QuoteRequest": {
-      "kind": "record",
-      "doc": "Authenticated quote intake. The handler takes `Json<serde_json::Value>` and then rejects any key outside this set (contract.rs REQUEST_FIELDS) before deserialising into the canonical-interfaces QuoteRequest.",
-      "fields": {
-        "organizationName": { "type": "String" },
-        "contactName": { "type": "String" },
-        "contactEmail": { "type": "String", "doc": "Follow-up address only. Owner identity comes from the accepted credential, never from this field." },
-        "website": { "type": "String", "required": false },
-        "employeeCount": { "type": "I64" },
-        "annualRevenueBand": { "type": "String", "required": false },
-        "frameworks": { "type": { "kind": "list", "item": "String" } },
-        "currentStage": { "type": "String" },
-        "infrastructure": { "type": { "kind": "list", "item": "String" } },
-        "dataSensitivity": { "type": { "kind": "list", "item": "String" } },
-        "targetDate": { "type": "String", "required": false },
-        "hasSecurityProgram": { "type": "Bool" },
-        "hasPolicies": { "type": "Bool" },
-        "hasRiskAssessment": { "type": "Bool" },
-        "hasIncidentResponsePlan": { "type": "Bool" },
-        "hasVendorManagement": { "type": "Bool" },
-        "notes": { "type": "String", "required": false },
-        "contextKey": { "type": "String", "required": false, "doc": "Allow-listed context selector. The server substitutes `quote-analysis` when omitted." },
-        "answersVersion": { "type": "I64", "doc": "Questionnaire schema version; only 1 is accepted." }
-      }
-    },
-
-    "QuoteEstimate": {
-      "kind": "record",
-      "doc": "Structured Gemini-assisted estimate, persisted only after server-side validation.",
-      "fields": {
-        "quoteId": "QuoteId",
-        "status": "String",
-        "currency": "String",
-        "lowerBoundCents": "I64",
-        "upperBoundCents": "I64",
-        "durationWeeksLow": "I64",
-        "durationWeeksHigh": "I64",
-        "confidence": "String",
-        "summary": "String",
-        "assumptions": { "type": { "kind": "list", "item": "String" } },
-        "gaps": { "type": { "kind": "list", "item": "String" } },
-        "nextSteps": { "type": { "kind": "list", "item": "String" } },
-        "frameworks": { "type": { "kind": "list", "item": "String" } },
-        "model": "String",
-        "contextVersion": "String",
-        "createdAt": "DateTime"
-      }
-    },
-
-    "QuoteProblem": {
-      "kind": "record",
-      "doc": "Bounded public error payload. Every 4xx and 5xx JSON response from this service is one of these.",
-      "fields": {
-        "code": "String",
-        "message": "String",
-        "requestId": "String"
-      }
-    },
-
-    "QuoteSubmissionResponse": {
-      "kind": "record",
-      "fields": {
-        "quoteId": "QuoteId",
-        "status": "QuoteSubmissionStatus",
-        "streamUrl": "String",
-        "createdAt": "DateTime"
-      }
-    },
-
-    "QuoteRetryResponse": {
-      "kind": "record",
-      "fields": {
-        "quoteId": "QuoteId",
-        "status": "QuoteRetryStatus",
-        "streamUrl": "String",
-        "updatedAt": "DateTime"
-      }
-    },
-
-    "QuoteSummary": {
-      "kind": "record",
-      "fields": {
-        "quoteId": "QuoteId",
-        "status": "QuoteSummaryStatus",
-        "organizationName": "String",
-        "frameworks": { "type": { "kind": "list", "item": "String" } },
-        "createdAt": "DateTime",
-        "updatedAt": "DateTime",
-        "estimate": { "type": "QuoteEstimate", "required": false, "doc": "Present only when the quote is ready." }
-      }
-    },
-
-    "QuoteDetail": {
-      "kind": "record",
-      "fields": {
-        "quoteId": "QuoteId",
-        "status": "QuoteDetailStatus",
-        "request": "QuoteRequest",
-        "eventsUrl": "String",
-        "createdAt": "DateTime",
-        "updatedAt": "DateTime",
-        "estimate": { "type": "QuoteEstimate", "required": false },
-        "problem": { "type": "QuoteProblem", "required": false, "doc": "Present only when the quote is failed." }
-      }
-    },
-
-    "QuoteListResponse": {
-      "kind": "record",
-      "fields": {
-        "quotes": { "type": { "kind": "list", "item": "QuoteSummary" } },
-        "nextCursor": { "type": "String", "required": false }
-      }
-    },
-
-    "QuoteStatusEvent": {
-      "kind": "record",
-      "doc": "One frame of the authenticated quote-progress WebSocket.",
-      "fields": {
-        "quoteId": "QuoteId",
-        "sequence": { "type": "String", "doc": "Monotonic decimal-string event sequence." },
-        "stage": "QuoteStage",
-        "message": "String",
-        "terminal": "Bool",
-        "estimate": { "type": "QuoteEstimate", "required": false },
-        "occurredAt": "DateTime",
-        "problem": { "type": "QuoteProblem", "required": false }
-      }
-    },
-
-    "HealthResponse": {
-      "kind": "record",
-      "doc": "Public liveness plus which optional subsystems were configured at boot. `#[serde(rename_all = \"camelCase\")]` in src/lib.rs.",
-      "fields": {
-        "databaseConfigured": "Bool",
-        "geminiConfigured": "Bool",
-        "geminiModel": "String",
-        "service": "String",
-        "sharedAuthConfigured": "Bool",
-        "status": "String",
-        "version": "String",
-        "webhookConfigured": "Bool"
-      }
-    },
-
-    "ReadyResponse": {
-      "kind": "record",
-      "doc": "200 body of /readyz. `#[serde(rename_all = \"camelCase\")]` in src/readiness.rs.",
-      "fields": {
-        "databaseReady": "Bool",
-        "service": "String",
-        "status": "String",
-        "version": "String"
-      }
-    },
-
-    "NotReadyResponse": {
-      "kind": "record",
-      "doc": "503 body of /readyz. This struct carries no rename_all, so the keys are exactly `code` and `message`.",
-      "fields": {
-        "code": "String",
-        "message": "String"
-      }
-    }
-  },
-
+  "description": "Typed route map for github.com/canonical-cloud. Keys compile in Rust/TS/Dart; opto-sync distributes this document (scope ores.api-docs.route-map).",
   "map": {
-    "healthz": {
-      "path": "/healthz",
-      "methods": ["GET"],
-      "summary": "Unauthenticated liveness and boot configuration.",
-      "response": "HealthResponse"
+    "healthz": "/healthz",
+    "register_pre_interest": {
+      "path": "/v1/pre-interest-registrations",
+      "methods": ["POST"],
+      "summary": "Public write-only, enumeration-resistant pre-interest registration. No public list, read, update, or delete operation exists.",
+      "request_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requestId", "email", "partyType", "interestAreas", "consentRevision", "consentedAt", "sourceHost", "registrationConsent", "marketingConsent"],
+        "properties": {
+          "requestId": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 320 },
+          "partyType": { "type": "string", "enum": ["individual", "organization"] },
+          "organizationName": { "type": "string", "minLength": 1, "maxLength": 200 },
+          "interestAreas": { "type": "array", "minItems": 1, "maxItems": 9, "uniqueItems": true, "items": { "type": "string", "enum": ["readiness_assessment", "soc2", "iso_27001", "hipaa", "pci_dss_4", "fedramp", "nist", "gdpr", "cmmc"] } },
+          "consentRevision": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "consentedAt": { "type": "string", "format": "date-time" },
+          "sourceHost": { "type": "string", "enum": ["user.canonical.plus", "org.canonical.plus"] },
+          "locale": { "type": "string", "minLength": 2, "maxLength": 35 },
+          "referralCode": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "websiteUrl": { "type": "string", "format": "uri", "minLength": 9, "maxLength": 2048 },
+          "registrationConsent": { "type": "boolean", "const": true },
+          "marketingConsent": { "type": "boolean" },
+          "marketingConsentRevision": { "type": "string", "minLength": 1, "maxLength": 64 }
+        }
+      },
+      "response_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["receiptId", "status", "acceptedAt", "nextStepUrl"],
+        "properties": {
+          "receiptId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["accepted"] },
+          "acceptedAt": { "type": "string", "format": "date-time" },
+          "nextStepUrl": { "type": "string", "maxLength": 2048 }
+        }
+      }
     },
-    "readyz": {
-      "path": "/readyz",
-      "methods": ["GET"],
-      "summary": "Readiness: PostgreSQL reachable and the quote schema, RLS policies, and runtime role all verified.",
-      "response": "ReadyResponse",
-      "errors": { "503": "NotReadyResponse" }
-    },
-
     "list_quotes": {
       "path": "/api/v1/quotes",
       "methods": ["GET"],
-      "summary": "Owner-scoped quotes, newest first.",
-      "query_params": {
-        "cursor": { "type": "String", "required": false, "doc": "Opaque owner-bound cursor; the server rejects a cursor that is not a UUID." },
-        "limit": { "type": "I64", "required": false, "doc": "Clamped to 1..=100; defaults to 25." }
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 }
+        }
       },
-      "response": "QuoteListResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "503": "QuoteProblem" }
+      "response_schema": {
+        "type": "object",
+        "required": ["quotes"],
+        "properties": {
+          "quotes": { "type": "array" },
+          "nextCursor": { "type": "string" }
+        }
+      }
     },
     "create_quote": {
       "path": "/api/v1/quotes",
       "methods": ["POST"],
-      "summary": "Submit a quote request. Requires an `Idempotency-Key` header; replies 202 Accepted.",
-      "request": "QuoteRequest",
-      "response": "QuoteSubmissionResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+      "request_schema": {
+        "type": "object",
+        "required": ["organizationName", "contactEmail"],
+        "properties": {
+          "organizationName": { "type": "string", "minLength": 1 },
+          "contactEmail": { "type": "string", "format": "email" }
+        }
+      },
+      "response_schema": {
+        "type": "object",
+        "required": ["quoteId", "status"],
+        "properties": {
+          "quoteId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string" }
+        }
+      }
     },
     "get_quote": {
-      "path": "/api/v1/quotes/{quote_id}",
+      "path": "/api/v1/quotes/{quoteId}",
       "methods": ["GET"],
-      "summary": "One owner-scoped quote.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteDetail",
-      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+      "path_params": {
+        "type": "object",
+        "required": ["quoteId"],
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+      }
     },
     "retry_quote": {
-      "path": "/api/v1/quotes/{quote_id}/retry",
+      "path": "/api/v1/quotes/{quoteId}/retry",
       "methods": ["POST"],
-      "summary": "Requeue a failed quote. Requires an `Idempotency-Key` header and carries no request body.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteRetryResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "404": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
+      "path_params": {
+        "type": "object",
+        "required": ["quoteId"],
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+      }
     },
     "quote_events": {
-      "path": "/api/v1/quotes/{quote_id}/events",
+      "path": "/api/v1/quotes/{quoteId}/events",
       "methods": ["GET"],
-      "summary": "WebSocket upgrade. Each frame is a QuoteStatusEvent; there is no JSON unary response to generate a client for.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteStatusEvent",
-      "client": false,
-      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+      "path_params": {
+        "type": "object",
+        "required": ["quoteId"],
+        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+      }
     },
-
-    "list_quotes_alias": {
-      "path": "/v1/quotes",
+    "list_readiness_frameworks": "/api/v1/readiness/frameworks",
+    "get_readiness_framework": {
+      "path": "/api/v1/readiness/frameworks/{frameworkId}",
       "methods": ["GET"],
-      "summary": "Compatibility alias of list_quotes, registered by the same handler.",
-      "query_params": {
-        "cursor": { "type": "String", "required": false },
-        "limit": { "type": "I64", "required": false }
-      },
-      "response": "QuoteListResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "503": "QuoteProblem" }
+      "path_params": {
+        "type": "object",
+        "required": ["frameworkId"],
+        "properties": { "frameworkId": { "type": "string", "minLength": 1 } }
+      }
     },
-    "create_quote_alias": {
-      "path": "/v1/quotes",
+    "list_readiness_assessments": { "path": "/api/v1/readiness/assessments", "methods": ["GET"] },
+    "create_readiness_assessment": { "path": "/api/v1/readiness/assessments", "methods": ["POST"] },
+    "get_readiness_assessment": {
+      "path": "/api/v1/readiness/assessments/{assessmentId}",
+      "methods": ["GET"],
+      "path_params": {
+        "type": "object",
+        "required": ["assessmentId"],
+        "properties": { "assessmentId": { "type": "string", "format": "uuid" } }
+      }
+    },
+    "sync_changes": {
+      "path": "/api/v1/sync/changes",
+      "methods": ["GET"],
+      "summary": "Authoritative opto-sync pull. The route map uses opto-sync; opto-sync does not use this RPC system.",
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": { "type": "string", "minLength": 1, "maxLength": 4096 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 500, "default": 200 }
+        }
+      }
+    },
+    "sync_mutations": {
+      "path": "/api/v1/sync/mutations",
       "methods": ["POST"],
-      "summary": "Compatibility alias of create_quote. Note that the returned streamUrl always points at /api/v1/quotes/{id}/events.",
-      "request": "QuoteRequest",
-      "response": "QuoteSubmissionResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
-    },
-    "get_quote_alias": {
-      "path": "/v1/quotes/{quote_id}",
-      "methods": ["GET"],
-      "summary": "Compatibility alias of get_quote.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteDetail",
-      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
-    },
-    "retry_quote_alias": {
-      "path": "/v1/quotes/{quote_id}/retry",
-      "methods": ["POST"],
-      "summary": "Compatibility alias of retry_quote.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteRetryResponse",
-      "errors": { "400": "QuoteProblem", "401": "QuoteProblem", "404": "QuoteProblem", "409": "QuoteProblem", "429": "QuoteProblem", "503": "QuoteProblem" }
-    },
-    "quote_events_alias": {
-      "path": "/v1/quotes/{quote_id}/events",
-      "methods": ["GET"],
-      "summary": "Compatibility alias of quote_events. WebSocket upgrade.",
-      "path_params": { "quote_id": "QuoteId" },
-      "response": "QuoteStatusEvent",
-      "client": false,
-      "errors": { "401": "QuoteProblem", "404": "QuoteProblem", "503": "QuoteProblem" }
+      "summary": "Authoritative opto-sync push.",
+      "request_schema": {
+        "type": "object",
+        "required": ["operations"],
+        "properties": { "operations": { "type": "array", "minItems": 1, "maxItems": 50 } }
+      }
     }
   }
 }
