@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.commercial-service-tier.v1.schema.json",
+  "$defs": {
+    "FoundationReadinessTier": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "FoundationReadinessTier",
+      "type": "object",
+      "properties": {
+        "id": { "const": "foundation-readiness" },
+        "name": { "const": "Foundation Readiness" },
+        "monthlyUsd": { "const": 2500 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "ManagedReadinessTier": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ManagedReadinessTier",
+      "type": "object",
+      "properties": {
+        "id": { "const": "managed-readiness" },
+        "name": { "const": "Managed Readiness" },
+        "monthlyUsd": { "const": 7500 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "AssuranceEngineeringTier": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AssuranceEngineeringTier",
+      "type": "object",
+      "properties": {
+        "id": { "const": "assurance-engineering" },
+        "name": { "const": "Assurance Engineering" },
+        "monthlyUsd": { "const": 20000 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "ServiceTier": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ServiceTier",
+      "oneOf": [
+        { "$ref": "FoundationReadinessTier" },
+        { "$ref": "ManagedReadinessTier" },
+        { "$ref": "AssuranceEngineeringTier" }
+      ]
+    },
+    "PublicationStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "PublicationStatus",
+      "type": "string",
+      "enum": ["proposed", "approved", "retired"]
+    },
+    "ServiceTierCatalog": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ServiceTierCatalog",
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "publicationStatus": { "$ref": "PublicationStatus" },
+        "currency": { "const": "USD" },
+        "asOf": { "type": "string" },
+        "tiers": {
+          "type": "array",
+          "items": { "$ref": "ServiceTier" }
+        }
+      },
+      "required": ["schemaVersion", "publicationStatus", "currency", "asOf", "tiers"],
+      "unevaluatedProperties": false
+    }
+  }
+}
