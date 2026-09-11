@@ -1,10 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "canonical.commercial-service-tier.v1.schema.json",
+  "$id": "urn:canonical-cloud:commercial-service-tier:v1",
   "$defs": {
     "FoundationReadinessTier": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "FoundationReadinessTier",
       "type": "object",
       "properties": {
         "id": { "type": "string", "const": "foundation-readiness" },
@@ -15,8 +13,6 @@
       "unevaluatedProperties": false
     },
     "ManagedReadinessTier": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "ManagedReadinessTier",
       "type": "object",
       "properties": {
         "id": { "type": "string", "const": "managed-readiness" },
@@ -27,8 +23,6 @@
       "unevaluatedProperties": false
     },
     "AssuranceEngineeringTier": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "AssuranceEngineeringTier",
       "type": "object",
       "properties": {
         "id": { "type": "string", "const": "assurance-engineering" },
@@ -39,17 +33,13 @@
       "unevaluatedProperties": false
     },
     "ServiceTier": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "ServiceTier",
       "anyOf": [
-        { "$ref": "#/$defs/FoundationReadinessTier" },
-        { "$ref": "#/$defs/ManagedReadinessTier" },
-        { "$ref": "#/$defs/AssuranceEngineeringTier" }
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/FoundationReadinessTier" },
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/ManagedReadinessTier" },
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/AssuranceEngineeringTier" }
       ]
     },
     "PublicationStatus": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "PublicationStatus",
       "anyOf": [
         { "type": "string", "const": "approved" },
         { "type": "string", "const": "proposed" },
@@ -57,17 +47,15 @@
       ]
     },
     "ServiceTierCatalog": {
-      "$schema": "https://json-schema.org/draft/2020-12/schema",
-      "$id": "ServiceTierCatalog",
       "type": "object",
       "properties": {
         "schemaVersion": { "type": "number", "const": 1 },
-        "publicationStatus": { "$ref": "#/$defs/PublicationStatus" },
+        "publicationStatus": { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/PublicationStatus" },
         "currency": { "type": "string", "const": "USD" },
         "asOf": { "type": "string" },
         "tiers": {
           "type": "array",
-          "items": { "$ref": "#/$defs/ServiceTier" }
+          "items": { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/ServiceTier" }
         }
       },
       "required": ["schemaVersion", "publicationStatus", "currency", "asOf", "tiers"],
