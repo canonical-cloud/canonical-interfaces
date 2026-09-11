@@ -4,6 +4,7 @@
   "description": "Typed request, asynchronous status, and estimate payloads for the canonical.plus compliance quote workflow.",
   "$defs": {
     "QuoteRequest": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Authenticated request to generate a bounded compliance-services quote.",
       "required": [
@@ -46,6 +47,7 @@
       }
     },
     "QuoteSubmissionResponse": {
+      "x-visibility": "public",
       "type":"object","description":"Accepted response from POST /api/v1/quotes.","required":["quoteId","status","streamUrl","createdAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
@@ -55,6 +57,7 @@
       }
     },
     "QuoteEstimate": {
+      "x-visibility": "public",
       "type":"object","description":"Structured Gemini-assisted estimate persisted after server-side validation.","required":["quoteId","status","currency","lowerBoundCents","upperBoundCents","durationWeeksLow","durationWeeksHigh","confidence","summary","assumptions","gaps","nextSteps","frameworks","model","contextVersion","createdAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},
@@ -76,6 +79,7 @@
       }
     },
     "QuoteStatusEvent": {
+      "x-visibility": "public",
       "type":"object","description":"Authenticated WebSocket progress message for one quote.","required":["quoteId","sequence","stage","message","terminal","occurredAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},
@@ -89,6 +93,7 @@
       }
     },
     "QuoteProblem": {
+      "x-visibility": "public",
       "type":"object","description":"Bounded public error payload for quote endpoints.","required":["code","message","requestId"],"additionalProperties":false,
       "properties": {
         "code":{"type":"string","pattern":"^(invalid_request|unauthorized|forbidden|not_found|conflict|idempotency_key_reused|rate_limited|context_unavailable|storage_unavailable|upstream_unavailable|analysis_failed|internal)$","description":"Stable machine-readable error code."},
@@ -97,6 +102,7 @@
       }
     },
     "QuoteSummary": {
+      "x-visibility": "public",
       "type":"object","description":"Owner-scoped list item for a compliance quote.","required":["quoteId","status","organizationName","frameworks","createdAt","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
@@ -109,6 +115,7 @@
       }
     },
     "QuoteDetail": {
+      "x-visibility": "public",
       "type":"object","description":"Owner-scoped authoritative REST representation of one quote.","required":["quoteId","status","request","eventsUrl","createdAt","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Server-generated quote identifier."},
@@ -122,6 +129,7 @@
       }
     },
     "QuoteListQuery": {
+      "x-visibility": "public",
       "type":"object","description":"Bounded owner-scoped list query for GET /api/v1/quotes.","additionalProperties":false,
       "properties": {
         "cursor":{"type":"string","minLength":1,"maxLength":4096,"description":"Opaque owner-bound pagination cursor."},
@@ -129,6 +137,7 @@
       }
     },
     "QuoteListResponse": {
+      "x-visibility": "public",
       "type":"object","description":"Owner-scoped quote list response.","required":["quotes"],"additionalProperties":false,
       "properties": {
         "quotes":{"type":"array","maxItems":100,"items":{"$ref":"#/$defs/QuoteSummary"},"description":"Quotes in descending creation order."},
@@ -136,6 +145,7 @@
       }
     },
     "QuoteRetryResponse": {
+      "x-visibility": "public",
       "type":"object","description":"Accepted response after retrying a failed quote.","required":["quoteId","status","streamUrl","updatedAt"],"additionalProperties":false,
       "properties": {
         "quoteId":{"type":"string","format":"uuid","description":"Quote identifier."},

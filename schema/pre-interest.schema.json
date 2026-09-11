@@ -6,6 +6,7 @@
   "x-canonical-source": "contracts/pre-interest/v1/pre-interest.schema.json",
   "$defs": {
     "PreInterestRegistrationRequest": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.",
       "required": [
@@ -210,6 +211,7 @@
       ]
     },
     "PreInterestRegistrationResponse": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Uniform response for newly created, duplicate-request, and already-known email aliases.",
       "required": [
@@ -246,6 +248,7 @@
       }
     },
     "PreInterestProblem": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Safe bounded error that never echoes contact data.",
       "required": [
