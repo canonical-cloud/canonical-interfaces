@@ -1,0 +1,2723 @@
+{
+  "authorities": {
+    "jsonSchema": {
+      "authority": "independently-authored",
+      "dialect": "https://json-schema.org/draft/2020-12/schema"
+    },
+    "onUnexplainedMismatch": "STOPPED_FOR_EVALUATION",
+    "precedence": "none",
+    "typespec": {
+      "authority": "independently-authored",
+      "generatedJsonSchemaRole": "comparison-evidence-only"
+    }
+  },
+  "configuration": {
+    "bundleId": "typespec.generated.schema.json",
+    "differential": {
+      "enabled": true,
+      "formatAssertion": false,
+      "instanceCorpus": "contracts/commercial-service-tier/v1/instances",
+      "maxProbesPerDeclarationPerLane": 128
+    },
+    "emitter": "@typespec/json-schema",
+    "emitterOptions": {
+      "bundleId": "typespec.generated.schema.json",
+      "emitAllModels": "true",
+      "emitAllRefs": "true",
+      "emitter-output-dir": "/home/runner/work/canonical-interfaces/canonical-interfaces/.typespec-json-schema-validator/generated",
+      "file-type": "json",
+      "int64-strategy": "string",
+      "polymorphic-models-strategy": "oneOf",
+      "seal-object-schemas": "true"
+    },
+    "executionMode": "subprocess",
+    "mappingSchema": "ores.typespec-json-schema-validator.mapping/v1",
+    "maxFindings": 250,
+    "mode": "check"
+  },
+  "counts": {
+    "authoredDeclarations": 6,
+    "differentialFindings": 163,
+    "emittedFindings": 168,
+    "findings": 168,
+    "findingsTruncated": false,
+    "generatedDeclarations": 6,
+    "structuralFindings": 5,
+    "typespecDeclarations": 6,
+    "typespecOutOfScopeDeclarations": 0
+  },
+  "coverage": {
+    "comparedDimensions": [
+      "top-level declaration names",
+      "declaration kind families",
+      "required and optional properties",
+      "nullability",
+      "scalar types and formats",
+      "numeric and string constraints",
+      "enums",
+      "unions and composition",
+      "references",
+      "defaults and annotations",
+      "additional and unevaluated property policy",
+      "instance-level verdict agreement over a synthesized probe corpus"
+    ],
+    "differentialInstanceValidation": true,
+    "directDeclarationInventory": true,
+    "outOfScopeTypeSpecDeclarations": [],
+    "sourceMutationCheck": true,
+    "typespecGeneratedJsonSchemaComparison": true
+  },
+  "declarationMap": [
+    {
+      "authored": "AssuranceEngineeringTier",
+      "generated": "AssuranceEngineeringTier",
+      "kind": "model",
+      "typespec": "AssuranceEngineeringTier"
+    },
+    {
+      "authored": "FoundationReadinessTier",
+      "generated": "FoundationReadinessTier",
+      "kind": "model",
+      "typespec": "FoundationReadinessTier"
+    },
+    {
+      "authored": "ManagedReadinessTier",
+      "generated": "ManagedReadinessTier",
+      "kind": "model",
+      "typespec": "ManagedReadinessTier"
+    },
+    {
+      "authored": "PublicationStatus",
+      "generated": "PublicationStatus",
+      "kind": "union",
+      "typespec": "PublicationStatus"
+    },
+    {
+      "authored": "ServiceTier",
+      "generated": "ServiceTier",
+      "kind": "union",
+      "typespec": "ServiceTier"
+    },
+    {
+      "authored": "ServiceTierCatalog",
+      "generated": "ServiceTierCatalog",
+      "kind": "model",
+      "typespec": "ServiceTierCatalog"
+    }
+  ],
+  "differential": {
+    "declarations": [
+      {
+        "authored": "AssuranceEngineeringTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "AssuranceEngineeringTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "AssuranceEngineeringTier"
+      },
+      {
+        "authored": "FoundationReadinessTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "FoundationReadinessTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "FoundationReadinessTier"
+      },
+      {
+        "authored": "ManagedReadinessTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "ManagedReadinessTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "ManagedReadinessTier"
+      },
+      {
+        "authored": "PublicationStatus",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "PublicationStatus",
+        "probes": 12,
+        "refusals": 0,
+        "typespec": "PublicationStatus"
+      },
+      {
+        "authored": "ServiceTier",
+        "behaviorallyIndistinguishable": false,
+        "divergences": 0,
+        "generated": "ServiceTier",
+        "probes": 47,
+        "refusals": 47,
+        "typespec": "ServiceTier"
+      },
+      {
+        "authored": "ServiceTierCatalog",
+        "behaviorallyIndistinguishable": false,
+        "divergences": 0,
+        "generated": "ServiceTierCatalog",
+        "probes": 124,
+        "refusals": 116,
+        "typespec": "ServiceTierCatalog"
+      }
+    ],
+    "summary": {
+      "agreements": 143,
+      "behaviorallyIndistinguishableDeclarations": 4,
+      "comparedDeclarations": 6,
+      "corpusInstances": 2,
+      "divergences": 0,
+      "formatAssertion": false,
+      "maxProbesPerDeclarationPerLane": 128,
+      "probesEvaluated": 306,
+      "refusals": 163
+    }
+  },
+  "findings": [
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTier",
+      "fingerprint": "502d3f8ef80136757306151f12e03b297a2684faf27c413e76c474c855ae26f5",
+      "left": {
+        "message": "could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTier: could not resolve $ref #/$defs/AssuranceEngineeringTier referenced from #/anyOf/0 in https://tsjsv.invalid/0/ServiceTier",
+      "pointer": "#/$defs/ServiceTier",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "920beff0f25aa135f52e8da12bf4f7a447b6b0fa3f156725c7b056d85671582e",
+      "left": {
+        "message": "could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/PublicationStatus referenced from #/properties/publicationStatus in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "c331866b47e56b016ec070a925b99009077722970ba36a4d2af9caadfa73ad41",
+      "left": {
+        "message": "could not resolve $ref #/$defs/ServiceTier referenced from #/properties/tiers/items in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/ServiceTier referenced from #/properties/tiers/items in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "differential-instance-validation",
+      "declaration": "ServiceTierCatalog",
+      "fingerprint": "c331866b47e56b016ec070a925b99009077722970ba36a4d2af9caadfa73ad41",
+      "left": {
+        "message": "could not resolve $ref #/$defs/ServiceTier referenced from #/properties/tiers/items in https://tsjsv.invalid/0/ServiceTierCatalog",
+        "name": "SchemaResolutionError"
+      },
+      "message": "differential validation could not be performed for ServiceTierCatalog: could not resolve $ref #/$defs/ServiceTier referenced from #/properties/tiers/items in https://tsjsv.invalid/0/ServiceTierCatalog",
+      "pointer": "#/$defs/ServiceTierCatalog",
+      "resolutionState": "unexplained",
+      "right": null,
+      "ruleId": "differential-validation-refused",
+      "severity": "error"
+    },
+    {
+      "comparison": "json-schema-structural-validation",
+      "fingerprint": "b67573a32e1e72c50ebe469fa859b7c065609fa782c66d99f93484a8c25b35cd",
+      "message": "local JSON Pointer reference does not resolve within its schema resource",
+      "pointer": "#/$defs/ServiceTier/anyOf/0/$ref",
+      "resolutionState": "unexplained",
+      "ruleId": "json-schema-unresolved-local-ref",
+      "severity": "error",
+      "source": "/home/runner/work/canonical-interfaces/canonical-interfaces/contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    {
+      "comparison": "json-schema-structural-validation",
+      "fingerprint": "a8f4c297c85f5248ecb7168f40c21cf300e2504894fb4ee37ddab9748390df7a",
+      "message": "local JSON Pointer reference does not resolve within its schema resource",
+      "pointer": "#/$defs/ServiceTier/anyOf/1/$ref",
+      "resolutionState": "unexplained",
+      "ruleId": "json-schema-unresolved-local-ref",
+      "severity": "error",
+      "source": "/home/runner/work/canonical-interfaces/canonical-interfaces/contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    {
+      "comparison": "json-schema-structural-validation",
+      "fingerprint": "36995a99f838c1c81608ad171cfed07f555155e5a20f99da84a814fa901babb7",
+      "message": "local JSON Pointer reference does not resolve within its schema resource",
+      "pointer": "#/$defs/ServiceTier/anyOf/2/$ref",
+      "resolutionState": "unexplained",
+      "ruleId": "json-schema-unresolved-local-ref",
+      "severity": "error",
+      "source": "/home/runner/work/canonical-interfaces/canonical-interfaces/contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    {
+      "comparison": "json-schema-structural-validation",
+      "fingerprint": "0a141c1cb3ed3dc6b753cd65d8079ecba2c1b310593627e883d89b261187922a",
+      "message": "local JSON Pointer reference does not resolve within its schema resource",
+      "pointer": "#/$defs/ServiceTierCatalog/properties/publicationStatus/$ref",
+      "resolutionState": "unexplained",
+      "ruleId": "json-schema-unresolved-local-ref",
+      "severity": "error",
+      "source": "/home/runner/work/canonical-interfaces/canonical-interfaces/contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    {
+      "comparison": "json-schema-structural-validation",
+      "fingerprint": "48859fb8c09471ac87653912f6e376d72cd7c0231537c20f436771acf8df0517",
+      "message": "local JSON Pointer reference does not resolve within its schema resource",
+      "pointer": "#/$defs/ServiceTierCatalog/properties/tiers/items/$ref",
+      "resolutionState": "unexplained",
+      "ruleId": "json-schema-unresolved-local-ref",
+      "severity": "error",
+      "source": "/home/runner/work/canonical-interfaces/canonical-interfaces/contracts/commercial-service-tier/v1/authored.schema.json"
+    }
+  ],
+  "inputs": {
+    "authoredJsonSchema": {
+      "digest": "3a366afb36a9c514e5c390267223a0cac356f28de58e10a7ad41ec03f33d5a4a",
+      "files": [
+        {
+          "relativePath": "authored.schema.json",
+          "sha256": "0d092f4a0c05e93a0bc050ae1e3ea04696869d8d10d58bd20e11954911dbb786"
+        }
+      ],
+      "input": "contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    "generatedJsonSchema": {
+      "digest": "e150b07c34b9ff8329101e5f3133e2ecdc26a9d9c0767773427146db0d05939f",
+      "files": [
+        {
+          "relativePath": "typespec.generated.schema.json",
+          "sha256": "e2cc69cf96988d303c4457704a5d9566cce9e91651bf5fb040561d4e08ed3017"
+        }
+      ],
+      "input": ".typespec-json-schema-validator/generated/typespec.generated.schema.json"
+    },
+    "mapping": null,
+    "typespec": {
+      "digest": "d229afda1187138813f04ca9c954c8478e5c3c203418754f8326f4c8c09a118d",
+      "files": [
+        {
+          "path": "main.tsp",
+          "sha256": "48b7ae8ac3023f4b583781e55b0f68e1eb053c51fc5be300c3a6a4036db3859d"
+        }
+      ],
+      "input": "contracts/commercial-service-tier/v1/main.tsp"
+    }
+  },
+  "runId": "0c1341b18cf4798dcf36b4d1477872e69da6ed07716377206df2622decb6239a",
+  "schema": "ores.typespec-json-schema-validator.report/v1",
+  "status": "stopped_for_evaluation",
+  "toolchain": {
+    "jsonSchemaEmitter": "@typespec/json-schema",
+    "typespecCompiler": {
+      "available": true,
+      "command": "/home/runner/work/canonical-interfaces/canonical-interfaces/.deps/tjsv/node_modules/.bin/tsp",
+      "version": "1.15.0"
+    },
+    "validator": {
+      "name": "@oresoftware/typespec-json-schema-validator",
+      "version": "0.1.0"
+    }
+  },
+  "zeroUnexplainedFindings": false
+}
