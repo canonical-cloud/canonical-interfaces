@@ -11,7 +11,12 @@ JSON Schema (`schema/*.schema.json`, indexed by `schema/index.json`) is the
 single source of truth. API definitions use the exact camelCase JSON wire names;
 the compliance-domain schema retains its established snake_case names.
 Everything under `generated/` is an **adapter** — never hand-edit it; add a type
-as a `$def` and regenerate.
+as a `$def` and regenerate. HTTP **route keys** live in
+`route-maps/api.route-map.json` (github.com/oresoftware/api-docs). Run
+`python3 scripts/generate-routes.py --map route-maps/api.route-map.json --out generated/routes`
+for compile-time Rust/TS/Dart objects whose keys are operations and whose
+values are paths. Those maps sync across devices via opto-sync envelopes
+(`ores.api-docs.route-map`); opto-sync itself does not call this RPC layer.
 
 | Language | Path |
 | --- | --- |
@@ -19,6 +24,7 @@ as a `$def` and regenerate.
 | Rust (serde) | `generated/rust/src/lib.rs` |
 | Rust → WebAssembly (tsify) | `generated/rust-wasm/src/lib.rs` |
 | Dart / Flutter | `generated/dart/lib/canonical_interfaces.dart` |
+| Dart / Flutter quote v1 | `generated/dart/lib/quote_v1.dart` |
 | Python (dataclasses) | `generated/python/canonical_interfaces.py` |
 | Go | `generated/go/interfaces.go` |
 

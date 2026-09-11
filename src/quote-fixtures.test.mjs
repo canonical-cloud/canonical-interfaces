@@ -21,6 +21,10 @@ function validateValue(value, rule, field) {
     assert.equal(typeof value, "string", `${field} must be a string`);
     if (rule.minLength !== undefined) assert.ok(value.length >= rule.minLength, field);
     if (rule.maxLength !== undefined) assert.ok(value.length <= rule.maxLength, field);
+    // Guard on the value, not just `!== undefined`: a null keyword would build
+    // `new RegExp(null)` and silently assert against /null/, which reports as a
+    // confusing value mismatch rather than the schema defect it is.
+    assert.notEqual(rule.pattern, null, `${field}: schema has a null "pattern"; omit the keyword instead`);
     if (rule.pattern !== undefined) assert.match(value, new RegExp(rule.pattern), field);
     if (rule.enum !== undefined) assert.ok(rule.enum.includes(value), field);
     return;

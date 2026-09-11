@@ -315,3 +315,42 @@ type QuoteRetryResponse struct {
 	// RFC 3339 retry acceptance timestamp.
 	UpdatedAt string `json:"updatedAt"`
 }
+
+// PreInterestRegistrationRequest: Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+type PreInterestRegistrationRequest struct {
+	// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+	RequestId string `json:"requestId"`
+	Email string `json:"email"`
+	// (one of: individual, organization)
+	PartyType string `json:"partyType"`
+	OrganizationName *string `json:"organizationName,omitempty"`
+	InterestAreas []string `json:"interestAreas"`
+	ConsentRevision string `json:"consentRevision"`
+	ConsentedAt string `json:"consentedAt"`
+	// (one of: user.canonical.plus, org.canonical.plus)
+	SourceHost string `json:"sourceHost"`
+	Locale *string `json:"locale,omitempty"`
+	ReferralCode *string `json:"referralCode,omitempty"`
+	DisplayName *string `json:"displayName,omitempty"`
+	WebsiteUrl *string `json:"websiteUrl,omitempty"`
+	RegistrationConsent bool `json:"registrationConsent"`
+	MarketingConsent bool `json:"marketingConsent"`
+	MarketingConsentRevision *string `json:"marketingConsentRevision,omitempty"`
+}
+
+// PreInterestRegistrationResponse: Uniform response for newly created, duplicate-request, and already-known email aliases.
+type PreInterestRegistrationResponse struct {
+	ReceiptId string `json:"receiptId"`
+	// (one of: accepted)
+	Status string `json:"status"`
+	AcceptedAt string `json:"acceptedAt"`
+	NextStepUrl string `json:"nextStepUrl"`
+}
+
+// PreInterestProblem: Safe bounded error that never echoes contact data.
+type PreInterestProblem struct {
+	// (one of: invalid_request, rate_limited, verification_required, storage_unavailable, internal)
+	Code string `json:"code"`
+	Message string `json:"message"`
+	RequestId string `json:"requestId"`
+}

@@ -94,6 +94,36 @@ abstract final class QuoteRetryResponseStatus {
   static const List<String> values = <String>["queued"];
 }
 
+/// Permitted wire values for the fields typed as `PreInterestRegistrationRequestPartyType`.
+abstract final class PreInterestRegistrationRequestPartyType {
+  static const String individual = "individual";
+  static const String organization = "organization";
+  static const List<String> values = <String>["individual", "organization"];
+}
+
+/// Permitted wire values for the fields typed as `PreInterestRegistrationRequestSourceHost`.
+abstract final class PreInterestRegistrationRequestSourceHost {
+  static const String userCanonicalPlus = "user.canonical.plus";
+  static const String orgCanonicalPlus = "org.canonical.plus";
+  static const List<String> values = <String>["user.canonical.plus", "org.canonical.plus"];
+}
+
+/// Permitted wire values for the fields typed as `PreInterestRegistrationResponseStatus`.
+abstract final class PreInterestRegistrationResponseStatus {
+  static const String accepted = "accepted";
+  static const List<String> values = <String>["accepted"];
+}
+
+/// Permitted wire values for the fields typed as `PreInterestProblemCode`.
+abstract final class PreInterestProblemCode {
+  static const String invalidRequest = "invalid_request";
+  static const String rateLimited = "rate_limited";
+  static const String verificationRequired = "verification_required";
+  static const String storageUnavailable = "storage_unavailable";
+  static const String internal = "internal";
+  static const List<String> values = <String>["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"];
+}
+
 /// Legacy-compatible response of GET /api/health and GET /api/v1/health.
 final class HealthStatus {
   const HealthStatus({required this.status, required this.service});
@@ -807,5 +837,112 @@ final class QuoteRetryResponse {
     "status": status,
     "streamUrl": streamUrl,
     "updatedAt": updatedAt,
+  };
+}
+
+/// Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key.
+final class PreInterestRegistrationRequest {
+  const PreInterestRegistrationRequest({required this.requestId, required this.email, required this.partyType, this.organizationName, required this.interestAreas, required this.consentRevision, required this.consentedAt, required this.sourceHost, this.locale, this.referralCode, this.displayName, this.websiteUrl, required this.registrationConsent, required this.marketingConsent, this.marketingConsentRevision});
+
+  /// Opaque client-generated idempotency UUID; it must not contain or derive from contact data.
+  final String requestId;
+  final String email;
+  /// (one of: individual, organization)
+  final String partyType;
+  final String? organizationName;
+  final List<String> interestAreas;
+  final String consentRevision;
+  final String consentedAt;
+  /// (one of: user.canonical.plus, org.canonical.plus)
+  final String sourceHost;
+  final String? locale;
+  final String? referralCode;
+  final String? displayName;
+  final String? websiteUrl;
+  final bool registrationConsent;
+  final bool marketingConsent;
+  final String? marketingConsentRevision;
+
+  factory PreInterestRegistrationRequest.fromJson(Map<String, Object?> json) => PreInterestRegistrationRequest(
+    requestId: json["requestId"] as String,
+    email: json["email"] as String,
+    partyType: json["partyType"] as String,
+    organizationName: json["organizationName"] == null ? null : json["organizationName"] as String,
+    interestAreas: (json["interestAreas"] as List).cast<String>(),
+    consentRevision: json["consentRevision"] as String,
+    consentedAt: json["consentedAt"] as String,
+    sourceHost: json["sourceHost"] as String,
+    locale: json["locale"] == null ? null : json["locale"] as String,
+    referralCode: json["referralCode"] == null ? null : json["referralCode"] as String,
+    displayName: json["displayName"] == null ? null : json["displayName"] as String,
+    websiteUrl: json["websiteUrl"] == null ? null : json["websiteUrl"] as String,
+    registrationConsent: json["registrationConsent"] as bool,
+    marketingConsent: json["marketingConsent"] as bool,
+    marketingConsentRevision: json["marketingConsentRevision"] == null ? null : json["marketingConsentRevision"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "requestId": requestId,
+    "email": email,
+    "partyType": partyType,
+    if (organizationName != null) "organizationName": organizationName,
+    "interestAreas": interestAreas,
+    "consentRevision": consentRevision,
+    "consentedAt": consentedAt,
+    "sourceHost": sourceHost,
+    if (locale != null) "locale": locale,
+    if (referralCode != null) "referralCode": referralCode,
+    if (displayName != null) "displayName": displayName,
+    if (websiteUrl != null) "websiteUrl": websiteUrl,
+    "registrationConsent": registrationConsent,
+    "marketingConsent": marketingConsent,
+    if (marketingConsentRevision != null) "marketingConsentRevision": marketingConsentRevision,
+  };
+}
+
+/// Uniform response for newly created, duplicate-request, and already-known email aliases.
+final class PreInterestRegistrationResponse {
+  const PreInterestRegistrationResponse({required this.receiptId, required this.status, required this.acceptedAt, required this.nextStepUrl});
+
+  final String receiptId;
+  /// (one of: accepted)
+  final String status;
+  final String acceptedAt;
+  final String nextStepUrl;
+
+  factory PreInterestRegistrationResponse.fromJson(Map<String, Object?> json) => PreInterestRegistrationResponse(
+    receiptId: json["receiptId"] as String,
+    status: json["status"] as String,
+    acceptedAt: json["acceptedAt"] as String,
+    nextStepUrl: json["nextStepUrl"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "receiptId": receiptId,
+    "status": status,
+    "acceptedAt": acceptedAt,
+    "nextStepUrl": nextStepUrl,
+  };
+}
+
+/// Safe bounded error that never echoes contact data.
+final class PreInterestProblem {
+  const PreInterestProblem({required this.code, required this.message, required this.requestId});
+
+  /// (one of: invalid_request, rate_limited, verification_required, storage_unavailable, internal)
+  final String code;
+  final String message;
+  final String requestId;
+
+  factory PreInterestProblem.fromJson(Map<String, Object?> json) => PreInterestProblem(
+    code: json["code"] as String,
+    message: json["message"] as String,
+    requestId: json["requestId"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "code": code,
+    "message": message,
+    "requestId": requestId,
   };
 }

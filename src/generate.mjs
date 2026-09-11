@@ -30,7 +30,20 @@ const fail = (msg) => { throw new GenError(msg); };
 // --- helpers -----------------------------------------------------------------
 
 const oneLine = (s) => String(s || "").replace(/\s+/g, " ").trim();
-const pascal = (s) => s.split(/[_\-\s]+/).map((w) => (w ? w[0].toUpperCase() + w.slice(1) : "")).join("");
+const pascal = (value) => {
+  const words = String(value).match(/[A-Za-z0-9]+/g) || [];
+  let symbol = words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("");
+  if (!symbol) {
+    fail(`cannot derive a portable identifier from ${JSON.stringify(value)}`);
+  }
+  if (/^[0-9]/.test(symbol)) symbol = `Value${symbol}`;
+  if (!/^[A-Za-z][A-Za-z0-9]*$/.test(symbol)) {
+    fail(`cannot derive a portable identifier from ${JSON.stringify(value)}`);
+  }
+  return symbol;
+};
 const snake = (s) => s.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 const camel = (s) => s.replace(/[_\-]([a-z0-9])/g, (_, c) => c.toUpperCase());
 // Comment-escapers so a description can never break the generated file.
@@ -137,10 +150,35 @@ function loadTypes() {
 
 // Collect distinct enum types referenced by fields (for languages with enums).
 function collectEnums(types) {
-  const enums = new Map(); // enumName -> values[]
+  const enums = new Map();
   for (const t of types) {
     for (const p of t.props) {
-      if (isStringEnum(p.schema)) enums.set(enumTypeName(t.name, p.name), p.schema.enum.slice());
+      // Only string enum — booleans/integers never become language enums.
+      if (!isStringEnum(p.schema)) continue;
+      const enumName = enumTypeName(t.name, p.name);
+      const values = p.schema.enum.slice();
+      const symbols = new Map();
+      for (const value of values) {
+        if (typeof value !== "string") {
+          fail(`${enumName}: string enum contains a non-string value`);
+        }
+        const symbol = pascal(value);
+        const previous = symbols.get(symbol);
+        if (previous !== undefined) {
+          fail(
+            `${enumName}: enum values ${JSON.stringify(previous)} and ${JSON.stringify(value)} both map to portable enum symbol "${symbol}"`,
+          );
+        }
+        symbols.set(symbol, value);
+      }
+      const existing = enums.get(enumName);
+      if (existing !== undefined) {
+        if (JSON.stringify(existing) !== JSON.stringify(values)) {
+          fail(`${enumName}: incompatible enum definitions share one generated type name`);
+        }
+        continue;
+      }
+      enums.set(enumName, values);
     }
   }
   return enums;
