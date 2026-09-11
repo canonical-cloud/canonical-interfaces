@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "publicationStatus": "proposed",
+  "currency": "USD",
+  "asOf": "2026-09-11",
+  "tiers": [
+    {
+      "id": "foundation-readiness",
+      "name": "Foundation Readiness",
+      "monthlyUsd": 2600
+    }
+  ]
+}
