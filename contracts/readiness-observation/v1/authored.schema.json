@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.readiness-observation.v1.authored.schema.json",
+  "$defs": {
+    "ReportedStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReportedStatus",
+      "type": "string",
+      "enum": [
+        "observed",
+        "not-observed",
+        "exception",
+        "not-applicable-requested",
+        "unknown"
+      ]
+    },
+    "ObservationReceiptStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationReceiptStatus",
+      "type": "string",
+      "enum": ["accepted", "duplicate"]
+    },
+    "TransportVerification": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TransportVerification",
+      "type": "string",
+      "enum": ["signature-valid", "bearer-authenticated"]
+    },
+    "SubstantiveReview": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "SubstantiveReview",
+      "type": "string",
+      "enum": [
+        "unreviewed",
+        "in-review",
+        "accepted-as-evidence",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "ObservationProblemCode": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationProblemCode",
+      "type": "string",
+      "enum": [
+        "invalid-request",
+        "invalid-signature",
+        "stale-signature",
+        "invalid-digest",
+        "unknown-source",
+        "event-conflict",
+        "sequence-conflict",
+        "rate-limited",
+        "storage-unavailable",
+        "internal"
+      ]
+    },
+    "ObservationAssertion": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationAssertion",
+      "type": "object",
+      "properties": {
+        "frameworkId": {"type": "string"},
+        "controlId": {"type": "string"},
+        "reportedStatus": {"$ref": "ReportedStatus"},
+        "statement": {"type": "string"},
+        "evidenceIds": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": [
+        "frameworkId",
+        "controlId",
+        "reportedStatus",
+        "evidenceIds"
+      ],
+      "unevaluatedProperties": false
+    },
+    "EvidenceItem": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "EvidenceItem",
+      "type": "object",
+      "properties": {
+        "evidenceId": {"type": "string"},
+        "kind": {"type": "string"},
+        "sha256": {"type": "string"},
+        "collectedAt": {"type": "string"},
+        "locator": {"type": "string"},
+        "contentType": {"type": "string"},
+        "sizeBytes": {"type": "integer"}
+      },
+      "required": ["evidenceId", "kind", "sha256", "collectedAt"],
+      "unevaluatedProperties": false
+    },
+    "ObservationEvent": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationEvent",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.readiness.observation.v1"
+        },
+        "eventId": {"type": "string"},
+        "sourceId": {"type": "string"},
+        "sourceSequence": {"type": "integer"},
+        "organization": {"type": "string"},
+        "observedAt": {"type": "string"},
+        "assertions": {
+          "type": "array",
+          "items": {"$ref": "ObservationAssertion"}
+        },
+        "evidence": {
+          "type": "array",
+          "items": {"$ref": "EvidenceItem"}
+        }
+      },
+      "required": [
+        "specVersion",
+        "eventId",
+        "sourceId",
+        "sourceSequence",
+        "organization",
+        "observedAt",
+        "assertions",
+        "evidence"
+      ],
+      "unevaluatedProperties": false
+    },
+    "ObservationReceipt": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationReceipt",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.readiness.observation.receipt.v1"
+        },
+        "receiptId": {"type": "string"},
+        "eventId": {"type": "string"},
+        "sourceId": {"type": "string"},
+        "sourceSequence": {"type": "integer"},
+        "status": {"$ref": "ObservationReceiptStatus"},
+        "duplicate": {"type": "boolean"},
+        "payloadSha256": {"type": "string"},
+        "receivedAt": {"type": "string"},
+        "transportVerification": {"$ref": "TransportVerification"},
+        "substantiveReview": {"$ref": "SubstantiveReview"}
+      },
+      "required": [
+        "specVersion",
+        "receiptId",
+        "eventId",
+        "sourceId",
+        "sourceSequence",
+        "status",
+        "duplicate",
+        "payloadSha256",
+        "receivedAt",
+        "transportVerification",
+        "substantiveReview"
+      ],
+      "unevaluatedProperties": false
+    },
+    "ObservationProblem": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ObservationProblem",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.readiness.observation.problem.v1"
+        },
+        "code": {"$ref": "ObservationProblemCode"},
+        "message": {"type": "string"},
+        "requestId": {"type": "string"}
+      },
+      "required": ["specVersion", "code", "message", "requestId"],
+      "unevaluatedProperties": false
+    }
+  }
+}

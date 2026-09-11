@@ -1,0 +1,13 @@
+{
+  "specVersion": "canonical.readiness.observation.receipt.v1",
+  "receiptId": "receipt_01JTEST000000000000001",
+  "eventId": "evt_01JTEST000000000000000001",
+  "sourceId": "customer-ci",
+  "sourceSequence": 42,
+  "status": "accepted",
+  "duplicate": false,
+  "payloadSha256": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "receivedAt": "2026-09-08T23:00:01Z",
+  "transportVerification": "signature-valid",
+  "substantiveReview": "unreviewed"
+}

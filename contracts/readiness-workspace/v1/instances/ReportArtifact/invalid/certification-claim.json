@@ -1,0 +1,17 @@
+{
+  "specVersion": "canonical.readiness.report-artifact.v1",
+  "tenantUuid": "11111111-1111-4111-8111-111111111111",
+  "reportUuid": "22222222-2222-4222-8222-222222222222",
+  "assessmentReportId": "sha256:6c590d3fcad70631824d4b0fab9f1cd8384f371d96b8a25b10b10659a4c3431e",
+  "scopeId": "organization/acme",
+  "createdAt": "2026-09-09T15:00:00Z",
+  "category": "iam",
+  "frameworkIds": ["soc2"],
+  "outcome": "certified",
+  "counts": {"passed": 40, "failed": 0, "unknownCount": 0, "highOrCriticalFailures": 0},
+  "bucket": "canonical-rdy-11111111-1111-4111-8111-111111111111",
+  "objectKey": "reports/v1/2026/09/09/iam/20260909T150000Z_22222222-2222-4222-8222-222222222222_6c590d3fcad7.json",
+  "contentSha256": "6c590d3fcad70631824d4b0fab9f1cd8384f371d96b8a25b10b10659a4c3431e",
+  "contentType": "application/json",
+  "sizeBytes": 48219
+}
