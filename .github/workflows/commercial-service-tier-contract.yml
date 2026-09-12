@@ -1,0 +1,104 @@
+name: Commercial service-tier peer-authority contract
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/commercial-service-tier/**'
+      - '.github/workflows/commercial-service-tier-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/commercial-service-tier/**'
+      - '.github/workflows/commercial-service-tier-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commercial-service-tier-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tjsv:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          show-progress: false
+
+      - name: Check out pinned TJSV
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ORESoftware/typespec-json-schema-validator
+          ref: 5bab34e08856c47af3600adf40a4aa860fa71c01
+          path: .deps/tjsv
+          persist-credentials: false
+          show-progress: false
+
+      - name: Set up Node 22.16
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22.16.0'
+
+      - name: Install TJSV and build only the pinned flags2env native dependency
+        working-directory: .deps/tjsv
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm rebuild @oresoftware/f2e
+          test -s node_modules/@oresoftware/f2e/clients/nodejs/build/Release/flags2env.node
+
+      - name: Check independent TypeSpec and JSON Schema authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/commercial-service-tier/v1/main.tsp \
+            --schema=contracts/commercial-service-tier/v1/authored.schema.json \
+            --instances=contracts/commercial-service-tier/v1/instances \
+            --report=artifacts/commercial-service-tier.parity.json \
+            --max-probes=128
+          jq -e '.status == "passed"' artifacts/commercial-service-tier.parity.json >/dev/null
+          jq -e '(.findings | length) == 0' artifacts/commercial-service-tier.parity.json >/dev/null
+
+      - name: Prove authored-price drift is rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp contracts/commercial-service-tier/v1/authored.schema.json /tmp/drift.schema.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('/tmp/drift.schema.json')
+          doc = json.loads(path.read_text())
+          doc['$defs']['FoundationReadinessTier']['properties']['monthlyUsd']['const'] = 2600
+          path.write_text(json.dumps(doc, indent=2) + '\n')
+          PY
+          set +e
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/commercial-service-tier/v1/main.tsp \
+            --schema=/tmp/drift.schema.json \
+            --instances=contracts/commercial-service-tier/v1/instances \
+            --report=/tmp/drift.report.json \
+            --max-probes=128
+          code=$?
+          set -e
+          test "$code" -eq 2
+          jq -e '.status == "stopped_for_evaluation"' /tmp/drift.report.json >/dev/null
+          jq -e '(.findings | length) > 0' /tmp/drift.report.json >/dev/null
+
+      - name: Upload deterministic parity receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: commercial-service-tier-tjsv
+          path: artifacts/commercial-service-tier.parity.json
+          if-no-files-found: warn
+          retention-days: 14
