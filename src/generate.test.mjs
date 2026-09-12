@@ -94,15 +94,30 @@ test('build() emits one file per language', () => {
   }
 });
 
+// Each language now emits two artifacts — the published surface and the
+// internal one. These tests are about how a *shape* is rendered (nullability,
+// wire names, enum vocabularies), not about which side of the boundary a type
+// landed on, so they read the language's whole output. Which types are public
+// is asserted separately, in visibility.test.mjs.
+const LANG_FILES = {
+  rust: ['rust/src/lib.rs', 'rust/src/internal.rs'],
+  'rust-wasm': ['rust-wasm/src/lib.rs', 'rust-wasm/src/internal.rs'],
+  typescript: ['typescript/index.ts', 'typescript/internal.ts'],
+  python: ['python/canonical_interfaces.py', 'python/_internal.py'],
+  go: ['go/interfaces.go', 'go/internal/canonicalsync/interfaces.go'],
+  dart: ['dart/lib/canonical_interfaces.dart', 'dart/lib/src/internal.dart'],
+};
+const surface = (files, lang) => LANG_FILES[lang].map((f) => files[f]).join('\n');
+
 test('every language emits every schema type — no partial surfaces', () => {
   const files = build();
   const names = loadTypes().map((t) => t.name);
   for (const name of names) {
-    assert.match(files['rust/src/lib.rs'], new RegExp(`pub struct ${name} \\{`), `rust missing ${name}`);
-    assert.match(files['typescript/index.ts'], new RegExp(`export type ${name} = \\{`), `typescript missing ${name}`);
-    assert.match(files['python/canonical_interfaces.py'], new RegExp(`class ${name}:`), `python missing ${name}`);
-    assert.match(files['go/interfaces.go'], new RegExp(`type ${name} struct`), `go missing ${name}`);
-    assert.match(files['dart/lib/canonical_interfaces.dart'], new RegExp(`final class ${name} \\{`), `dart missing ${name}`);
+    assert.match(surface(files, 'rust'), new RegExp(`pub struct ${name} \\{`), `rust missing ${name}`);
+    assert.match(surface(files, 'typescript'), new RegExp(`export type ${name} = \\{`), `typescript missing ${name}`);
+    assert.match(surface(files, 'python'), new RegExp(`class ${name}:`), `python missing ${name}`);
+    assert.match(surface(files, 'go'), new RegExp(`type ${name} struct`), `go missing ${name}`);
+    assert.match(surface(files, 'dart'), new RegExp(`final class ${name} \\{`), `dart missing ${name}`);
   }
 });
 
@@ -114,7 +129,7 @@ test('dart quote_v1.dart is a re-export shim, not a second surface', () => {
 });
 
 test('dart guards required-nullable fields on both decode and encode', () => {
-  const dart = build()['dart/lib/canonical_interfaces.dart'];
+  const dart = surface(build(), 'dart');
   // Required by the schema, so the key is never omitted and the ctor arg is
   // mandatory — but the value is nullable, so decoding must not cast null.
   assert.match(dart, /required this\.baseVersion/);
@@ -126,16 +141,20 @@ test('dart guards required-nullable fields on both decode and encode', () => {
 });
 
 test('dart exposes enum vocabularies as constants', () => {
-  const dart = build()['dart/lib/canonical_interfaces.dart'];
+  const dart = surface(build(), 'dart');
   assert.match(dart, /abstract final class AuditEngagementFramework \{/);
   assert.match(dart, /static const String iso27001 = "iso_27001";/);
-  assert.match(dart, /static const List<String> values = <String>\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"\];/);
+  // The vocabulary is the schema's, not a fixed six: canonical.plus publishes
+  // readiness coverage for all fifteen frameworks.
+  assert.match(dart, /static const List<String> values = <String>\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr", "cis_controls", "cmmc", "csa_ccm", "dora", "iso_22301", "iso_27701", "nis2", "nist_csf", "nist_800_53"\];/);
 });
 
 test('rust and rust-wasm never diverge in data shape (same structs + fields)', () => {
   const out = build();
   const pubLines = (s) => s.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('pub '));
-  assert.deepEqual(pubLines(out['rust-wasm/src/lib.rs']), pubLines(out['rust/src/lib.rs']));
+  // Both halves, so a type moving across the visibility boundary in one crate
+  // and not the other is still caught.
+  assert.deepEqual(pubLines(surface(out, 'rust-wasm')), pubLines(surface(out, 'rust')));
 });
 
 test('rust-wasm generated types remain declaration-only Tsify', () => {
@@ -181,62 +200,62 @@ test('rust-wasm package entrypoint owns only a no-op lifecycle hook', () => {
 
 test('generated types carry through to every language', () => {
   const files = build();
-  assert.match(files['rust/src/lib.rs'], /pub struct ServiceInfo/);
-  assert.match(files['rust/src/lib.rs'], /pub struct QuoteRequest/);
-  assert.match(files['rust/src/lib.rs'], /pub struct QuoteListResponse/);
+  assert.match(surface(files, 'rust'), /pub struct ServiceInfo/);
+  assert.match(surface(files, 'rust'), /pub struct QuoteRequest/);
+  assert.match(surface(files, 'rust'), /pub struct QuoteListResponse/);
   assert.match(files['rust/Cargo.toml'], /name = "canonical-interfaces"/);
-  assert.match(files['typescript/index.ts'], /export type ServiceInfo = \{/);
-  assert.match(files['typescript/index.ts'], /export type QuoteEstimate = \{/);
-  assert.match(files['typescript/index.ts'], /export type QuoteDetail = \{/);
-  assert.match(files['python/canonical_interfaces.py'], /class AuditEngagement:/);
-  assert.match(files['python/canonical_interfaces.py'], /class QuoteStatusEvent:/);
-  assert.match(files['python/canonical_interfaces.py'], /class QuoteRetryResponse:/);
-  assert.match(files['go/interfaces.go'], /package canonicalinterfaces/);
-  assert.match(files['go/interfaces.go'], /type QuoteProblem struct/);
-  assert.match(files['go/interfaces.go'], /type QuoteListResponse struct/);
-  assert.match(files['dart/lib/canonical_interfaces.dart'], /final class QuoteRequest/);
-  assert.match(files['dart/lib/canonical_interfaces.dart'], /final class QuoteDetail/);
+  assert.match(surface(files, 'typescript'), /export type ServiceInfo = \{/);
+  assert.match(surface(files, 'typescript'), /export type QuoteEstimate = \{/);
+  assert.match(surface(files, 'typescript'), /export type QuoteDetail = \{/);
+  assert.match(surface(files, 'python'), /class AuditEngagement:/);
+  assert.match(surface(files, 'python'), /class QuoteStatusEvent:/);
+  assert.match(surface(files, 'python'), /class QuoteRetryResponse:/);
+  assert.match(surface(files, 'go'), /package canonicalinterfaces/);
+  assert.match(surface(files, 'go'), /type QuoteProblem struct/);
+  assert.match(surface(files, 'go'), /type QuoteListResponse struct/);
+  assert.match(surface(files, 'dart'), /final class QuoteRequest/);
+  assert.match(surface(files, 'dart'), /final class QuoteDetail/);
 });
 
 test('string enums surface as typed unions/literals per language', () => {
   const files = build();
-  assert.match(files['typescript/index.ts'], /framework: "soc2" \| "fedramp" \| "hipaa" \| "iso_27001" \| "pci_dss" \| "gdpr";/);
-  assert.match(files['python/canonical_interfaces.py'], /Literal\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"\]/);
-  assert.match(files['rust/src/lib.rs'], /pub enum AuditEngagementFramework/);
-  assert.match(files['typescript/index.ts'], /status: "applied" \| "conflict" \| "gone" \| "invalid" \| "idempotency_key_reused";/);
-  assert.match(files['typescript/index.ts'], /status: "queued" \| "analyzing" \| "ready" \| "failed";/);
+  assert.match(surface(files, 'typescript'), /framework: "soc2" \| "fedramp" \| "hipaa" \| "iso_27001" \| "pci_dss" \| "gdpr" \| "cis_controls" \| "cmmc" \| "csa_ccm" \| "dora" \| "iso_22301" \| "iso_27701" \| "nis2" \| "nist_csf" \| "nist_800_53";/);
+  assert.match(surface(files, 'python'), /Literal\["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr", "cis_controls", "cmmc", "csa_ccm", "dora", "iso_22301", "iso_27701", "nis2", "nist_csf", "nist_800_53"\]/);
+  assert.match(surface(files, 'rust'), /pub enum AuditEngagementFramework/);
+  assert.match(surface(files, 'typescript'), /status: "applied" \| "conflict" \| "gone" \| "invalid" \| "idempotency_key_reused";/);
+  assert.match(surface(files, 'typescript'), /status: "queued" \| "analyzing" \| "ready" \| "failed";/);
 });
 
 test('camelCase JSON fields stay camelCase on the wire and idiomatic in Rust', () => {
   const files = build();
-  assert.match(files['typescript/index.ts'], /protocolVersion: number;/);
-  assert.match(files['typescript/index.ts'], /organizationName: string;/);
-  assert.match(files['typescript/index.ts'], /quoteId: string;/);
-  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "protocolVersion"\)\]\n    pub protocol_version: i64,/);
-  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "organizationName"\)\]\n    pub organization_name: String,/);
-  assert.match(files['rust/src/lib.rs'], /#\[serde\(rename = "quoteId"\)\]\n    pub quote_id: String,/);
-  assert.match(files['go/interfaces.go'], /ProtocolVersion int64 `json:"protocolVersion"`/);
-  assert.match(files['go/interfaces.go'], /OrganizationName string `json:"organizationName"`/);
-  assert.match(files['go/interfaces.go'], /QuoteId string `json:"quoteId"`/);
+  assert.match(surface(files, 'typescript'), /protocolVersion: number;/);
+  assert.match(surface(files, 'typescript'), /organizationName: string;/);
+  assert.match(surface(files, 'typescript'), /quoteId: string;/);
+  assert.match(surface(files, 'rust'), /#\[serde\(rename = "protocolVersion"\)\]\n    pub protocol_version: i64,/);
+  assert.match(surface(files, 'rust'), /#\[serde\(rename = "organizationName"\)\]\n    pub organization_name: String,/);
+  assert.match(surface(files, 'rust'), /#\[serde\(rename = "quoteId"\)\]\n    pub quote_id: String,/);
+  assert.match(surface(files, 'go'), /ProtocolVersion int64 `json:"protocolVersion"`/);
+  assert.match(surface(files, 'go'), /OrganizationName string `json:"organizationName"`/);
+  assert.match(surface(files, 'go'), /QuoteId string `json:"quoteId"`/);
 });
 
 test('required nullable decimal versions stay nullable in every adapter', () => {
   const files = build();
-  assert.match(files['typescript/index.ts'], /baseVersion: string \| null;/);
-  assert.match(files['rust/src/lib.rs'], /pub base_version: Option<String>,/);
-  assert.match(files['python/canonical_interfaces.py'], /baseVersion: Optional\[str\]/);
-  assert.match(files['go/interfaces.go'], /BaseVersion \*string `json:"baseVersion"`/);
+  assert.match(surface(files, 'typescript'), /baseVersion: string \| null;/);
+  assert.match(surface(files, 'rust'), /pub base_version: Option<String>,/);
+  assert.match(surface(files, 'python'), /baseVersion: Optional\[str\]/);
+  assert.match(surface(files, 'go'), /BaseVersion \*string `json:"baseVersion"`/);
 });
 
 test('optional fields are nullable/omittable per language', () => {
   const files = build();
-  assert.match(files['typescript/index.ts'], /target_report_date\?: string;/);
-  assert.match(files['typescript/index.ts'], /contextKey\?: string;/);
-  assert.match(files['rust/src/lib.rs'], /pub target_report_date: Option<String>,/);
-  assert.match(files['rust/src/lib.rs'], /pub context_key: Option<String>,/);
-  assert.match(files['go/interfaces.go'], /json:"target_report_date,omitempty"/);
-  assert.match(files['go/interfaces.go'], /json:"contextKey,omitempty"/);
-  assert.match(files['dart/lib/canonical_interfaces.dart'], /final String\? contextKey;/);
+  assert.match(surface(files, 'typescript'), /target_report_date\?: string;/);
+  assert.match(surface(files, 'typescript'), /contextKey\?: string;/);
+  assert.match(surface(files, 'rust'), /pub target_report_date: Option<String>,/);
+  assert.match(surface(files, 'rust'), /pub context_key: Option<String>,/);
+  assert.match(surface(files, 'go'), /json:"target_report_date,omitempty"/);
+  assert.match(surface(files, 'go'), /json:"contextKey,omitempty"/);
+  assert.match(surface(files, 'dart'), /final String\? contextKey;/);
 });
 
 test('generated files on disk are up to date (run: npm run generate)', () => {
