@@ -1,0 +1,227 @@
+{
+  "authorities": {
+    "jsonSchema": {
+      "authority": "independently-authored",
+      "dialect": "https://json-schema.org/draft/2020-12/schema"
+    },
+    "onUnexplainedMismatch": "STOPPED_FOR_EVALUATION",
+    "precedence": "none",
+    "typespec": {
+      "authority": "independently-authored",
+      "generatedJsonSchemaRole": "comparison-evidence-only"
+    }
+  },
+  "configuration": {
+    "bundleId": "typespec.generated.schema.json",
+    "differential": {
+      "enabled": true,
+      "formatAssertion": false,
+      "instanceCorpus": "contracts/commercial-service-tier/v1/instances",
+      "maxProbesPerDeclarationPerLane": 128
+    },
+    "emitter": "@typespec/json-schema",
+    "emitterOptions": {
+      "bundleId": "typespec.generated.schema.json",
+      "emitAllModels": "true",
+      "emitAllRefs": "true",
+      "emitter-output-dir": "/home/runner/work/canonical-interfaces/canonical-interfaces/.typespec-json-schema-validator/generated",
+      "file-type": "json",
+      "int64-strategy": "string",
+      "polymorphic-models-strategy": "oneOf",
+      "seal-object-schemas": "true"
+    },
+    "executionMode": "subprocess",
+    "mappingSchema": "ores.typespec-json-schema-validator.mapping/v1",
+    "maxFindings": 250,
+    "mode": "check"
+  },
+  "counts": {
+    "authoredDeclarations": 6,
+    "differentialFindings": 0,
+    "emittedFindings": 0,
+    "findings": 0,
+    "findingsTruncated": false,
+    "generatedDeclarations": 6,
+    "structuralFindings": 0,
+    "typespecDeclarations": 6,
+    "typespecOutOfScopeDeclarations": 0
+  },
+  "coverage": {
+    "comparedDimensions": [
+      "top-level declaration names",
+      "declaration kind families",
+      "required and optional properties",
+      "nullability",
+      "scalar types and formats",
+      "numeric and string constraints",
+      "enums",
+      "unions and composition",
+      "references",
+      "defaults and annotations",
+      "additional and unevaluated property policy",
+      "instance-level verdict agreement over a synthesized probe corpus"
+    ],
+    "differentialInstanceValidation": true,
+    "directDeclarationInventory": true,
+    "outOfScopeTypeSpecDeclarations": [],
+    "sourceMutationCheck": true,
+    "typespecGeneratedJsonSchemaComparison": true
+  },
+  "declarationMap": [
+    {
+      "authored": "AssuranceEngineeringTier",
+      "generated": "AssuranceEngineeringTier",
+      "kind": "model",
+      "typespec": "AssuranceEngineeringTier"
+    },
+    {
+      "authored": "FoundationReadinessTier",
+      "generated": "FoundationReadinessTier",
+      "kind": "model",
+      "typespec": "FoundationReadinessTier"
+    },
+    {
+      "authored": "ManagedReadinessTier",
+      "generated": "ManagedReadinessTier",
+      "kind": "model",
+      "typespec": "ManagedReadinessTier"
+    },
+    {
+      "authored": "PublicationStatus",
+      "generated": "PublicationStatus",
+      "kind": "union",
+      "typespec": "PublicationStatus"
+    },
+    {
+      "authored": "ServiceTier",
+      "generated": "ServiceTier",
+      "kind": "union",
+      "typespec": "ServiceTier"
+    },
+    {
+      "authored": "ServiceTierCatalog",
+      "generated": "ServiceTierCatalog",
+      "kind": "model",
+      "typespec": "ServiceTierCatalog"
+    }
+  ],
+  "differential": {
+    "declarations": [
+      {
+        "authored": "AssuranceEngineeringTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "AssuranceEngineeringTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "AssuranceEngineeringTier"
+      },
+      {
+        "authored": "FoundationReadinessTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "FoundationReadinessTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "FoundationReadinessTier"
+      },
+      {
+        "authored": "ManagedReadinessTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "ManagedReadinessTier",
+        "probes": 41,
+        "refusals": 0,
+        "typespec": "ManagedReadinessTier"
+      },
+      {
+        "authored": "PublicationStatus",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "PublicationStatus",
+        "probes": 12,
+        "refusals": 0,
+        "typespec": "PublicationStatus"
+      },
+      {
+        "authored": "ServiceTier",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "ServiceTier",
+        "probes": 47,
+        "refusals": 0,
+        "typespec": "ServiceTier"
+      },
+      {
+        "authored": "ServiceTierCatalog",
+        "behaviorallyIndistinguishable": true,
+        "divergences": 0,
+        "generated": "ServiceTierCatalog",
+        "probes": 70,
+        "refusals": 0,
+        "typespec": "ServiceTierCatalog"
+      }
+    ],
+    "summary": {
+      "agreements": 252,
+      "behaviorallyIndistinguishableDeclarations": 6,
+      "comparedDeclarations": 6,
+      "corpusInstances": 2,
+      "divergences": 0,
+      "formatAssertion": false,
+      "maxProbesPerDeclarationPerLane": 128,
+      "probesEvaluated": 252,
+      "refusals": 0
+    }
+  },
+  "findings": [],
+  "inputs": {
+    "authoredJsonSchema": {
+      "digest": "0e339cf3918f3678b9cb32f5100d35018dec31c8bc6c05a9c072c7fca0c93398",
+      "files": [
+        {
+          "relativePath": "authored.schema.json",
+          "sha256": "01dd06dac7ebcfe9f13327e0801a12846327dc1794865ac0009b05c63865effd"
+        }
+      ],
+      "input": "contracts/commercial-service-tier/v1/authored.schema.json"
+    },
+    "generatedJsonSchema": {
+      "digest": "e150b07c34b9ff8329101e5f3133e2ecdc26a9d9c0767773427146db0d05939f",
+      "files": [
+        {
+          "relativePath": "typespec.generated.schema.json",
+          "sha256": "e2cc69cf96988d303c4457704a5d9566cce9e91651bf5fb040561d4e08ed3017"
+        }
+      ],
+      "input": ".typespec-json-schema-validator/generated/typespec.generated.schema.json"
+    },
+    "mapping": null,
+    "typespec": {
+      "digest": "d229afda1187138813f04ca9c954c8478e5c3c203418754f8326f4c8c09a118d",
+      "files": [
+        {
+          "path": "main.tsp",
+          "sha256": "48b7ae8ac3023f4b583781e55b0f68e1eb053c51fc5be300c3a6a4036db3859d"
+        }
+      ],
+      "input": "contracts/commercial-service-tier/v1/main.tsp"
+    }
+  },
+  "runId": "b67eed048977da0696e543299c28b4a026a97235eac4c35005e7ceec528b8fc4",
+  "schema": "ores.typespec-json-schema-validator.report/v1",
+  "status": "passed",
+  "toolchain": {
+    "jsonSchemaEmitter": "@typespec/json-schema",
+    "typespecCompiler": {
+      "available": true,
+      "command": "/home/runner/work/canonical-interfaces/canonical-interfaces/.deps/tjsv/node_modules/.bin/tsp",
+      "version": "1.15.0"
+    },
+    "validator": {
+      "name": "@oresoftware/typespec-json-schema-validator",
+      "version": "0.1.0"
+    }
+  },
+  "zeroUnexplainedFindings": true
+}
