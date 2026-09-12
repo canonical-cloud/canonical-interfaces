@@ -24,3 +24,6 @@ temp/worktrees
 __pycache__/
 *.pyc
 .compat/
+
+# Sanctioned scratch locations - AGENTS.md requires both, trailing-slash form
+temp/
