@@ -5,11 +5,13 @@
   "type": "module",
   "description": "JSON Schema typed I/O, TypeSpec, Protobuf, SQL, and generated language adapters for canonical.cloud.",
   "scripts": {
-    "project:pre-interest": "node scripts/project-pre-interest-contract.mjs --write",
-    "check:pre-interest": "node scripts/project-pre-interest-contract.mjs --check",
     "generate": "node scripts/project-pre-interest-contract.mjs --write && node src/generate-output.mjs",
     "check": "node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check",
-    "test": "node --test src/*.test.mjs scripts/project-pre-interest-contract.test.mjs && node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check"
+    "test": "node --test src/*.test.mjs scripts/project-pre-interest-contract.test.mjs && node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check",
+    "lint:ores": "if [ -f .ores-lint/lint.sh ]; then sh .ores-lint/lint.sh; else echo 'ores-lint not installed'; fi",
+    "prepublishOnly": "npm run lint:ores",
+    "project:pre-interest": "node scripts/project-pre-interest-contract.mjs --write",
+    "check:pre-interest": "node scripts/project-pre-interest-contract.mjs --check"
   },
   "exports": {
     "./schema": "./schema/index.json",
@@ -23,5 +25,13 @@
     "./dart": "./generated/dart/lib/canonical_interfaces.dart",
     "./python": "./generated/python/canonical_interfaces.py",
     "./go": "./generated/go/interfaces.go"
+  },
+  "oresLint": {
+    "note": "Declared, not installed. ores-lint resolves these from a global install - see .ores-lint/README.md",
+    "requires": {
+      "eslint": ">=9",
+      "typescript-eslint": ">=8 (optional; without it .ts files are skipped)"
+    },
+    "install": "npm i -g eslint typescript-eslint"
   }
 }
