@@ -38,7 +38,7 @@ jobs:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
       - name: Compare peer authorities and emit Contract IR
-        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        uses: ORESoftware/typespec-json-schema-validator@93dd73cb246a09b0a1c62d7192cc62ca6ecbe405
         with:
           typespec: schema-authority-canary/main.tsp
           schema: schema-authority-canary/authored.schema.json
@@ -57,11 +57,12 @@ jobs:
           const manifest = JSON.parse(readFileSync("contract-admission/contract-ir-consumer.json", "utf8"));
           const report = JSON.parse(readFileSync(".typespec-json-schema-validator/report.json", "utf8"));
           const ir = JSON.parse(readFileSync(".typespec-json-schema-validator/contract-ir.json", "utf8"));
+          const generated = JSON.parse(readFileSync(".typespec-json-schema-validator/generated/typespec.generated.schema.json", "utf8"));
           const sha = /^[a-f0-9]{64}$/;
           assert.equal(manifest.repository, process.env.GITHUB_REPOSITORY);
           assert.equal(manifest.repositoryRole, "interfaces");
           assert.equal(manifest.canonicalAuthorityRepository, process.env.GITHUB_REPOSITORY);
-          assert.equal(manifest.validator.actionCommit, "3171025cbe03a7026a71ce94eea18c910e1431b2");
+          assert.equal(manifest.validator.actionCommit, "93dd73cb246a09b0a1c62d7192cc62ca6ecbe405");
           assert.equal(manifest.authorityModel.precedence, "none");
           assert.equal(manifest.admission.allowFallbackAuthority, false);
           assert.equal(report.schema, "ores.typespec-json-schema-validator.report/v1");
@@ -69,6 +70,14 @@ jobs:
           assert.equal(report.zeroUnexplainedFindings, true);
           assert.deepEqual(report.findings, []);
           assert.match(report.runId, sha);
+          assert.equal(report.authorities.typespec.authority, "independently-authored");
+          assert.equal(report.authorities.typespec.generatedJsonSchemaRole, "comparison-evidence-only");
+          assert.equal(report.authorities.jsonSchema.authority, "independently-authored");
+          assert.equal(report.authorities.jsonSchema.dialect, "https://json-schema.org/draft/2020-12/schema");
+          assert.equal(report.authorities.precedence, "none");
+          assert.equal(report.coverage.typespecGeneratedJsonSchemaComparison, true);
+          assert.equal(report.coverage.differentialInstanceValidation, true);
+          assert.equal(generated.$schema, "https://json-schema.org/draft/2020-12/schema");
           assert.equal(ir.schema, manifest.validator.contractIrSchema);
           assert.equal(ir.status, "passed");
           assert.equal(ir.admissible, true);
@@ -84,6 +93,7 @@ jobs:
           NODE
       - name: Retain receipt, Contract IR, SARIF, and generated witness
         if: ${{ always() }}
+        continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: contract-ir-admission-${{ github.event.repository.name }}-${{ github.run_id }}
