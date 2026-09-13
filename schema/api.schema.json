@@ -4,6 +4,7 @@
   "description": "Typed-IO for the canonical-web-server.rs versioned REST API and compatibility endpoints.",
   "$defs": {
     "HealthStatus": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Legacy-compatible response of GET /api/health and GET /api/v1/health.",
       "required": ["status", "service"],
@@ -21,6 +22,7 @@
       }
     },
     "ServiceInfo": {
+      "x-visibility": "public",
       "type": "object",
       "description": "Response of GET /api/info and GET /api/v1/info.",
       "required": ["service", "version", "domain", "stack"],
@@ -54,6 +56,7 @@
       }
     },
     "DraftNoteValue": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Schema-version-1 value for the only record kind accepted by the initial sync protocol.",
       "required": ["title", "body"],
@@ -72,6 +75,7 @@
       }
     },
     "DraftNoteKey": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Owner-scoped key for a draft-note sync record.",
       "required": ["kind", "id"],
@@ -90,6 +94,7 @@
       }
     },
     "MutationOperation": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "One idempotent compare-and-swap operation in a draft-note mutation batch.",
       "required": ["mutationId", "key", "action", "baseVersion", "schemaVersion"],
@@ -144,6 +149,7 @@
       ]
     },
     "MutationRequest": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Body of POST /api/v1/sync/mutations.",
       "required": ["protocolVersion", "clientId", "operations"],
@@ -171,6 +177,7 @@
       }
     },
     "WireRecord": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Authoritative server snapshot of a draft-note record or tombstone.",
       "required": ["key", "version", "schemaVersion", "deleted"],
@@ -219,6 +226,7 @@
       ]
     },
     "MutationResult": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Per-operation result returned in the same order as the mutation request.",
       "required": ["mutationId", "status"],
@@ -246,6 +254,7 @@
       }
     },
     "MutationResponse": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Response of POST /api/v1/sync/mutations.",
       "required": ["results"],
@@ -261,6 +270,7 @@
       }
     },
     "ChangesQuery": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Query parameters accepted by GET /api/v1/sync/changes.",
       "additionalProperties": false,
@@ -281,6 +291,7 @@
       }
     },
     "ChangesResponse": {
+      "x-visibility": "internal",
       "type": "object",
       "description": "Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints.",
       "required": ["changes", "nextCursor", "caughtUp"],
