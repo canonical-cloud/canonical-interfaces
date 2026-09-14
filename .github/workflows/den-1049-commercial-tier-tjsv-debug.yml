@@ -1,0 +1,76 @@
+name: DEN-1049 commercial tier TJSV debug helper
+
+on:
+  push:
+    branches:
+      - DEN-1049-commercial-tier-tjsv-debug
+
+permissions:
+  contents: write
+
+concurrency:
+  group: den-1049-commercial-tier-tjsv-debug-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+          fetch-depth: 0
+          show-progress: false
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ORESoftware/typespec-json-schema-validator
+          ref: 5bab34e08856c47af3600adf40a4aa860fa71c01
+          path: .deps/tjsv
+          persist-credentials: false
+          show-progress: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22.16.0'
+
+      - name: Install pinned TJSV
+        working-directory: .deps/tjsv
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm rebuild @oresoftware/f2e
+
+      - name: Capture exact parity report without masking the exit code
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p debug
+          set +e
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/commercial-service-tier/v1/main.tsp \
+            --schema=contracts/commercial-service-tier/v1/authored.schema.json \
+            --instances=contracts/commercial-service-tier/v1/instances \
+            --report=debug/commercial-service-tier.parity.json \
+            --max-probes=128
+          code=$?
+          set -e
+          printf '%s\n' "$code" > debug/commercial-service-tier.exit-code.txt
+          test -s debug/commercial-service-tier.parity.json
+          jq . debug/commercial-service-tier.parity.json >/dev/null
+
+      - name: Commit diagnostic receipt to helper branch only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add debug/commercial-service-tier.parity.json debug/commercial-service-tier.exit-code.txt
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "DEN-1049: capture commercial tier TJSV finding"
+          git push origin HEAD:DEN-1049-commercial-tier-tjsv-debug
