@@ -1,0 +1,12 @@
+{
+  "specVersion": "canonical.audit.report.receipt.v1",
+  "reportId": "rpt_01J8EXAMPLE000000000000001",
+  "owner": {
+    "kind": "user",
+    "id": "usr_example_01"
+  },
+  "reportDigest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "status": "accepted",
+  "duplicate": false,
+  "receivedAt": "2026-09-14T20:00:01Z"
+}

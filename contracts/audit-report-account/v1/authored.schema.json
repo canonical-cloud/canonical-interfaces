@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.audit-report-account.v1.authored.schema.json",
+  "$defs": {
+    "AuditReportOwnerKind": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportOwnerKind",
+      "type": "string",
+      "enum": ["user", "org"]
+    },
+    "AuditReportSource": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportSource",
+      "type": "string",
+      "enum": ["canonical-cli", "canonical-company-auditor", "ci"]
+    },
+    "AuditReportReceiptStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportReceiptStatus",
+      "type": "string",
+      "enum": ["accepted", "duplicate"]
+    },
+    "AuditReportProblemCode": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportProblemCode",
+      "type": "string",
+      "enum": [
+        "invalid-request",
+        "invalid-digest",
+        "unauthorized-owner",
+        "report-conflict",
+        "rate-limited",
+        "storage-unavailable",
+        "internal"
+      ]
+    },
+    "AuditReportOwner": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportOwner",
+      "type": "object",
+      "properties": {
+        "kind": {"$ref": "AuditReportOwnerKind"},
+        "id": {"type": "string"}
+      },
+      "required": ["kind", "id"],
+      "unevaluatedProperties": false
+    },
+    "AuditReportCreateMetadata": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportCreateMetadata",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.audit.report.metadata.v1"
+        },
+        "owner": {"$ref": "AuditReportOwner"},
+        "programId": {"type": "string"},
+        "programVersion": {"type": "string"},
+        "programDigest": {"type": "string"},
+        "reportDigest": {"type": "string"},
+        "createdAt": {"type": "string"},
+        "source": {"$ref": "AuditReportSource"},
+        "labels": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": [
+        "specVersion",
+        "owner",
+        "programId",
+        "programVersion",
+        "programDigest",
+        "reportDigest",
+        "createdAt",
+        "source"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AuditReportRecord": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportRecord",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.audit.report.record.v1"
+        },
+        "reportId": {"type": "string"},
+        "owner": {"$ref": "AuditReportOwner"},
+        "subjectId": {"type": "string"},
+        "programId": {"type": "string"},
+        "programVersion": {"type": "string"},
+        "programDigest": {"type": "string"},
+        "reportDigest": {"type": "string"},
+        "createdAt": {"type": "string"},
+        "receivedAt": {"type": "string"},
+        "source": {"$ref": "AuditReportSource"},
+        "labels": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      },
+      "required": [
+        "specVersion",
+        "reportId",
+        "owner",
+        "subjectId",
+        "programId",
+        "programVersion",
+        "programDigest",
+        "reportDigest",
+        "createdAt",
+        "receivedAt",
+        "source"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AuditReportReceipt": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportReceipt",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.audit.report.receipt.v1"
+        },
+        "reportId": {"type": "string"},
+        "owner": {"$ref": "AuditReportOwner"},
+        "reportDigest": {"type": "string"},
+        "status": {"$ref": "AuditReportReceiptStatus"},
+        "duplicate": {"type": "boolean"},
+        "receivedAt": {"type": "string"}
+      },
+      "required": [
+        "specVersion",
+        "reportId",
+        "owner",
+        "reportDigest",
+        "status",
+        "duplicate",
+        "receivedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AuditReportProblem": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditReportProblem",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.audit.report.problem.v1"
+        },
+        "code": {"$ref": "AuditReportProblemCode"},
+        "message": {"type": "string"},
+        "requestId": {"type": "string"}
+      },
+      "required": ["specVersion", "code", "message", "requestId"],
+      "unevaluatedProperties": false
+    }
+  }
+}
