@@ -16,6 +16,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { EXTRA_EMITTERS } from "./emitters-extra.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -64,6 +65,55 @@ const DART_KEYWORDS = new Set([
   "false","final","finally","for","if","in","is","new","null","rethrow","return","super","switch",
   "this","throw","true","try","var","void","while","with",
 ]);
+const VISIBILITIES = new Set(["public", "internal"]);
+
+// Emit types in dependency order. Most targets do not care, but C++ needs a
+// complete type before `std::optional<T>` and C before an embedded struct, so
+// declaration order in the schema file would otherwise decide whether the
+// generated header compiles. Stable: ties keep schema order, so regenerating
+// without a schema change is a no-op.
+export function topoSort(types) {
+  const byName = new Map(types.map((t) => [t.name, t]));
+  const deps = (t) => {
+    const out = [];
+    for (const p of t.props) {
+      for (const sub of [p.schema, p.schema && p.schema.items]) {
+        const r = refName(sub);
+        if (r && byName.has(r)) out.push(r);
+      }
+    }
+    return out;
+  };
+  const state = new Map(); // name -> "open" | "done"
+  const ordered = [];
+  const visit = (t, trail) => {
+    const seen = state.get(t.name);
+    if (seen === "done") return;
+    if (seen === "open") {
+      // A value-type cycle has no by-value representation in C++, C or Rust
+      // without indirection, so this is a schema problem, not a sort problem.
+      fail(`type cycle through ${[...trail, t.name].join(" -> ")}; break it or box one side`);
+    }
+    state.set(t.name, "open");
+    for (const d of deps(t)) visit(byName.get(d), [...trail, t.name]);
+    state.set(t.name, "done");
+    ordered.push(t);
+  };
+  for (const t of types) visit(t, []);
+  return ordered;
+}
+
+// Every emitter takes this shape rather than a flat type list, so that adding a
+// language cannot accidentally emit the internal types into the public module.
+export function partition(types) {
+  const ordered = topoSort(types);
+  return {
+    all: ordered,
+    public: ordered.filter((t) => t.visibility === "public"),
+    internal: ordered.filter((t) => t.visibility === "internal"),
+  };
+}
+
 const FIELD_RE = /^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[a-z][A-Za-z0-9]*)$/;
 
 const refName = (s) => (s && s.$ref ? s.$ref.split("/").pop() : null);
@@ -107,10 +157,23 @@ function loadTypes() {
       if (!/^[A-Z][A-Za-z0-9]*$/.test(name)) fail(`${file}: $def name must be PascalCase: ${name}`);
       if (seen.has(name)) fail(`duplicate type name "${name}" in ${file} and ${seen.get(name)}`);
       seen.set(name, file);
+      // Visibility is declared per type, and it is mandatory: a new $def that
+      // forgets it would otherwise default into the public SDK surface, which is
+      // the one mistake this split exists to prevent.
+      const visibility = def["x-visibility"];
+      if (!VISIBILITIES.has(visibility)) {
+        fail(`${file}:${name}: "x-visibility" must be ${[...VISIBILITIES].map((v) => `"${v}"`).join(" or ")}`);
+      }
       const required = new Set(def.required || []);
       const props = Object.entries(def.properties || {}).map(([pname, pschema]) => {
         if (!FIELD_RE.test(pname)) {
           fail(`${file}:${name}: property "${pname}" must be snake_case or lowerCamelCase (${FIELD_RE})`);
+        }
+        // The type is the unit of visibility, not the field. Accepting a marker
+        // here and ignoring it would be worse than refusing it: the schema would
+        // read as though a field were hidden while every emitter still shipped it.
+        if ("x-visibility" in pschema) {
+          fail(`${file}:${name}.${pname}: "x-visibility" belongs on the $def, not on a property; split the type instead`);
         }
         if (Array.isArray(pschema.type)) {
           const nonNullTypes = pschema.type.filter((type) => type !== "null");
@@ -131,17 +194,25 @@ function loadTypes() {
         }
         return { name: pname, schema: pschema, required: required.has(pname), description: pschema.description || "" };
       });
-      types.push({ name, description: def.description || "", props, source: file });
+      types.push({ name, description: def.description || "", props, source: file, visibility });
     }
   }
 
-  // Validate every $ref points at a known type.
-  const known = new Set(types.map((t) => t.name));
+  // Validate every $ref points at a known type, and that a public type never
+  // reaches into the internal set — that would drag an unpublished definition
+  // into the external surface with it. (The reverse direction is legal in the
+  // schema but not yet emittable; build() rejects it with an explicit message.)
+  const known = new Map(types.map((t) => [t.name, t]));
   for (const t of types) {
     for (const p of t.props) {
       for (const s of [p.schema, p.schema && p.schema.items]) {
         const r = refName(s);
-        if (r && !known.has(r)) fail(`${t.source}:${t.name}.${p.name}: $ref to unknown type "${r}"`);
+        if (!r) continue;
+        if (!known.has(r)) fail(`${t.source}:${t.name}.${p.name}: $ref to unknown type "${r}"`);
+        if (t.visibility === "public" && known.get(r).visibility === "internal") {
+          fail(`${t.source}:${t.name}.${p.name}: public type $refs internal type "${r}"; ` +
+               `either publish "${r}" or move "${t.name}" to x-visibility "internal"`);
+        }
       }
     }
   }
@@ -305,25 +376,52 @@ function renderRustBody(types, { wasm }) {
   return out.join("\n");
 }
 
-function emitRust(types) {
+// The internal payloads live behind a non-default Cargo feature. A crate that
+// does not ask for `features = ["internal"]` cannot name them at all — the
+// module is not compiled into its dependency graph — so the first-party sync
+// protocol stays out of the published surface without a second crate to release.
+const RUST_INTERNAL_DOC = [
+  "//! First-party payloads for the canonical.cloud sync protocol.",
+  "//!",
+  "//! Not part of the published SDK surface. Reachable only with",
+  "//! `canonical-interfaces = { .., features = [\"internal\"] }`.",
+].join("\n");
+
+function emitRust({ public: pub, internal: intl }) {
   const cargo = `[package]
 name = "canonical-interfaces"
 version = "0.1.0"
 edition = "2021"
 description = "Generated typed payloads for the canonical.cloud API (see canonical-interfaces)."
 
+[features]
+default = []
+# First-party sync payloads. Off by default so an external consumer never
+# compiles them, and turning them on is a visible line in their Cargo.toml.
+internal = []
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 `;
-  return { "rust/src/lib.rs": renderRustBody(types, { wasm: false }), "rust/Cargo.toml": cargo };
+  const lib = [
+    renderRustBody(pub, { wasm: false }),
+    '#[cfg(feature = "internal")]',
+    "pub mod internal;",
+    "",
+  ].join("\n");
+  return {
+    "rust/src/lib.rs": lib,
+    "rust/src/internal.rs": `${RUST_INTERNAL_DOC}\n\n${renderRustBody(intl, { wasm: false })}`,
+    "rust/Cargo.toml": cargo,
+  };
 }
 
 // Wasm build of the Rust types: same serde structs, plus tsify + wasm-bindgen so
 // the payloads cross the JS/wasm boundary as real objects and a .d.ts is emitted.
 // Kept in a separate crate (generated/rust-wasm) so the plain `rust` crate stays
 // dependency-free. Build with: wasm-pack build generated/rust-wasm --target web
-function emitRustWasm(types) {
+function emitRustWasm({ public: pub, internal: intl }) {
   const cargo = `[package]
 name = "canonical-interfaces-wasm"
 version = "0.1.0"
@@ -333,6 +431,10 @@ description = "Generated typed payloads for the canonical.cloud API, compiled to
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+default = []
+internal = []
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -340,7 +442,17 @@ wasm-bindgen = "0.2"
 serde-wasm-bindgen = "0.6"
 tsify = { version = "0.5", features = ["js"] }
 `;
-  return { "rust-wasm/src/lib.rs": renderRustBody(types, { wasm: true }), "rust-wasm/Cargo.toml": cargo };
+  const lib = [
+    renderRustBody(pub, { wasm: true }),
+    '#[cfg(feature = "internal")]',
+    "pub mod internal;",
+    "",
+  ].join("\n");
+  return {
+    "rust-wasm/src/lib.rs": lib,
+    "rust-wasm/src/internal.rs": `${RUST_INTERNAL_DOC}\n\n${renderRustBody(intl, { wasm: true })}`,
+    "rust-wasm/Cargo.toml": cargo,
+  };
 }
 
 // The canonical TypeScript type for a field — shared by the `typescript` emitter
@@ -352,8 +464,9 @@ function tsFieldType(p) {
   return isNullable(p.schema) ? `${base} | null` : base;
 }
 
-function emitTs(types) {
+function renderTsBody(types, note) {
   const out = [`// ${BANNER}`, ""];
+  if (note) out.push(...note, "");
   for (const t of types) {
     if (t.description) out.push(`/** ${cBlock(t.description)} */`);
     out.push(`export type ${t.name} = {`);
@@ -364,13 +477,30 @@ function emitTs(types) {
     }
     out.push("};", "");
   }
-  return { "typescript/index.ts": out.join("\n") };
+  return out.join("\n");
 }
 
-function emitPython(types) {
+// `index.ts` is the barrel an external consumer imports; `internal.ts` is not
+// re-exported from it, so the internal payloads are reachable only by importing
+// that path by name — a deliberate, greppable act rather than an accident of
+// `import * from "canonical-interfaces"`.
+function emitTs({ public: pub, internal: intl }) {
+  return {
+    "typescript/index.ts": renderTsBody(pub),
+    "typescript/internal.ts": renderTsBody(intl, [
+      "// First-party payloads for the canonical.cloud sync protocol.",
+      "// Deliberately NOT re-exported from index.ts: not part of the published surface.",
+    ]),
+  };
+}
+
+function renderPythonBody(types, note) {
   const usesLiteral = types.some((t) => t.props.some((p) => isStringEnum(p.schema)));
   const typing = `from typing import List, Optional${usesLiteral ? ", Literal" : ""}`;
-  const out = [`# ${BANNER}`, "from __future__ import annotations", "from dataclasses import dataclass", typing, ""];
+  const out = [`# ${BANNER}`];
+  if (note) out.push(...note);
+  out.push("from __future__ import annotations", "from dataclasses import dataclass", typing, "");
+  out.push(`__all__ = [${types.map((t) => `"${t.name}"`).join(", ")}]`, "");
   for (const t of types) {
     out.push("@dataclass", `class ${t.name}:`);
     if (t.description) out.push(`    """${pyDoc(t.description)}"""`);
@@ -385,11 +515,26 @@ function emitPython(types) {
     }
     out.push("");
   }
-  return { "python/canonical_interfaces.py": out.join("\n") };
+  return out.join("\n");
 }
 
-function emitGo(types) {
-  const out = [`// ${BANNER}`, "", "package canonicalinterfaces", ""];
+// The leading underscore is Python's own convention for "not the public API",
+// and it is the one every linter, `from x import *`, and documentation tool
+// already honours.
+function emitPython({ public: pub, internal: intl }) {
+  return {
+    "python/canonical_interfaces.py": renderPythonBody(pub),
+    "python/_internal.py": renderPythonBody(intl, [
+      "# First-party payloads for the canonical.cloud sync protocol.",
+      "# Underscore-private: not exported by canonical_interfaces and not published.",
+    ]),
+  };
+}
+
+function renderGoBody(types, pkg, note) {
+  const out = [`// ${BANNER}`, ""];
+  if (note) out.push(...note);
+  out.push(`package ${pkg}`, "");
   for (const t of types) {
     if (t.description) out.push(`// ${t.name}: ${cLine(t.description)}`);
     out.push(`type ${t.name} struct {`);
@@ -403,7 +548,29 @@ function emitGo(types) {
     }
     out.push("}", "");
   }
-  return { "go/interfaces.go": out.join("\n") };
+  return out.join("\n");
+}
+
+// Go's `internal/` is not a convention — it is a rule the compiler enforces:
+// no package outside this module's subtree can import it, whatever it declares.
+function emitGo({ public: pub, internal: intl }) {
+  return {
+    // A module file is what makes internal/ mean anything: the rule is scoped to
+    // the module that declares it, so without go.mod the directory is just a name.
+    "go/go.mod": [
+      `// ${BANNER}`,
+      "",
+      "module cloud.canonical/interfaces",
+      "",
+      "go 1.22",
+      "",
+    ].join("\n"),
+    "go/interfaces.go": renderGoBody(pub, "canonicalinterfaces"),
+    "go/internal/canonicalsync/interfaces.go": renderGoBody(intl, "canonicalsync", [
+      "// First-party payloads for the canonical.cloud sync protocol.",
+      "// Under internal/: the Go compiler refuses this import outside this module.",
+    ]),
+  };
 }
 
 // --- dart --------------------------------------------------------------------
@@ -455,8 +622,9 @@ function dartEncode(schema, expr, nullable) {
   return expr;
 }
 
-function emitDart(types) {
+function renderDartBody(types, note) {
   const out = [`// ${BANNER}`, ""];
+  if (note) out.push(...note, "");
 
   for (const [enumName, values] of collectEnums(types)) {
     out.push(`/// Permitted wire values for the fields typed as \`${enumName}\`.`);
@@ -522,8 +690,20 @@ function emitDart(types) {
     out.push("  };", "}", "");
   }
 
+  return out.join("\n");
+}
+
+// Everything under `lib/src/` is off-limits to another package: that is Dart's
+// own packaging rule, and `dart pub publish` and the analyzer both enforce it.
+function emitDart({ public: pub, internal: intl }) {
   return {
-    "dart/lib/canonical_interfaces.dart": out.join("\n"),
+    "dart/lib/canonical_interfaces.dart": renderDartBody(pub),
+    "dart/lib/src/internal.dart": renderDartBody(intl, [
+      "/// First-party payloads for the canonical.cloud sync protocol.",
+      "///",
+      "/// Under `lib/src/`: not part of this package's public API and not exported",
+      "/// from `canonical_interfaces.dart`.",
+    ]),
     // Compatibility shim: `generated/dart/lib/quote_v1.dart` was the whole Dart
     // surface before every type was emitted. Kept so existing imports resolve.
     "dart/lib/quote_v1.dart": [
@@ -538,6 +718,8 @@ function emitDart(types) {
   };
 }
 
+// Every emitter takes the visibility partition, never a flat list, so a new
+// language cannot be added that quietly publishes the internal types.
 const EMITTERS = {
   rust: emitRust,
   "rust-wasm": emitRustWasm,
@@ -545,18 +727,55 @@ const EMITTERS = {
   python: emitPython,
   go: emitGo,
   dart: emitDart,
-  // TODO(client langs): ruby, java, csharp, php, elixir — one render fn each.
+  ...EXTRA_EMITTERS,
 };
+
+// The languages the polyglot clients ship. Kept as an assertion rather than a
+// comment: dropping an emitter is then a test failure, not something noticed
+// the next time somebody counts the directories under generated/.
+export const REQUIRED_LANGUAGES = [
+  "c", "cpp", "dart", "elixir", "erlang", "gleam", "go", "java", "kotlin",
+  "php", "python", "ruby", "rust", "swift", "typescript", "zig",
+];
 
 // --- run ---------------------------------------------------------------------
 
+// An internal type embedding a published one is a reasonable thing to want, but
+// no emitter wires the cross-module import yet (and Go could not without knowing
+// the consumer's module path). Refusing it here is the honest failure: the
+// alternative is emitting a file that names a type it never imported.
+function assertNoCrossBoundaryRefs(parts) {
+  const publicNames = new Set(parts.public.map((t) => t.name));
+  for (const t of parts.internal) {
+    for (const p of t.props) {
+      for (const sub of [p.schema, p.schema && p.schema.items]) {
+        const r = refName(sub);
+        if (r && publicNames.has(r)) {
+          fail(`${t.source}:${t.name}.${p.name}: internal type $refs public type "${r}". ` +
+               "Emitters do not yet write the cross-module import for this; either inline " +
+               `the shape into "${t.name}" or move "${r}" to x-visibility "internal".`);
+        }
+      }
+    }
+  }
+}
+
 export function build() {
-  const types = loadTypes();
+  const parts = partition(loadTypes());
+  assertNoCrossBoundaryRefs(parts);
   const files = {};
-  for (const emit of Object.values(EMITTERS)) Object.assign(files, emit(types));
+  for (const [lang, emit] of Object.entries(EMITTERS)) {
+    const produced = emit(parts);
+    for (const rel of Object.keys(produced)) {
+      if (Object.prototype.hasOwnProperty.call(files, rel)) {
+        fail(`emitter "${lang}" would overwrite ${rel} produced by another emitter`);
+      }
+    }
+    Object.assign(files, produced);
+  }
   return files;
 }
-export { loadTypes, pascal, snake, oneLine, refName, isNullable, isStringEnum, enumTypeName, collectEnums };
+export { loadTypes, pascal, snake, camel, oneLine, refName, isNullable, isStringEnum, nonNullSchema, enumTypeName, collectEnums, cLine, cBlock, BANNER };
 
 function main() {
   const check = process.argv.includes("--check");
