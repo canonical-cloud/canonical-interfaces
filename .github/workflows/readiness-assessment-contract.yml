@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - "contracts/readiness-assessment/v1/**"
+      - "scripts/check-readiness-assessment-runtime.mjs"
       - ".github/workflows/readiness-assessment-contract.yml"
   push:
     branches: [main, dev]
     paths:
       - "contracts/readiness-assessment/v1/**"
+      - "scripts/check-readiness-assessment-runtime.mjs"
       - ".github/workflows/readiness-assessment-contract.yml"
   workflow_dispatch:
 
@@ -65,6 +67,8 @@ jobs:
           assert.equal(ir.admission.receipt.runId, report.runId);
           assert.ok(ir.admission.scope.admittedDeclarations >= 10);
           NODE
+      - name: Verify runtime relational invariants
+        run: node scripts/check-readiness-assessment-runtime.mjs
       - name: Retain parity receipt, Contract IR, SARIF and generated witness
         if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
