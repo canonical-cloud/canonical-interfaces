@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.readiness-assessment.v1.authored.schema.json",
+  "$defs": {
+    "AssessmentFindingStatus": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentFindingStatus","type":"string","enum":["pass","fail","unknown","error"]},
+    "AssessmentSeverity": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentSeverity","type":"string","enum":["info","low","medium","high","critical"]},
+    "RecommendationPriority": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RecommendationPriority","type":"string","enum":["urgent","high","medium","low"]},
+    "AssessmentEvidenceRef": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentEvidenceRef","type":"object",
+      "properties":{"evidenceId":{"type":"string"},"sha256":{"type":"string"},"observedAt":{"type":"string"},"kind":{"type":"string"}},
+      "required":["evidenceId","sha256","observedAt"],"unevaluatedProperties":false
+    },
+    "AssessmentTarget": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentTarget","type":"object",
+      "properties":{"targetId":{"type":"string"},"kind":{"type":"string"},"locator":{"type":"string"}},
+      "required":["targetId","kind"],"unevaluatedProperties":false
+    },
+    "AssessmentControlMapping": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentControlMapping","type":"object",
+      "properties":{"frameworkId":{"type":"string"},"controlId":{"type":"string"},"catalogVersion":{"type":"string"}},
+      "required":["frameworkId","controlId","catalogVersion"],"unevaluatedProperties":false
+    },
+    "AssessmentFinding": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentFinding","type":"object",
+      "properties":{
+        "findingId":{"type":"string"},"checkId":{"type":"string"},"status":{"$ref":"AssessmentFindingStatus"},"severity":{"$ref":"AssessmentSeverity"},
+        "title":{"type":"string"},"summary":{"type":"string"},"targetId":{"type":"string"},
+        "evidenceIds":{"type":"array","items":{"type":"string"}},
+        "mappings":{"type":"array","items":{"$ref":"AssessmentControlMapping"}}
+      },
+      "required":["findingId","checkId","status","severity","title","summary","targetId","evidenceIds","mappings"],"unevaluatedProperties":false
+    },
+    "AssessmentCounts": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentCounts","type":"object",
+      "properties":{"passed":{"type":"integer"},"failed":{"type":"integer"},"unknownCount":{"type":"integer"},"errors":{"type":"integer"},"highOrCriticalFailures":{"type":"integer"}},
+      "required":["passed","failed","unknownCount","errors","highOrCriticalFailures"],"unevaluatedProperties":false
+    },
+    "AssessmentRecommendationInput": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentRecommendationInput","type":"object",
+      "properties":{"recommendationId":{"type":"string"},"sourceFindingIds":{"type":"array","items":{"type":"string"}},"priority":{"$ref":"RecommendationPriority"},"title":{"type":"string"},"summary":{"type":"string"},"runbookRef":{"type":"string"}},
+      "required":["recommendationId","sourceFindingIds","priority","title","summary"],"unevaluatedProperties":false
+    },
+    "AssessmentReport": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AssessmentReport","type":"object",
+      "properties":{
+        "specVersion":{"type":"string","const":"canonical.readiness.assessment.v1"},
+        "assessmentReportId":{"type":"string"},"scopeId":{"type":"string"},"generatedAt":{"type":"string"},"engineId":{"type":"string"},"engineVersion":{"type":"string"},
+        "sourceObservationIds":{"type":"array","items":{"type":"string"}},
+        "evidence":{"type":"array","items":{"$ref":"AssessmentEvidenceRef"}},
+        "targets":{"type":"array","items":{"$ref":"AssessmentTarget"}},
+        "findings":{"type":"array","items":{"$ref":"AssessmentFinding"}},
+        "recommendations":{"type":"array","items":{"$ref":"AssessmentRecommendationInput"}},
+        "counts":{"$ref":"AssessmentCounts"},"scoreBasisPoints":{"type":"integer"},"boundary":{"type":"string"}
+      },
+      "required":["specVersion","assessmentReportId","scopeId","generatedAt","engineId","engineVersion","sourceObservationIds","evidence","targets","findings","recommendations","counts","boundary"],
+      "unevaluatedProperties":false
+    }
+  }
+}
