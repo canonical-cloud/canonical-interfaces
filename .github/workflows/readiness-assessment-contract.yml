@@ -5,12 +5,14 @@ on:
     paths:
       - "contracts/readiness-assessment/v1/**"
       - "scripts/check-readiness-assessment-runtime.mjs"
+      - "src/project-admitted-contract-ir.mjs"
       - ".github/workflows/readiness-assessment-contract.yml"
   push:
     branches: [main, dev]
     paths:
       - "contracts/readiness-assessment/v1/**"
       - "scripts/check-readiness-assessment-runtime.mjs"
+      - "src/project-admitted-contract-ir.mjs"
       - ".github/workflows/readiness-assessment-contract.yml"
   workflow_dispatch:
 
@@ -69,7 +71,38 @@ jobs:
           NODE
       - name: Verify runtime relational invariants
         run: node scripts/check-readiness-assessment-runtime.mjs
-      - name: Retain parity receipt, Contract IR, SARIF and generated witness
+      - name: Project the admitted common contract surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          node src/project-admitted-contract-ir.mjs \
+            --input .typespec-json-schema-validator/readiness-assessment.contract-ir.json \
+            --output .typespec-json-schema-validator/readiness-assessment.admitted-projection.schema.json
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+          const projection = JSON.parse(readFileSync(".typespec-json-schema-validator/readiness-assessment.admitted-projection.schema.json", "utf8"));
+          const ir = JSON.parse(readFileSync(".typespec-json-schema-validator/readiness-assessment.contract-ir.json", "utf8"));
+          assert.equal(projection["x-canonical-generated"], true);
+          assert.equal(projection["x-canonical-source"].kind, "admitted-contract-ir");
+          assert.equal(projection["x-canonical-source"].runId, ir.admission.receipt.runId);
+          assert.deepEqual(
+            Object.keys(projection.$defs).sort(),
+            [
+              "AssessmentControlMapping",
+              "AssessmentCounts",
+              "AssessmentEvidenceRef",
+              "AssessmentFinding",
+              "AssessmentFindingStatus",
+              "AssessmentRecommendationInput",
+              "AssessmentReport",
+              "AssessmentSeverity",
+              "AssessmentTarget",
+              "RecommendationPriority",
+            ].sort(),
+          );
+          NODE
+      - name: Retain parity receipt, Contract IR, projection, SARIF and generated witness
         if: ${{ always() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
