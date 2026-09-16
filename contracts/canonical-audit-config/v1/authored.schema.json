@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.audit-config.v1.authored.schema.json",
+  "$defs": {
+    "AuditEnvironment": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AuditEnvironment","type":"string","enum":["test","staging","production"]},
+    "InteractionMode": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"InteractionMode","type":"string","enum":["interactive","non-interactive"]},
+    "SecretReferenceScheme": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"SecretReferenceScheme","type":"string","enum":["env","sops","file","vault"]},
+    "PublishingProvider": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"PublishingProvider","type":"string","enum":["disabled","cloudflare-r2"]},
+    "PublicationVisibility": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"PublicationVisibility","type":"string","enum":["private","authenticated","public"]},
+    "ServiceProvider": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceProvider","type":"string","enum":["github","aws","gcp","azure","cloudflare","supabase","neondb","vercel","upstash","kubernetes","sentry","datadog","other"]},
+    "ServiceKind": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceKind","type":"string","enum":["organization","cloud","edge","database-platform","hosting","cache-messaging","orchestrator","observability","other"]},
+    "AuditReportFormat": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AuditReportFormat","type":"string","enum":["json","markdown","html"]},
+    "FrameworkSelection": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FrameworkSelection","type":"object",
+      "properties":{"soc2":{"type":"boolean"},"nist_csf_2_0":{"type":"boolean"},"nist_sp_800_53_rev5":{"type":"boolean"},"iso_iec_27001_2022":{"type":"boolean"}},
+      "required":["soc2","nist_csf_2_0","nist_sp_800_53_rev5","iso_iec_27001_2022"],"unevaluatedProperties":false
+    },
+    "InteractionPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"InteractionPolicy","type":"object",
+      "properties":{"default_mode":{"$ref":"InteractionMode"},"prompt_for_missing":{"type":"boolean"},"allow_interactive_override":{"type":"boolean"},"fail_on_missing_required":{"type":"boolean"}},
+      "required":["default_mode","prompt_for_missing","allow_interactive_override","fail_on_missing_required"],"unevaluatedProperties":false
+    },
+    "SecurityPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"SecurityPolicy","type":"object",
+      "properties":{"allow_mutations":{"type":"boolean","const":false},"allow_plaintext_secrets":{"type":"boolean","const":false},"secret_reference_schemes":{"type":"array","items":{"$ref":"SecretReferenceScheme"}},"redact_logs":{"type":"boolean"},"redact_reports":{"type":"boolean"},"record_secret_fingerprints":{"type":"boolean"}},
+      "required":["allow_mutations","allow_plaintext_secrets","secret_reference_schemes","redact_logs","redact_reports","record_secret_fingerprints"],"unevaluatedProperties":false
+    },
+    "RepositoryLayout": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RepositoryLayout","type":"object",
+      "properties":{"private":{"type":"boolean"},"evidence_dir":{"type":"string"},"workpapers_dir":{"type":"string"},"reports_dir":{"type":"string"},"manifests_dir":{"type":"string"},"customer_dir":{"type":"string"}},
+      "required":["private","evidence_dir","workpapers_dir","reports_dir","manifests_dir","customer_dir"],"unevaluatedProperties":false
+    },
+    "PublishingPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"PublishingPolicy","type":"object",
+      "properties":{"enabled":{"type":"boolean"},"provider":{"$ref":"PublishingProvider"},"source_dir":{"type":"string"},"visibility":{"$ref":"PublicationVisibility"},"custom_domain":{"type":"string"},"r2_bucket":{"type":"string"},"r2_prefix":{"type":"string"},"access_policy":{"type":"string"},"cache_control":{"type":"string"},"include_git_commit_sha":{"type":"boolean"},"publish_integrity_manifest":{"type":"boolean"}},
+      "required":["enabled","provider","source_dir","visibility","include_git_commit_sha","publish_integrity_manifest"],"unevaluatedProperties":false
+    },
+    "ServiceSettings": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceSettings","type":"object",
+      "properties":{"organization":{"type":"string"},"api_base_url":{"type":"string"},"account_id":{"type":"string"},"regions":{"type":"array","items":{"type":"string"}},"profile":{"type":"string"},"project_ids":{"type":"array","items":{"type":"string"}},"tenant_id":{"type":"string"},"subscription_ids":{"type":"array","items":{"type":"string"}},"project_refs":{"type":"array","items":{"type":"string"}},"team_id":{"type":"string"},"contexts":{"type":"array","items":{"type":"string"}},"site":{"type":"string"},"resource_ids":{"type":"array","items":{"type":"string"}}},
+      "required":[],"unevaluatedProperties":false
+    },
+    "ServiceConnection": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceConnection","type":"object",
+      "properties":{"id":{"type":"string"},"provider":{"$ref":"ServiceProvider"},"kind":{"$ref":"ServiceKind"},"enabled":{"type":"boolean"},"read_only":{"type":"boolean","const":true},"auth_refs":{"type":"array","items":{"type":"string"}},"collect":{"type":"array","items":{"type":"string"}},"settings":{"$ref":"ServiceSettings"}},
+      "required":["id","provider","kind","enabled","read_only","auth_refs","collect","settings"],"unevaluatedProperties":false
+    },
+    "EvidencePolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"EvidencePolicy","type":"object",
+      "properties":{"content_addressed":{"type":"boolean"},"hash":{"type":"string","const":"sha256"},"retain_raw_provider_payloads":{"type":"boolean"},"write_normalized_evidence":{"type":"boolean"},"write_collection_manifest":{"type":"boolean"},"write_provenance":{"type":"boolean"}},
+      "required":["content_addressed","hash","retain_raw_provider_payloads","write_normalized_evidence","write_collection_manifest","write_provenance"],"unevaluatedProperties":false
+    },
+    "ReportPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ReportPolicy","type":"object",
+      "properties":{"formats":{"type":"array","items":{"$ref":"AuditReportFormat"}},"include_framework_crosswalk":{"type":"boolean"},"include_evidence_gaps":{"type":"boolean"},"include_remediation":{"type":"boolean"},"include_limitations":{"type":"boolean"}},
+      "required":["formats","include_framework_crosswalk","include_evidence_gaps","include_remediation","include_limitations"],"unevaluatedProperties":false
+    },
+    "GitPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"GitPolicy","type":"object",
+      "properties":{"commit_generated_reports":{"type":"boolean"},"commit_raw_secrets":{"type":"boolean","const":false},"require_clean_worktree":{"type":"boolean"},"sign_manifest":{"type":"boolean"}},
+      "required":["commit_generated_reports","commit_raw_secrets","require_clean_worktree","sign_manifest"],"unevaluatedProperties":false
+    },
+    "SecretSources": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"SecretSources","type":"object",
+      "properties":{"sops_age_file":{"type":"string"},"local_env_file":{"type":"string"},"vault_paths":{"type":"array","items":{"type":"string"}}},
+      "required":[],"unevaluatedProperties":false
+    },
+    "CanonicalAuditConfig": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"CanonicalAuditConfig","type":"object",
+      "properties":{
+        "schema_version":{"type":"string","const":"canonical.audit-config.v1"},
+        "customer_id":{"type":"string"},"display_name":{"type":"string"},"environment":{"$ref":"AuditEnvironment"},"audit_mode":{"type":"string","const":"read-only"},
+        "frameworks":{"$ref":"FrameworkSelection"},"interaction":{"$ref":"InteractionPolicy"},"security":{"$ref":"SecurityPolicy"},"repository":{"$ref":"RepositoryLayout"},"publishing":{"$ref":"PublishingPolicy"},
+        "services":{"type":"array","items":{"$ref":"ServiceConnection"}},"evidence":{"$ref":"EvidencePolicy"},"reports":{"$ref":"ReportPolicy"},"git":{"$ref":"GitPolicy"},"secret_sources":{"$ref":"SecretSources"}
+      },
+      "required":["schema_version","customer_id","display_name","environment","audit_mode","frameworks","interaction","security","repository","publishing","services","evidence","reports","git"],
+      "unevaluatedProperties":false
+    }
+  }
+}
