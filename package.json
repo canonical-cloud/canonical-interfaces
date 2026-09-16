@@ -18,6 +18,8 @@
     "./quote-schema": "./schema/quote.schema.json",
     "./pre-interest-schema": "./schema/pre-interest.schema.json",
     "./pre-interest-contract": "./contracts/pre-interest/v1/pre-interest.schema.json",
+    "./compliance-rpc-schema": "./contracts/compliance-rpc/v1/authored.schema.json",
+    "./compliance-rpc-typespec": "./contracts/compliance-rpc/v1/main.tsp",
     "./quote-fixtures": "./fixtures/quote-v1",
     "./sql": "./sql/schema.sql",
     "./typescript": "./generated/typescript/index.ts",
