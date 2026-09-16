@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.compliance-rpc.v1.authored.schema.json",
+  "$defs": {
+    "OperationId": {
+      "$id": "OperationId",
+      "type": "string",
+      "enum": [
+        "compliance.evidence.upload",
+        "compliance.evidence.verify",
+        "compliance.assessment.run",
+        "compliance.finding.acknowledge",
+        "audit.request.create",
+        "audit.workpaper.submit",
+        "audit.workpaper.approve",
+        "integration.connection.verify",
+        "integration.connection.permissions",
+        "report.generate"
+      ]
+    },
+    "ProblemCategory": {
+      "$id": "ProblemCategory",
+      "type": "string",
+      "enum": ["validation", "authentication", "authorization", "integrity", "conflict", "quota", "unavailable", "internal"]
+    },
+    "ProblemCode": {
+      "$id": "ProblemCode",
+      "type": "string",
+      "enum": [
+        "INVALID_REQUEST",
+        "UNAUTHENTICATED",
+        "FORBIDDEN",
+        "EVIDENCE_DIGEST_MISMATCH",
+        "IDEMPOTENCY_KEY_REUSED",
+        "CONNECTION_PRIVILEGE_DRIFT",
+        "RATE_LIMITED",
+        "SERVICE_UNAVAILABLE",
+        "INTERNAL"
+      ]
+    },
+    "AuthStrength": {
+      "$id": "AuthStrength",
+      "type": "string",
+      "enum": ["session", "mfa", "phishing-resistant", "service"]
+    },
+    "RpcRequestMeta": {
+      "$id": "RpcRequestMeta",
+      "type": "object",
+      "properties": {
+        "requestId": {"type": "string"},
+        "idempotencyKey": {"type": "string"},
+        "deadlineUnixMs": {"type": "integer"},
+        "traceparent": {"type": "string"}
+      },
+      "required": ["requestId"],
+      "unevaluatedProperties": false
+    },
+    "RpcCall": {
+      "$id": "RpcCall",
+      "type": "object",
+      "properties": {
+        "specVersion": {"type": "string", "const": "canonical.compliance.rpc.call.v1"},
+        "operation": {"$ref": "OperationId"},
+        "meta": {"$ref": "RpcRequestMeta"},
+        "payload": {}
+      },
+      "required": ["specVersion", "operation", "meta", "payload"],
+      "unevaluatedProperties": false
+    },
+    "RequestContext": {
+      "$id": "RequestContext",
+      "type": "object",
+      "properties": {
+        "specVersion": {"type": "string", "const": "canonical.compliance.rpc.context.v1"},
+        "tenantId": {"type": "string"},
+        "actorId": {"type": "string"},
+        "sessionId": {"type": "string"},
+        "roles": {"type": "array", "items": {"type": "string"}},
+        "scopes": {"type": "array", "items": {"type": "string"}},
+        "authStrength": {"$ref": "AuthStrength"},
+        "traceId": {"type": "string"}
+      },
+      "required": ["specVersion", "tenantId", "actorId", "sessionId", "roles", "scopes", "authStrength", "traceId"],
+      "unevaluatedProperties": false
+    },
+    "RemediationHint": {
+      "$id": "RemediationHint",
+      "type": "object",
+      "properties": {"code": {"type": "string"}},
+      "required": ["code"],
+      "unevaluatedProperties": false
+    },
+    "RpcProblem": {
+      "$id": "RpcProblem",
+      "type": "object",
+      "properties": {
+        "specVersion": {"type": "string", "const": "canonical.compliance.rpc.problem.v1"},
+        "code": {"$ref": "ProblemCode"},
+        "category": {"$ref": "ProblemCategory"},
+        "message": {"type": "string"},
+        "retryable": {"type": "boolean"},
+        "traceId": {"type": "string"},
+        "incidentId": {"type": "string"},
+        "remediation": {"$ref": "RemediationHint"}
+      },
+      "required": ["specVersion", "code", "category", "message", "retryable", "traceId"],
+      "unevaluatedProperties": false
+    }
+  }
+}
