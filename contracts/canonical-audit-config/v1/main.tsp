@@ -74,6 +74,16 @@ enum AuditReportFormat {
   html: "html",
 }
 
+@id("ToolchainPolicy")
+model ToolchainPolicy {
+  @pattern("^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
+  canonical_cli: string;
+  validator: "oresoftware/typespec-json-schema-validator";
+  validator_receipt_schema: "ores.tjsv.config-instance/v1";
+  require_exact_cli_version: true;
+  runtime_schema_drift: "warn";
+}
+
 @id("FrameworkSelection")
 model FrameworkSelection {
   soc2: boolean;
@@ -191,6 +201,7 @@ model SecretSources {
 @id("CanonicalAuditConfig")
 model CanonicalAuditConfig {
   schema_version: "canonical.audit-config.v1";
+  toolchain: ToolchainPolicy;
   customer_id: string;
   display_name: string;
   environment: AuditEnvironment;
