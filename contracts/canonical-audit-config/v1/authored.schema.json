@@ -38,7 +38,7 @@
     "ServiceSettings": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceSettings","type":"object",
       "properties":{"organization":{"type":"string"},"api_base_url":{"type":"string"},"account_id":{"type":"string"},"regions":{"type":"array","items":{"type":"string"}},"profile":{"type":"string"},"project_ids":{"type":"array","items":{"type":"string"}},"tenant_id":{"type":"string"},"subscription_ids":{"type":"array","items":{"type":"string"}},"project_refs":{"type":"array","items":{"type":"string"}},"team_id":{"type":"string"},"contexts":{"type":"array","items":{"type":"string"}},"site":{"type":"string"},"resource_ids":{"type":"array","items":{"type":"string"}}},
-      "required":[],"unevaluatedProperties":false
+      "unevaluatedProperties":false
     },
     "ServiceConnection": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceConnection","type":"object",
@@ -63,7 +63,7 @@
     "SecretSources": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"SecretSources","type":"object",
       "properties":{"sops_age_file":{"type":"string"},"local_env_file":{"type":"string"},"vault_paths":{"type":"array","items":{"type":"string"}}},
-      "required":[],"unevaluatedProperties":false
+      "unevaluatedProperties":false
     },
     "CanonicalAuditConfig": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"CanonicalAuditConfig","type":"object",
