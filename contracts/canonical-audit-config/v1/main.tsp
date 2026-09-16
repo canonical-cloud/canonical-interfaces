@@ -102,19 +102,19 @@ model SecurityPolicy {
 
 @id("RepositoryLayout")
 model RepositoryLayout {
-  private: boolean;
-  evidence_dir: string;
-  workpapers_dir: string;
-  reports_dir: string;
-  manifests_dir: string;
-  customer_dir: string;
+  private: true;
+  evidence_dir: "evidence";
+  workpapers_dir: "workpapers";
+  reports_dir: "reports";
+  manifests_dir: "manifests";
+  customer_dir: "customer";
 }
 
 @id("PublishingPolicy")
 model PublishingPolicy {
   enabled: boolean;
   provider: PublishingProvider;
-  source_dir: string;
+  source_dir: "customer";
   visibility: PublicationVisibility;
   custom_domain?: string;
   r2_bucket?: string;
