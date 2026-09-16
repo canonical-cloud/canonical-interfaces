@@ -10,6 +10,13 @@ display_name = "Customer 1 Demo"
 environment = "test"
 audit_mode = "read-only"
 
+[toolchain]
+canonical_cli = "0.1.0"
+validator = "oresoftware/typespec-json-schema-validator"
+validator_receipt_schema = "ores.tjsv.config-instance/v1"
+require_exact_cli_version = true
+runtime_schema_drift = "warn"
+
 [frameworks]
 soc2 = true
 nist_csf_2_0 = true
