@@ -10,6 +10,17 @@
     "ServiceProvider": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceProvider","type":"string","enum":["github","aws","gcp","azure","cloudflare","supabase","neondb","vercel","upstash","kubernetes","sentry","datadog","other"]},
     "ServiceKind": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ServiceKind","type":"string","enum":["organization","cloud","edge","database-platform","hosting","cache-messaging","orchestrator","observability","other"]},
     "AuditReportFormat": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AuditReportFormat","type":"string","enum":["json","markdown","html"]},
+    "ToolchainPolicy": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"ToolchainPolicy","type":"object",
+      "properties":{
+        "canonical_cli":{"type":"string","pattern":"^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"},
+        "validator":{"type":"string","const":"oresoftware/typespec-json-schema-validator"},
+        "validator_receipt_schema":{"type":"string","const":"ores.tjsv.config-instance/v1"},
+        "require_exact_cli_version":{"type":"boolean","const":true},
+        "runtime_schema_drift":{"type":"string","const":"warn"}
+      },
+      "required":["canonical_cli","validator","validator_receipt_schema","require_exact_cli_version","runtime_schema_drift"],"unevaluatedProperties":false
+    },
     "FrameworkSelection": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FrameworkSelection","type":"object",
       "properties":{"soc2":{"type":"boolean"},"nist_csf_2_0":{"type":"boolean"},"nist_sp_800_53_rev5":{"type":"boolean"},"iso_iec_27001_2022":{"type":"boolean"}},
@@ -69,11 +80,12 @@
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"CanonicalAuditConfig","type":"object",
       "properties":{
         "schema_version":{"type":"string","const":"canonical.audit-config.v1"},
+        "toolchain":{"$ref":"ToolchainPolicy"},
         "customer_id":{"type":"string"},"display_name":{"type":"string"},"environment":{"$ref":"AuditEnvironment"},"audit_mode":{"type":"string","const":"read-only"},
         "frameworks":{"$ref":"FrameworkSelection"},"interaction":{"$ref":"InteractionPolicy"},"security":{"$ref":"SecurityPolicy"},"repository":{"$ref":"RepositoryLayout"},"publishing":{"$ref":"PublishingPolicy"},
         "services":{"type":"array","items":{"$ref":"ServiceConnection"}},"evidence":{"$ref":"EvidencePolicy"},"reports":{"$ref":"ReportPolicy"},"git":{"$ref":"GitPolicy"},"secret_sources":{"$ref":"SecretSources"}
       },
-      "required":["schema_version","customer_id","display_name","environment","audit_mode","frameworks","interaction","security","repository","publishing","services","evidence","reports","git"],
+      "required":["schema_version","toolchain","customer_id","display_name","environment","audit_mode","frameworks","interaction","security","repository","publishing","services","evidence","reports","git"],
       "unevaluatedProperties":false
     }
   }
