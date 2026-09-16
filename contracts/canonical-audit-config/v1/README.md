@@ -16,24 +16,27 @@ Every v1 `.canonical-cfg.toml` must contain a `[toolchain]` table. This prevents
 [toolchain]
 canonical_cli = "0.1.0"
 validator = "oresoftware/typespec-json-schema-validator"
+validator_revision = "7b1e79a32b89006a6eb6642ccd71ef25ffac0103"
 validator_receipt_schema = "ores.tjsv.config-instance/v1"
+config_bridge = "oresoftware/ores-cli"
+config_bridge_revision = "f07b3785a6cd1957591104d19099724452058172"
 require_exact_cli_version = true
 runtime_schema_drift = "warn"
 ```
 
-`canonical_cli` is the exact Canonical CLI version expected by the file. Build, CI, pre-commit/pre-push and explicit `canonical config validate` checks must fail closed when that version differs from the running CLI. A migration must deliberately update the config and its contract fixtures rather than silently accepting `latest`, an unbounded range or an unknown CLI.
+`canonical_cli` is the exact Canonical CLI version expected by the file. Build, CI, pre-commit/pre-push and explicit `canonical-config validate` checks must fail closed when that version differs from the running CLI. A migration must deliberately update the config and its contract fixtures rather than silently accepting `latest`, an unbounded range or an unknown CLI.
 
-`validator` and `validator_receipt_schema` make the validation implementation/protocol visible in the config. The current v1 contract requires `oresoftware/typespec-json-schema-validator` and the `ores.tjsv.config-instance/v1` receipt. `require_exact_cli_version` is deliberately fixed to `true` for v1.
+`validator` and `validator_receipt_schema` make the validation implementation/protocol visible in the config. The current v1 contract requires `oresoftware/typespec-json-schema-validator` and the `ores.tjsv.config-instance/v1` receipt. `validator_revision` pins the exact admitted TJSV implementation. `config_bridge` must be `oresoftware/ores-cli`, and `config_bridge_revision` pins the exact `ores-config-shape` implementation used to parse/bridge the TOML instance. Both revision fields are lowercase 40-hex Git object IDs so customer evidence can be traced back to immutable source.
 
-`runtime_schema_drift = "warn"` applies only to the additional JSON-Schema observation after the TOML parser has successfully produced a value. It does not weaken TOML parse failures, the read-only security invariants below, credential-reference rules, path-safety checks, or other application invariants that must remain fail closed.
+`require_exact_cli_version` is deliberately fixed to `true` for v1. `runtime_schema_drift = "warn"` applies only to the additional JSON-Schema observation after the TOML parser has successfully produced a value. It does not weaken TOML parse failures, the read-only security invariants below, credential-reference rules, path-safety checks, or other application invariants that must remain fail closed.
 
 ## Validation lifecycle
 
 The same contract is checked at multiple boundaries without creating another schema authority:
 
 1. **Contract/build admission:** `tjsv check` compiles the TypeSpec authority, compares it with the independently authored Draft 2020-12 Schema A, evaluates the positive/negative corpus, and emits retained parity/Contract-IR evidence. Drift fails the build.
-2. **Configuration build/CI check:** parse `.canonical-cfg.toml` with the application TOML parser, convert the parsed value to JSON-equivalent data, then run `tjsv-config --mode build` against `authored.schema.json`. Invalid shape or unavailable validation fails closed.
-3. **CLI / git-hook check:** `canonical config validate` performs the same build-mode shape check and verifies the running `canonical-cli` version against `[toolchain].canonical_cli`. This is suitable for pre-commit/pre-push and zed-pkg install/smoke hooks.
+2. **Configuration build/CI check:** parse `.canonical-cfg.toml` with the application TOML parser or `ores-config-shape`, convert the parsed value to JSON-equivalent data, then run `tjsv-config --mode build` against `authored.schema.json`. Invalid shape, unavailable validation, or mismatched declared tool revisions fail closed.
+3. **CLI / git-hook check:** `canonical-config validate` performs the same build-mode shape check and verifies the running `canonical-cli` version plus the expected validator/bridge identities and revisions against `[toolchain]`. This is suitable for pre-commit/pre-push and zed-pkg install/smoke hooks.
 4. **Runtime observation:** after the application has parsed its config, stream the JSON-equivalent value to `tjsv-config --mode runtime`. Schema drift is logged as a structured warning and startup may continue; actual parser or safety-invariant failures still stop execution.
 
 Configuration contents must not be written to an unprotected temporary file merely to invoke validation. Consumers should stream the parsed JSON-equivalent value to TJSV over stdin. TJSV diagnostics should retain schema/config pointers and keyword classes rather than configuration values.
