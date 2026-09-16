@@ -27,12 +27,12 @@
     },
     "RepositoryLayout": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"RepositoryLayout","type":"object",
-      "properties":{"private":{"type":"boolean"},"evidence_dir":{"type":"string"},"workpapers_dir":{"type":"string"},"reports_dir":{"type":"string"},"manifests_dir":{"type":"string"},"customer_dir":{"type":"string"}},
+      "properties":{"private":{"type":"boolean","const":true},"evidence_dir":{"type":"string","const":"evidence"},"workpapers_dir":{"type":"string","const":"workpapers"},"reports_dir":{"type":"string","const":"reports"},"manifests_dir":{"type":"string","const":"manifests"},"customer_dir":{"type":"string","const":"customer"}},
       "required":["private","evidence_dir","workpapers_dir","reports_dir","manifests_dir","customer_dir"],"unevaluatedProperties":false
     },
     "PublishingPolicy": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"PublishingPolicy","type":"object",
-      "properties":{"enabled":{"type":"boolean"},"provider":{"$ref":"PublishingProvider"},"source_dir":{"type":"string"},"visibility":{"$ref":"PublicationVisibility"},"custom_domain":{"type":"string"},"r2_bucket":{"type":"string"},"r2_prefix":{"type":"string"},"access_policy":{"type":"string"},"cache_control":{"type":"string"},"include_git_commit_sha":{"type":"boolean"},"publish_integrity_manifest":{"type":"boolean"}},
+      "properties":{"enabled":{"type":"boolean"},"provider":{"$ref":"PublishingProvider"},"source_dir":{"type":"string","const":"customer"},"visibility":{"$ref":"PublicationVisibility"},"custom_domain":{"type":"string"},"r2_bucket":{"type":"string"},"r2_prefix":{"type":"string"},"access_policy":{"type":"string"},"cache_control":{"type":"string"},"include_git_commit_sha":{"type":"boolean"},"publish_integrity_manifest":{"type":"boolean"}},
       "required":["enabled","provider","source_dir","visibility","include_git_commit_sha","publish_integrity_manifest"],"unevaluatedProperties":false
     },
     "ServiceSettings": {
