@@ -3,7 +3,10 @@
   "toolchain": {
     "canonical_cli": "0.1.0",
     "validator": "oresoftware/typespec-json-schema-validator",
+    "validator_revision": "7b1e79a32b89006a6eb6642ccd71ef25ffac0103",
     "validator_receipt_schema": "ores.tjsv.config-instance/v1",
+    "config_bridge": "oresoftware/ores-cli",
+    "config_bridge_revision": "f07b3785a6cd1957591104d19099724452058172",
     "require_exact_cli_version": true,
     "runtime_schema_drift": "warn"
   },
