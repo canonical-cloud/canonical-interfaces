@@ -79,7 +79,12 @@ model ToolchainPolicy {
   @pattern("^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$")
   canonical_cli: string;
   validator: "oresoftware/typespec-json-schema-validator";
+  @pattern("^[0-9a-f]{40}$")
+  validator_revision: string;
   validator_receipt_schema: "ores.tjsv.config-instance/v1";
+  config_bridge: "oresoftware/ores-cli";
+  @pattern("^[0-9a-f]{40}$")
+  config_bridge_revision: string;
   require_exact_cli_version: true;
   runtime_schema_drift: "warn";
 }
