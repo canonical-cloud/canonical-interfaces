@@ -1,0 +1,195 @@
+{
+  "schema_version": "canonical.audit-config.v1",
+  "customer_id": "customer-1-demo",
+  "display_name": "Customer 1 Demo",
+  "environment": "test",
+  "audit_mode": "read-only",
+  "frameworks": {
+    "soc2": true,
+    "nist_csf_2_0": true,
+    "nist_sp_800_53_rev5": true,
+    "iso_iec_27001_2022": true
+  },
+  "interaction": {
+    "default_mode": "non-interactive",
+    "prompt_for_missing": false,
+    "allow_interactive_override": true,
+    "fail_on_missing_required": true
+  },
+  "security": {
+    "allow_mutations": false,
+    "allow_plaintext_secrets": false,
+    "secret_reference_schemes": ["env", "sops", "file", "vault"],
+    "redact_logs": true,
+    "redact_reports": true,
+    "record_secret_fingerprints": false
+  },
+  "repository": {
+    "private": true,
+    "evidence_dir": "evidence",
+    "workpapers_dir": "workpapers",
+    "reports_dir": "reports",
+    "manifests_dir": "manifests",
+    "customer_dir": "customer"
+  },
+  "publishing": {
+    "enabled": true,
+    "provider": "cloudflare-r2",
+    "source_dir": "customer",
+    "visibility": "authenticated",
+    "custom_domain": "customer-1-demo.audit.example.com",
+    "r2_bucket": "canonical-audit-customer-demo",
+    "r2_prefix": "customer-1-demo/",
+    "access_policy": "cloudflare-access",
+    "cache_control": "private, max-age=300",
+    "include_git_commit_sha": true,
+    "publish_integrity_manifest": true
+  },
+  "services": [
+    {
+      "id": "github-org",
+      "provider": "github",
+      "kind": "organization",
+      "enabled": true,
+      "read_only": true,
+      "auth_refs": ["env:GITHUB_TOKEN"],
+      "collect": ["repositories", "rulesets", "actions", "dependabot", "code-scanning", "secret-scanning", "security-policy"],
+      "settings": {"organization": "canonical-cloud-test", "api_base_url": "https://api.github.com"}
+    },
+    {
+      "id": "aws-primary",
+      "provider": "aws",
+      "kind": "cloud",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:AWS_PROFILE"],
+      "collect": ["iam", "cloudtrail", "config", "guardduty", "securityhub", "kms", "s3", "ec2", "rds", "eks", "cloudwatch", "budgets"],
+      "settings": {"account_id": "000000000000", "regions": ["us-east-1", "us-west-2"], "profile": "customer-1-audit"}
+    },
+    {
+      "id": "gcp-primary",
+      "provider": "gcp",
+      "kind": "cloud",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:GOOGLE_APPLICATION_CREDENTIALS"],
+      "collect": ["iam", "logging", "monitoring", "kms", "storage", "compute", "cloud-run", "gke", "sql", "billing"],
+      "settings": {"project_ids": ["customer-1-demo"]}
+    },
+    {
+      "id": "azure-primary",
+      "provider": "azure",
+      "kind": "cloud",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:AZURE_CONFIG_DIR"],
+      "collect": ["entra", "activity-log", "defender", "key-vault", "storage", "compute", "aks", "sql", "monitor", "cost-management"],
+      "settings": {"tenant_id": "00000000-0000-0000-0000-000000000000", "subscription_ids": ["00000000-0000-0000-0000-000000000000"]}
+    },
+    {
+      "id": "cloudflare-primary",
+      "provider": "cloudflare",
+      "kind": "edge",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:CLOUDFLARE_API_TOKEN"],
+      "collect": ["zones", "dns", "waf", "access", "workers", "pages", "r2", "logs", "zero-trust"],
+      "settings": {"account_id": "00000000000000000000000000000000"}
+    },
+    {
+      "id": "supabase-primary",
+      "provider": "supabase",
+      "kind": "database-platform",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:SUPABASE_ACCESS_TOKEN"],
+      "collect": ["projects", "database", "auth", "storage", "rls", "logs"],
+      "settings": {"project_refs": ["customer1demo"]}
+    },
+    {
+      "id": "neon-primary",
+      "provider": "neondb",
+      "kind": "database-platform",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:NEON_API_KEY"],
+      "collect": ["projects", "branches", "databases", "roles", "computes", "operations"],
+      "settings": {"project_ids": ["customer-1-demo"]}
+    },
+    {
+      "id": "vercel-primary",
+      "provider": "vercel",
+      "kind": "hosting",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:VERCEL_TOKEN"],
+      "collect": ["projects", "deployments", "domains", "environment-metadata", "logs"],
+      "settings": {"team_id": "team_customer_1_demo"}
+    },
+    {
+      "id": "upstash-primary",
+      "provider": "upstash",
+      "kind": "cache-messaging",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:UPSTASH_EMAIL", "env:UPSTASH_API_KEY"],
+      "collect": ["redis", "kafka", "qstash", "usage"],
+      "settings": {"resource_ids": ["demo-redis"]}
+    },
+    {
+      "id": "kubernetes-primary",
+      "provider": "kubernetes",
+      "kind": "orchestrator",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["file:${HOME}/.kube/config"],
+      "collect": ["namespaces", "workloads", "rbac", "network-policies", "pod-security", "events", "resource-usage"],
+      "settings": {"contexts": ["customer-1-demo"]}
+    },
+    {
+      "id": "sentry-primary",
+      "provider": "sentry",
+      "kind": "observability",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:SENTRY_AUTH_TOKEN"],
+      "collect": ["projects", "issues", "releases", "alerts", "audit-log"],
+      "settings": {"organization": "customer-1-demo"}
+    },
+    {
+      "id": "datadog-primary",
+      "provider": "datadog",
+      "kind": "observability",
+      "enabled": false,
+      "read_only": true,
+      "auth_refs": ["env:DATADOG_API_KEY", "env:DATADOG_APP_KEY"],
+      "collect": ["monitors", "dashboards", "logs", "security", "audit", "cost"],
+      "settings": {"site": "datadoghq.com"}
+    }
+  ],
+  "evidence": {
+    "content_addressed": true,
+    "hash": "sha256",
+    "retain_raw_provider_payloads": false,
+    "write_normalized_evidence": true,
+    "write_collection_manifest": true,
+    "write_provenance": true
+  },
+  "reports": {
+    "formats": ["json", "markdown", "html"],
+    "include_framework_crosswalk": true,
+    "include_evidence_gaps": true,
+    "include_remediation": true,
+    "include_limitations": true
+  },
+  "git": {
+    "commit_generated_reports": true,
+    "commit_raw_secrets": false,
+    "require_clean_worktree": true,
+    "sign_manifest": true
+  },
+  "secret_sources": {
+    "sops_age_file": "sops:env/enc/customer-1-demo.enc.yaml",
+    "local_env_file": "file:env/customer-1-demo.env"
+  }
+}
