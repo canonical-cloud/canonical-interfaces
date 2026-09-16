@@ -15,11 +15,14 @@
       "properties":{
         "canonical_cli":{"type":"string","pattern":"^[0-9]+\\.[0-9]+\\.[0-9]+([+-][0-9A-Za-z.-]+)?$"},
         "validator":{"type":"string","const":"oresoftware/typespec-json-schema-validator"},
+        "validator_revision":{"type":"string","pattern":"^[0-9a-f]{40}$"},
         "validator_receipt_schema":{"type":"string","const":"ores.tjsv.config-instance/v1"},
+        "config_bridge":{"type":"string","const":"oresoftware/ores-cli"},
+        "config_bridge_revision":{"type":"string","pattern":"^[0-9a-f]{40}$"},
         "require_exact_cli_version":{"type":"boolean","const":true},
         "runtime_schema_drift":{"type":"string","const":"warn"}
       },
-      "required":["canonical_cli","validator","validator_receipt_schema","require_exact_cli_version","runtime_schema_drift"],"unevaluatedProperties":false
+      "required":["canonical_cli","validator","validator_revision","validator_receipt_schema","config_bridge","config_bridge_revision","require_exact_cli_version","runtime_schema_drift"],"unevaluatedProperties":false
     },
     "FrameworkSelection": {
       "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"FrameworkSelection","type":"object",
