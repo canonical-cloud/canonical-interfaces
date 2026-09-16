@@ -1,0 +1,9 @@
+{
+  "specVersion": "canonical.compliance.rpc.call.v1",
+  "operation": "compliance.evidence.upload",
+  "meta": {
+    "requestId": "req_bad_authority",
+    "tenantId": "tenant-controlled-by-caller"
+  },
+  "payload": {}
+}
