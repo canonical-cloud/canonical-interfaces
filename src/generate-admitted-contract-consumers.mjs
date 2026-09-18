@@ -23,6 +23,7 @@ const root = path.resolve(here, "..");
 const generatorPath = path.join(here, "generate.mjs");
 const CONTRACT_SCHEMA = "https://json-schema.org/draft/2020-12/schema";
 const FAMILY_RE = /^[a-z0-9][a-z0-9-]{0,63}$/;
+const CODEGEN_NORMALIZATION = "canonical.codegen-projection.normalization.v1";
 
 class ConsumerCodegenError extends Error {}
 const fail = (message) => { throw new ConsumerCodegenError(message); };
@@ -94,6 +95,78 @@ function validateProjection(family, file) {
   return { family, file: path.resolve(file), projection, names, source };
 }
 
+function isNamedStringEnum(schema) {
+  return schema
+    && schema.type === "string"
+    && Array.isArray(schema.enum)
+    && schema.enum.length > 0
+    && schema.enum.every((value) => typeof value === "string");
+}
+
+function enumInlineSchema(schema) {
+  const inline = structuredClone(schema);
+  delete inline.$schema;
+  delete inline.$id;
+  return inline;
+}
+
+function rewriteSchemaForLegacyGenerator(value, namedEnums, location) {
+  if (Array.isArray(value)) {
+    return value.map((entry, index) => rewriteSchemaForLegacyGenerator(entry, namedEnums, `${location}/${index}`));
+  }
+  if (!value || typeof value !== "object") return value;
+
+  if (typeof value.$ref === "string") {
+    const refName = value.$ref.split("/").pop();
+    const namedEnum = namedEnums.get(refName);
+    if (namedEnum) {
+      const siblings = Object.keys(value).filter((key) => key !== "$ref");
+      if (siblings.length > 0) {
+        fail(`${location}: named string-enum $ref ${value.$ref} has unsupported siblings: ${siblings.join(", ")}`);
+      }
+      return enumInlineSchema(namedEnum);
+    }
+  }
+
+  const out = {};
+  for (const [key, entry] of Object.entries(value)) {
+    out[key] = rewriteSchemaForLegacyGenerator(entry, namedEnums, `${location}/${key}`);
+  }
+  if (out.type === "string" && Object.hasOwn(out, "const")) {
+    if (typeof out.const !== "string") fail(`${location}: only string const lowering is supported`);
+    if (Array.isArray(out.enum) && (out.enum.length !== 1 || out.enum[0] !== out.const)) {
+      fail(`${location}: const and enum disagree`);
+    }
+    out.enum = [out.const];
+    delete out.const;
+  }
+  return out;
+}
+
+export function normalizeProjectionForGenerator(projection) {
+  const defs = projection.$defs;
+  const namedEnums = new Map(
+    Object.entries(defs).filter(([, schema]) => isNamedStringEnum(schema)),
+  );
+  const normalizedDefs = {};
+  for (const [name, schema] of Object.entries(defs)) {
+    if (namedEnums.has(name)) continue;
+    normalizedDefs[name] = rewriteSchemaForLegacyGenerator(schema, namedEnums, `#/$defs/${name}`);
+  }
+  if (Object.keys(normalizedDefs).length === 0) {
+    fail("codegen projection contains no object/value models after enum lowering");
+  }
+  return {
+    ...structuredClone(projection),
+    $defs: normalizedDefs,
+    "x-canonical-codegen-normalization": {
+      schema: CODEGEN_NORMALIZATION,
+      namedStringEnumDeclarationsLowered: [...namedEnums.keys()].sort(),
+      stringConstsLoweredToSingleValueEnums: true,
+    },
+  };
+}
+
 function listFiles(dir, prefix = "") {
   if (!existsSync(dir)) return [];
   const out = [];
@@ -123,7 +196,7 @@ function compareTrees(expectedDir, actualDir) {
   if (drift.length > 0) fail(`consumer projection content drift: ${drift.join(", ")}`);
 }
 
-function buildProvenance(inputs, stagedProjectionBytes) {
+function buildProvenance(inputs, admittedProjectionBytes, codegenProjectionBytes) {
   const generator = readFileSync(generatorPath);
   return {
     schema: "canonical.generated-contract-consumers.provenance.v1",
@@ -132,10 +205,12 @@ function buildProvenance(inputs, stagedProjectionBytes) {
     generator: {
       path: "src/generate.mjs",
       sha256: sha256(generator),
+      normalization: CODEGEN_NORMALIZATION,
     },
     projections: inputs.map((input) => ({
       family: input.family,
-      projectionSha256: sha256(stagedProjectionBytes.get(input.family)),
+      admittedProjectionSha256: sha256(admittedProjectionBytes.get(input.family)),
+      codegenProjectionSha256: sha256(codegenProjectionBytes.get(input.family)),
       admissionRunId: input.source.runId,
       admissionReceiptDigest: input.source.receiptDigest,
       declarations: input.source.declarations.map((entry) => ({
@@ -170,13 +245,17 @@ export function generateFromAdmittedProjections(projections, outputDir) {
     mkdirSync(tempSchema, { recursive: true });
     cpSync(generatorPath, path.join(tempSrc, "generate.mjs"));
 
-    const stagedProjectionBytes = new Map();
+    const admittedProjectionBytes = new Map();
+    const codegenProjectionBytes = new Map();
     const schemaFiles = [];
     for (const input of inputs) {
       const fileName = `${input.family}.schema.json`;
-      const bytes = Buffer.from(stableJson(input.projection), "utf8");
-      stagedProjectionBytes.set(input.family, bytes);
-      writeFileSync(path.join(tempSchema, fileName), bytes);
+      const admittedBytes = Buffer.from(stableJson(input.projection), "utf8");
+      const normalized = normalizeProjectionForGenerator(input.projection);
+      const codegenBytes = Buffer.from(stableJson(normalized), "utf8");
+      admittedProjectionBytes.set(input.family, admittedBytes);
+      codegenProjectionBytes.set(input.family, codegenBytes);
+      writeFileSync(path.join(tempSchema, fileName), codegenBytes);
       schemaFiles.push(fileName);
     }
     writeFileSync(
@@ -202,7 +281,10 @@ export function generateFromAdmittedProjections(projections, outputDir) {
     rmSync(outputDir, { recursive: true, force: true });
     mkdirSync(path.dirname(outputDir), { recursive: true });
     cpSync(tempGenerated, outputDir, { recursive: true });
-    writeFileSync(path.join(outputDir, "contract-provenance.json"), stableJson(buildProvenance(inputs, stagedProjectionBytes)));
+    writeFileSync(
+      path.join(outputDir, "contract-provenance.json"),
+      stableJson(buildProvenance(inputs, admittedProjectionBytes, codegenProjectionBytes)),
+    );
     return { outputDir, files: listFiles(outputDir) };
   } finally {
     rmSync(tempRoot, { recursive: true, force: true });
