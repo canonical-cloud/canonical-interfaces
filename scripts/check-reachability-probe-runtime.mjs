@@ -23,6 +23,10 @@ function validHost(host) {
   return validText(host, 253) && !/[\s\/@?*#]/u.test(host);
 }
 
+function validTimestamp(value) {
+  return typeof value === "string" && value.endsWith("Z") && Number.isFinite(Date.parse(value));
+}
+
 function validatePlan(value) {
   if (value.specVersion !== "canonical.worker.reachability-probe.v1") return false;
   if (!sha256.test(value.authorizationRefSha256) || !sha256.test(value.planSha256)) return false;
@@ -52,7 +56,9 @@ function validateResultSet(value, admittedPlan) {
   if (value.specVersion !== "canonical.worker.reachability-probe-result.v1") return false;
   if (value.planSha256 !== admittedPlan.planSha256 || !sha256.test(value.planSha256)) return false;
   if (value.perspectiveId !== admittedPlan.perspectiveId) return false;
-  if (!Array.isArray(value.results) || value.results.length > admittedPlan.targets.length) return false;
+  if (!sha256.test(value.runnerIdentitySha256)) return false;
+  if (!validTimestamp(value.observedAt)) return false;
+  if (!Array.isArray(value.results) || value.results.length !== admittedPlan.targets.length) return false;
 
   const admitted = new Set(admittedPlan.targets.map((target) => target.targetId));
   const seen = new Set();
@@ -63,13 +69,13 @@ function validateResultSet(value, admittedPlan) {
     if (!observations.has(result.observation)) return false;
     if (!Number.isInteger(result.elapsedMillis) || result.elapsedMillis < 0) return false;
   }
-  return true;
+  return seen.size === admitted.size;
 }
 
 assert.equal(validatePlan(plan), true);
 assert.equal(validateResultSet(resultSet, plan), true);
 
-for (const badHost of ["10.0.0.0/8", "*.example.com", "https://example.com", "host name", "user@host"] ) {
+for (const badHost of ["10.0.0.0/8", "*.example.com", "https://example.com", "host name", "user@host"]) {
   const invalid = clone(plan);
   invalid.targets[0].host = badHost;
   assert.equal(validatePlan(invalid), false, `must reject host ${badHost}`);
@@ -102,5 +108,17 @@ assert.equal(validateResultSet(unknownTarget, plan), false);
 const duplicateResult = clone(resultSet);
 duplicateResult.results[1].targetId = duplicateResult.results[0].targetId;
 assert.equal(validateResultSet(duplicateResult, plan), false);
+
+const partialResult = clone(resultSet);
+partialResult.results.pop();
+assert.equal(validateResultSet(partialResult, plan), false);
+
+const unboundRunner = clone(resultSet);
+unboundRunner.runnerIdentitySha256 = "external-runner";
+assert.equal(validateResultSet(unboundRunner, plan), false);
+
+const invalidTimestamp = clone(resultSet);
+invalidTimestamp.observedAt = "today";
+assert.equal(validateResultSet(invalidTimestamp, plan), false);
 
 console.log("reachability probe runtime invariants verified");
