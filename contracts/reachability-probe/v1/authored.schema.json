@@ -15,7 +15,7 @@
       "properties": {
         "targetId": {"type": "string"},
         "host": {"type": "string"},
-        "port": {"type": "integer"}
+        "port": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647}
       },
       "required": ["targetId", "host", "port"],
       "unevaluatedProperties": false
@@ -30,8 +30,8 @@
         "planSha256": {"type": "string"},
         "perspectiveId": {"type": "string"},
         "trustZone": {"type": "string"},
-        "timeoutSeconds": {"type": "integer"},
-        "concurrency": {"type": "integer"},
+        "timeoutSeconds": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647},
+        "concurrency": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647},
         "targets": {"type": "array", "items": {"$ref": "ReachabilityTarget"}}
       },
       "required": ["specVersion", "authorizationRefSha256", "planSha256", "perspectiveId", "trustZone", "timeoutSeconds", "concurrency", "targets"],
