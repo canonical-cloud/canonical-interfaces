@@ -1,0 +1,17 @@
+{
+  "specVersion": "canonical.worker.reachability-probe-result.v1",
+  "planSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "perspectiveId": "external-runner",
+  "results": [
+    {
+      "targetId": "prod-db-5432",
+      "observation": "timed_out",
+      "elapsedMillis": 5000
+    },
+    {
+      "targetId": "public-bastion-22",
+      "observation": "connected",
+      "elapsedMillis": 38
+    }
+  ]
+}
