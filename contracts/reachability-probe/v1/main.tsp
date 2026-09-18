@@ -43,5 +43,7 @@ model ReachabilityProbeResultSet {
   specVersion: "canonical.worker.reachability-probe-result.v1";
   planSha256: string;
   perspectiveId: string;
+  runnerIdentitySha256: string;
+  observedAt: string;
   results: ReachabilityProbeResult[];
 }
