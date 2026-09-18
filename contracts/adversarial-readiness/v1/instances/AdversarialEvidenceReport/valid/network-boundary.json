@@ -1,0 +1,47 @@
+{
+  "specVersion": "canonical.adversarial-readiness.evidence.v1",
+  "reportId": "adv-01",
+  "planId": "prod-boundaries-external",
+  "authorizationRefSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "perspective": {
+    "perspectiveId": "external-runner",
+    "trustZone": "external",
+    "expectedPrivilege": "non-root"
+  },
+  "observedPrivilege": "non-root",
+  "generatedAt": "2026-09-18T18:00:00Z",
+  "targets": [
+    {
+      "targetId": "prod-db-5432",
+      "kind": "tcp-service",
+      "locatorSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "results": [
+    {
+      "checkId": "postgres-not-internet-reachable",
+      "title": "Production database network boundary",
+      "severity": "critical",
+      "kind": "tcp-reachability",
+      "targetId": "prod-db-5432",
+      "status": "unknown",
+      "expected": "deny",
+      "observed": "not-connected:timeout",
+      "evidenceLayer": "network-boundary",
+      "sourceObservationIds": ["aws-path-01"],
+      "recommendation": {
+        "catalogKey": "network.boundary-inconclusive",
+        "priority": "urgent",
+        "controlLayers": ["provider-path-analysis", "iac", "vpc-security-group"],
+        "verification": "Repeat the external source-perspective check and correlate the exact tuple with provider path-analysis evidence."
+      }
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "findings": 0,
+    "unknownCount": 1,
+    "errors": 0
+  },
+  "boundary": "Authorized bounded readiness evidence only; not an audit, attestation, certification, or legal conclusion."
+}
