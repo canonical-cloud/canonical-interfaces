@@ -2,6 +2,8 @@
   "specVersion": "canonical.worker.reachability-probe-result.v1",
   "planSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "perspectiveId": "external-runner",
+  "runnerIdentitySha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "observedAt": "2026-09-18T19:15:00Z",
   "results": [
     {
       "targetId": "prod-db-5432",
