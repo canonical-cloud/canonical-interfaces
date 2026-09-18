@@ -57,9 +57,11 @@
         "specVersion": {"type": "string", "const": "canonical.worker.reachability-probe-result.v1"},
         "planSha256": {"type": "string"},
         "perspectiveId": {"type": "string"},
+        "runnerIdentitySha256": {"type": "string"},
+        "observedAt": {"type": "string"},
         "results": {"type": "array", "items": {"$ref": "ReachabilityProbeResult"}}
       },
-      "required": ["specVersion", "planSha256", "perspectiveId", "results"],
+      "required": ["specVersion", "planSha256", "perspectiveId", "runnerIdentitySha256", "observedAt", "results"],
       "unevaluatedProperties": false
     }
   }
