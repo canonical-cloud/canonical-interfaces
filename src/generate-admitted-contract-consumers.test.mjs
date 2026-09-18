@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { generateFromAdmittedProjections } from "./generate-admitted-contract-consumers.mjs";
+import {
+  generateFromAdmittedProjections,
+  normalizeProjectionForGenerator,
+} from "./generate-admitted-contract-consumers.mjs";
 
 const digest = (char) => char.repeat(64);
 
@@ -28,6 +31,42 @@ function projection(name, runId = "run-1") {
           wireName: { type: "string" },
         },
         required: ["wireName"],
+        unevaluatedProperties: false,
+      },
+    },
+  };
+}
+
+function enumProjection() {
+  return {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "canonical.admitted-contract-projection.v1.schema.json",
+    "x-canonical-generated": true,
+    "x-canonical-source": {
+      kind: "admitted-contract-ir",
+      runId: "run-enum",
+      receiptDigest: digest("c"),
+      declarations: [
+        { id: "decl:Mode", name: "Mode", assertionDigest: digest("d") },
+        { id: "decl:Probe", name: "Probe", assertionDigest: digest("e") },
+      ],
+    },
+    $defs: {
+      Mode: {
+        $schema: "https://json-schema.org/draft/2020-12/schema",
+        $id: "Mode",
+        type: "string",
+        enum: ["allow", "deny"],
+      },
+      Probe: {
+        $schema: "https://json-schema.org/draft/2020-12/schema",
+        $id: "Probe",
+        type: "object",
+        properties: {
+          mode: { $ref: "Mode" },
+          specVersion: { type: "string", const: "example.v1" },
+        },
+        required: ["mode", "specVersion"],
         unevaluatedProperties: false,
       },
     },
@@ -65,7 +104,36 @@ test("generates existing language adapters without mutating an authority", () =>
   assert.match(ts, /export type AlphaEvidence/);
   assert.match(ts, /wireName: string/);
   assert.equal(provenance.projections[0].admissionRunId, "run-alpha");
+  assert.match(provenance.projections[0].admittedProjectionSha256, /^[0-9a-f]{64}$/);
+  assert.match(provenance.projections[0].codegenProjectionSha256, /^[0-9a-f]{64}$/);
   assert.equal(provenance.editableAuthority, false);
+}));
+
+test("lowers named string enum refs and string consts without changing the admitted projection", () => {
+  const admitted = enumProjection();
+  const before = JSON.stringify(admitted);
+  const normalized = normalizeProjectionForGenerator(admitted);
+
+  assert.equal(JSON.stringify(admitted), before);
+  assert.equal(normalized.$defs.Mode, undefined);
+  assert.deepEqual(normalized.$defs.Probe.properties.mode, { type: "string", enum: ["allow", "deny"] });
+  assert.deepEqual(normalized.$defs.Probe.properties.specVersion, { type: "string", enum: ["example.v1"] });
+  assert.deepEqual(normalized["x-canonical-codegen-normalization"].namedStringEnumDeclarationsLowered, ["Mode"]);
+});
+
+test("named enums become real wire enums rather than empty structs", () => withScratch((dir) => {
+  const file = writeProjection(dir, "enum.json", enumProjection());
+  const output = path.join(dir, "generated");
+  generateFromAdmittedProjections([{ family: "enum-contract", file }], output);
+
+  const rust = readFileSync(path.join(output, "rust/src/lib.rs"), "utf8");
+  const ts = readFileSync(path.join(output, "typescript/index.ts"), "utf8");
+  assert.match(rust, /pub enum ProbeMode/);
+  assert.match(rust, /#\[serde\(rename = "allow"\)\]/);
+  assert.doesNotMatch(rust, /pub struct Mode/);
+  assert.match(rust, /pub enum ProbeSpecVersion/);
+  assert.match(ts, /mode: "allow" \| "deny"/);
+  assert.match(ts, /specVersion: "example.v1"/);
 }));
 
 test("generation is deterministic regardless of projection argument order", () => withScratch((dir) => {
