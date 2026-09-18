@@ -7,6 +7,7 @@ on:
       - "contracts/reachability-probe/v1/**"
       - "src/project-admitted-contract-ir.mjs"
       - "src/generate-admitted-contract-consumers.mjs"
+      - "src/generate-admitted-contract-consumers.test.mjs"
       - "src/generate.mjs"
       - ".github/workflows/admitted-contract-consumers.yml"
   push:
@@ -16,6 +17,7 @@ on:
       - "contracts/reachability-probe/v1/**"
       - "src/project-admitted-contract-ir.mjs"
       - "src/generate-admitted-contract-consumers.mjs"
+      - "src/generate-admitted-contract-consumers.test.mjs"
       - "src/generate.mjs"
       - ".github/workflows/admitted-contract-consumers.yml"
   workflow_dispatch:
@@ -100,7 +102,7 @@ jobs:
           cargo fmt --manifest-path target/admitted-contract-consumers/rust/Cargo.toml -- --check
           cargo check --manifest-path target/admitted-contract-consumers/rust/Cargo.toml
 
-      - name: Verify generated wire names and provenance
+      - name: Verify generated wire semantics and provenance
         shell: bash
         run: |
           set -euo pipefail
@@ -112,16 +114,26 @@ jobs:
           const ts = readFileSync("target/admitted-contract-consumers/typescript/index.ts", "utf8");
           const provenance = JSON.parse(readFileSync("target/admitted-contract-consumers/contract-provenance.json", "utf8"));
 
-          for (const name of ["AdversarialReadinessEvidence", "ReachabilityProbePlan", "ReachabilityProbeResultSet"]) {
+          for (const name of ["AdversarialEvidenceReport", "ReachabilityProbePlan", "ReachabilityProbeResultSet"]) {
             assert.ok(rust.includes(`pub struct ${name}`), `Rust projection missing ${name}`);
             assert.ok(ts.includes(`export type ${name}`), `TypeScript projection missing ${name}`);
           }
+          assert.ok(rust.includes("pub enum ReachabilityProbeResultObservation"));
+          assert.ok(rust.includes("pub enum ReachabilityProbePlanSpecVersion"));
+          assert.ok(!rust.includes("pub struct ReachabilityObservation"));
+          assert.ok(ts.includes('observation: "connected" | "refused" | "timed_out" | "unreachable" | "unresolved"'));
+          assert.ok(ts.includes('specVersion: "canonical.worker.reachability-probe.v1"'));
           assert.ok(ts.includes("authorizationRefSha256"));
           assert.ok(ts.includes("runnerIdentitySha256"));
           assert.ok(!ts.includes("authorization_ref_sha256"));
           assert.equal(provenance.schema, "canonical.generated-contract-consumers.provenance.v1");
           assert.equal(provenance.editableAuthority, false);
+          assert.equal(provenance.generator.normalization, "canonical.codegen-projection.normalization.v1");
           assert.deepEqual(provenance.projections.map((entry) => entry.family), ["adversarial-readiness", "reachability-probe"]);
+          for (const projection of provenance.projections) {
+            assert.match(projection.admittedProjectionSha256, /^[0-9a-f]{64}$/);
+            assert.match(projection.codegenProjectionSha256, /^[0-9a-f]{64}$/);
+          }
           NODE
 
       - name: Retain admission and generated consumer evidence
