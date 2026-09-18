@@ -1,0 +1,21 @@
+{
+  "specVersion": "canonical.worker.reachability-probe.v1",
+  "authorizationRefSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "planSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "perspectiveId": "external-runner",
+  "trustZone": "external",
+  "timeoutSeconds": 5,
+  "concurrency": 4,
+  "targets": [
+    {
+      "targetId": "prod-db-5432",
+      "host": "db.example.internal",
+      "port": 5432
+    },
+    {
+      "targetId": "public-bastion-22",
+      "host": "203.0.113.10",
+      "port": 22
+    }
+  ]
+}
