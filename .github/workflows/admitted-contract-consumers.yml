@@ -1,0 +1,137 @@
+name: Admitted contract consumer generation
+
+on:
+  pull_request:
+    paths:
+      - "contracts/adversarial-readiness/v1/**"
+      - "contracts/reachability-probe/v1/**"
+      - "src/project-admitted-contract-ir.mjs"
+      - "src/generate-admitted-contract-consumers.mjs"
+      - "src/generate.mjs"
+      - ".github/workflows/admitted-contract-consumers.yml"
+  push:
+    branches: [main, dev]
+    paths:
+      - "contracts/adversarial-readiness/v1/**"
+      - "contracts/reachability-probe/v1/**"
+      - "src/project-admitted-contract-ir.mjs"
+      - "src/generate-admitted-contract-consumers.mjs"
+      - "src/generate.mjs"
+      - ".github/workflows/admitted-contract-consumers.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admitted-contract-consumers-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify checked-out revision
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: Admit adversarial readiness contract
+        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        with:
+          typespec: contracts/adversarial-readiness/v1/main.tsp
+          schema: contracts/adversarial-readiness/v1/authored.schema.json
+          instances: contracts/adversarial-readiness/v1/instances
+          report: target/admission/adversarial/report.json
+          sarif: target/admission/adversarial/report.sarif
+          contract_ir: target/admission/adversarial/contract-ir.json
+          output_dir: target/admission/adversarial/generated-witness
+          int64_strategy: number
+          max_probes: "256"
+
+      - name: Admit reachability probe contract
+        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        with:
+          typespec: contracts/reachability-probe/v1/main.tsp
+          schema: contracts/reachability-probe/v1/authored.schema.json
+          instances: contracts/reachability-probe/v1/instances
+          report: target/admission/reachability/report.json
+          sarif: target/admission/reachability/report.sarif
+          contract_ir: target/admission/reachability/contract-ir.json
+          output_dir: target/admission/reachability/generated-witness
+          int64_strategy: number
+          max_probes: "128"
+
+      - name: Project admitted common surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          node src/project-admitted-contract-ir.mjs \
+            --input target/admission/adversarial/contract-ir.json \
+            --output target/admission/adversarial/admitted.schema.json
+          node src/project-admitted-contract-ir.mjs \
+            --input target/admission/reachability/contract-ir.json \
+            --output target/admission/reachability/admitted.schema.json
+
+      - name: Generate language consumers from admitted projections
+        shell: bash
+        run: |
+          set -euo pipefail
+          node src/generate-admitted-contract-consumers.mjs \
+            --projection adversarial-readiness=target/admission/adversarial/admitted.schema.json \
+            --projection reachability-probe=target/admission/reachability/admitted.schema.json \
+            --output target/admitted-contract-consumers
+          node src/generate-admitted-contract-consumers.mjs \
+            --projection reachability-probe=target/admission/reachability/admitted.schema.json \
+            --projection adversarial-readiness=target/admission/adversarial/admitted.schema.json \
+            --check target/admitted-contract-consumers
+
+      - name: Verify generated Rust consumer compiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo fmt --manifest-path target/admitted-contract-consumers/rust/Cargo.toml -- --check
+          cargo check --manifest-path target/admitted-contract-consumers/rust/Cargo.toml
+
+      - name: Verify generated wire names and provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+
+          const rust = readFileSync("target/admitted-contract-consumers/rust/src/lib.rs", "utf8");
+          const ts = readFileSync("target/admitted-contract-consumers/typescript/index.ts", "utf8");
+          const provenance = JSON.parse(readFileSync("target/admitted-contract-consumers/contract-provenance.json", "utf8"));
+
+          for (const name of ["AdversarialReadinessEvidence", "ReachabilityProbePlan", "ReachabilityProbeResultSet"]) {
+            assert.ok(rust.includes(`pub struct ${name}`), `Rust projection missing ${name}`);
+            assert.ok(ts.includes(`export type ${name}`), `TypeScript projection missing ${name}`);
+          }
+          assert.ok(ts.includes("authorizationRefSha256"));
+          assert.ok(ts.includes("runnerIdentitySha256"));
+          assert.ok(!ts.includes("authorization_ref_sha256"));
+          assert.equal(provenance.schema, "canonical.generated-contract-consumers.provenance.v1");
+          assert.equal(provenance.editableAuthority, false);
+          assert.deepEqual(provenance.projections.map((entry) => entry.family), ["adversarial-readiness", "reachability-probe"]);
+          NODE
+
+      - name: Retain admission and generated consumer evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: admitted-contract-consumers-${{ github.run_id }}
+          path: |
+            target/admission/
+            target/admitted-contract-consumers/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
