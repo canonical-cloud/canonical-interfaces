@@ -78,7 +78,7 @@ jobs:
             --mode build \
             > .typespec-json-schema-validator/customer-1-demo.config-instance.json
       - name: Compare independently authored canonical audit config authorities
-        uses: ORESoftware/typespec-json-schema-validator@e22ea206d86ebc5141127f404f2870c162a3fad0
+        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
         with:
           typespec: contracts/canonical-audit-config/v1/main.tsp
           schema: contracts/canonical-audit-config/v1/authored.schema.json
