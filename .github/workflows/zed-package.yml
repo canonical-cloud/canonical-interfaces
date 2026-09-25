@@ -16,4 +16,4 @@ permissions:
 
 jobs:
   certify:
-    uses: zed-pkg/zed-interfaces/.github/workflows/certify-zed-package.yml@6e8f65d786330ade0cdc89f9877bba42c9e8f21a
+    uses: zed-pkg/zed-interfaces/.github/workflows/certify-zed-package.yml@996fc56e20c4bb41366377be14edfae886b84e82
