@@ -104,6 +104,7 @@
       "anyOf": [
         { "type": "string", "const": "passed" },
         { "type": "string", "const": "failed" },
+        { "type": "string", "const": "stale" },
         { "type": "string", "const": "indeterminate" }
       ]
     },
@@ -129,7 +130,8 @@
         { "type": "string", "const": "avoid" },
         { "type": "string", "const": "accept" },
         { "type": "string", "const": "mitigate" },
-        { "type": "string", "const": "transfer" }
+        { "type": "string", "const": "transfer" },
+        { "type": "string", "const": "monitor" }
       ]
     },
     "DecideRiskTreatment": {
@@ -172,10 +174,11 @@
     },
     "AccessDecision": {
       "anyOf": [
-        { "type": "string", "const": "keep" },
+        { "type": "string", "const": "approve" },
         { "type": "string", "const": "modify" },
         { "type": "string", "const": "revoke" },
-        { "type": "string", "const": "investigate" }
+        { "type": "string", "const": "investigate" },
+        { "type": "string", "const": "not_applicable" }
       ]
     },
     "DecideAccessReviewItem": {
@@ -212,10 +215,11 @@
       "required": ["tenant_id", "questionnaire_id", "question_id", "answer", "sources", "approval"],
       "unevaluatedProperties": false
     },
-    "TrustVisibility": {
+    "TrustResourceAccessLevel": {
       "anyOf": [
         { "type": "string", "const": "public" },
-        { "type": "string", "const": "gated" }
+        { "type": "string", "const": "request_access" },
+        { "type": "string", "const": "approved_only" }
       ]
     },
     "PublishTrustCenterResource": {
@@ -224,16 +228,17 @@
         "tenant_id": { "type": "string" },
         "trust_center_id": { "type": "string" },
         "resource_id": { "type": "string" },
-        "visibility": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/TrustVisibility" },
+        "access_level": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/TrustResourceAccessLevel" },
         "nda_required": { "type": "boolean" },
         "expires_at": { "type": "string" },
         "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
       },
-      "required": ["tenant_id", "trust_center_id", "resource_id", "visibility", "nda_required", "approval"],
+      "required": ["tenant_id", "trust_center_id", "resource_id", "access_level", "nda_required", "approval"],
       "unevaluatedProperties": false
     },
     "AiRiskTier": {
       "anyOf": [
+        { "type": "string", "const": "unclassified" },
         { "type": "string", "const": "low" },
         { "type": "string", "const": "moderate" },
         { "type": "string", "const": "high" },
