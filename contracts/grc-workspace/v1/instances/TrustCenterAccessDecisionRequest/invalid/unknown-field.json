@@ -1,0 +1,8 @@
+{
+  "specVersion": "canonical.grc.trust-access-decision.v1",
+  "requestId": "50000000-0000-4000-8000-000000000002",
+  "accessRequestUuid": "51000000-0000-4000-8000-000000000002",
+  "approved": false,
+  "resourceUuids": [],
+  "tenantUuid": "this-must-not-be-client-controlled"
+}
