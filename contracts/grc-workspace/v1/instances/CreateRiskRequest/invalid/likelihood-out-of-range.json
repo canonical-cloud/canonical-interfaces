@@ -1,0 +1,8 @@
+{
+  "specVersion": "canonical.grc.create-risk.v1",
+  "requestId": "40000000-0000-4000-8000-000000000001",
+  "title": "Invalid scored risk",
+  "category": "identity",
+  "likelihood": 6,
+  "impact": 5
+}
