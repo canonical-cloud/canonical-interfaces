@@ -1,0 +1,1221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.grc-workspace.v1.authored.schema.json",
+  "$defs": {
+    "ProgramStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ProgramStatus",
+      "type": "string",
+      "enum": [
+        "planned",
+        "active",
+        "paused",
+        "complete",
+        "cancelled"
+      ]
+    },
+    "ControlImplementationStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ControlImplementationStatus",
+      "type": "string",
+      "enum": [
+        "planned",
+        "implemented",
+        "partially_implemented",
+        "not_applicable"
+      ]
+    },
+    "ControlTestState": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ControlTestState",
+      "type": "string",
+      "enum": [
+        "queued",
+        "running",
+        "passed",
+        "failed",
+        "error",
+        "cancelled"
+      ]
+    },
+    "RiskStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "RiskStatus",
+      "type": "string",
+      "enum": [
+        "open",
+        "monitoring",
+        "treating",
+        "accepted",
+        "closed"
+      ]
+    },
+    "Criticality": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "Criticality",
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "PolicyStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "PolicyStatus",
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "published",
+        "retired"
+      ]
+    },
+    "VendorStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "VendorStatus",
+      "type": "string",
+      "enum": [
+        "proposed",
+        "active",
+        "monitoring",
+        "offboarding",
+        "offboarded",
+        "rejected"
+      ]
+    },
+    "QuestionnaireStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "QuestionnaireStatus",
+      "type": "string",
+      "enum": [
+        "draft",
+        "open",
+        "in_progress",
+        "review",
+        "completed",
+        "expired",
+        "cancelled"
+      ]
+    },
+    "AuditEvidenceRequestStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditEvidenceRequestStatus",
+      "type": "string",
+      "enum": [
+        "open",
+        "in_progress",
+        "ready",
+        "submitted",
+        "accepted",
+        "rejected",
+        "closed"
+      ]
+    },
+    "TrustCenterStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrustCenterStatus",
+      "type": "string",
+      "enum": [
+        "private",
+        "published",
+        "paused"
+      ]
+    },
+    "AiSystemStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AiSystemStatus",
+      "type": "string",
+      "enum": [
+        "evaluation",
+        "approved",
+        "restricted",
+        "retired"
+      ]
+    },
+    "TrainingStatus": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrainingStatus",
+      "type": "string",
+      "enum": [
+        "assigned",
+        "in_progress",
+        "completed",
+        "overdue",
+        "waived"
+      ]
+    },
+    "ControlCounts": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ControlCounts",
+      "type": "object",
+      "properties": {
+        "implemented": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "partiallyImplemented": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "planned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notApplicable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failingTests": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "implemented",
+        "partiallyImplemented",
+        "planned",
+        "notApplicable",
+        "failingTests"
+      ],
+      "unevaluatedProperties": false
+    },
+    "GrcDashboardSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "GrcDashboardSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.dashboard-summary.v1"
+        },
+        "tenantUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "activeProgramCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "controls": {
+          "$ref": "ControlCounts"
+        },
+        "openRiskCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "criticalVendorCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pendingQuestionnaireCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "openAuditRequestCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expiringEvidenceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trainingOverdueCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "calculatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "tenantUuid",
+        "activeProgramCount",
+        "controls",
+        "openRiskCount",
+        "criticalVendorCount",
+        "pendingQuestionnaireCount",
+        "openAuditRequestCount",
+        "expiringEvidenceCount",
+        "trainingOverdueCount",
+        "calculatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "ComplianceProgramSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ComplianceProgramSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.compliance-program-summary.v1"
+        },
+        "programUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "ProgramStatus"
+        },
+        "frameworkReleaseIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customFrameworkIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scopeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "programUuid",
+        "name",
+        "status",
+        "frameworkReleaseIds",
+        "customFrameworkIds",
+        "scopeIds",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "ControlSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ControlSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.control-summary.v1"
+        },
+        "controlImplementationUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "controlKey": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "ControlImplementationStatus"
+        },
+        "frameworkControlIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scopeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "latestTestState": {
+          "$ref": "ControlTestState"
+        },
+        "lastReviewedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextReviewDueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "controlImplementationUuid",
+        "controlKey",
+        "title",
+        "category",
+        "status",
+        "frameworkControlIds",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "ControlTestRunSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ControlTestRunSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.control-test-run-summary.v1"
+        },
+        "runUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "controlImplementationUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "testKey": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "ControlTestState"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observationCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failureCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "specVersion",
+        "runUuid",
+        "controlImplementationUuid",
+        "testKey",
+        "state",
+        "observationCount",
+        "failureCount"
+      ],
+      "unevaluatedProperties": false
+    },
+    "EvidenceSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "EvidenceSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.evidence-summary.v1"
+        },
+        "evidenceUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "sourceKind": {
+          "type": "string"
+        },
+        "sourceLocator": {
+          "type": "string"
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "collectedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reviewState": {
+          "type": "string"
+        },
+        "controlIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "provenanceEventCount": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "specVersion",
+        "evidenceUuid",
+        "kind",
+        "contentSha256",
+        "collectedAt",
+        "reviewState",
+        "controlIds",
+        "provenanceEventCount"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AssetSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AssetSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.asset-summary.v1"
+        },
+        "assetUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "assetKind": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "criticality": {
+          "$ref": "Criticality"
+        },
+        "dataClassification": {
+          "type": "string"
+        },
+        "lifecycleState": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "assetUuid",
+        "assetKind",
+        "name",
+        "criticality",
+        "dataClassification",
+        "lifecycleState",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "RiskSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "RiskSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.risk-summary.v1"
+        },
+        "riskUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scopeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "likelihood": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "inherentScore": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 25
+        },
+        "residualScore": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 25
+        },
+        "status": {
+          "$ref": "RiskStatus"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "treatmentCount": {
+          "type": "integer"
+        },
+        "linkedControlIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reviewDueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "riskUuid",
+        "title",
+        "category",
+        "likelihood",
+        "impact",
+        "inherentScore",
+        "status",
+        "treatmentCount",
+        "linkedControlIds",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "PolicySummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "PolicySummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.policy-summary.v1"
+        },
+        "policyUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "policyKey": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "PolicyStatus"
+        },
+        "currentVersion": {
+          "type": "integer"
+        },
+        "currentContentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "nextReviewDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "acknowledgementCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "policyUuid",
+        "policyKey",
+        "title",
+        "status",
+        "acknowledgementCount",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "VendorSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "VendorSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.vendor-summary.v1"
+        },
+        "vendorUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "criticality": {
+          "$ref": "Criticality"
+        },
+        "status": {
+          "$ref": "VendorStatus"
+        },
+        "latestRiskScoreBasisPoints": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "vendorUuid",
+        "name",
+        "criticality",
+        "status",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "QuestionnaireSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "QuestionnaireSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.questionnaire-summary.v1"
+        },
+        "questionnaireUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "counterpartyType": {
+          "type": "string"
+        },
+        "counterpartyRef": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "QuestionnaireStatus"
+        },
+        "questionCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "answeredCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "questionnaireUuid",
+        "direction",
+        "counterpartyType",
+        "status",
+        "questionCount",
+        "answeredCount",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AuditEvidenceRequestSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AuditEvidenceRequestSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.audit-evidence-request-summary.v1"
+        },
+        "requestUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "engagementUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requestKey": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "AuditEvidenceRequestStatus"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "controlIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "submittedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestUuid",
+        "engagementUuid",
+        "title",
+        "status",
+        "controlIds",
+        "evidenceIds",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "TrustCenterSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrustCenterSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.trust-center-summary.v1"
+        },
+        "trustCenterUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "TrustCenterStatus"
+        },
+        "publicResourceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gatedResourceCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pendingAccessRequestCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "trustCenterUuid",
+        "slug",
+        "title",
+        "status",
+        "publicResourceCount",
+        "gatedResourceCount",
+        "pendingAccessRequestCount",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AiSystemSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AiSystemSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.ai-system-summary.v1"
+        },
+        "aiSystemUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "assetUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "modelName": {
+          "type": "string"
+        },
+        "modelVersion": {
+          "type": "string"
+        },
+        "deploymentMode": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "riskTier": {
+          "$ref": "Criticality"
+        },
+        "humanOversight": {
+          "type": "boolean"
+        },
+        "status": {
+          "$ref": "AiSystemStatus"
+        },
+        "useCaseCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "aiSystemUuid",
+        "assetUuid",
+        "deploymentMode",
+        "purpose",
+        "riskTier",
+        "humanOversight",
+        "status",
+        "useCaseCount",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "TrainingAssignmentSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrainingAssignmentSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.training-assignment-summary.v1"
+        },
+        "assignmentUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "courseUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "userUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "courseTitle": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "TrainingStatus"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "assignmentUuid",
+        "courseUuid",
+        "userUuid",
+        "courseTitle",
+        "status"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateRiskRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateRiskRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-risk.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scopeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "likelihood": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "ownerId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "title",
+        "category",
+        "likelihood",
+        "impact"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateVendorRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateVendorRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-vendor.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "domain": {
+          "type": "string",
+          "maxLength": 253
+        },
+        "category": {
+          "type": "string"
+        },
+        "criticality": {
+          "$ref": "Criticality"
+        },
+        "ownerId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "name",
+        "criticality"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateQuestionnaireRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateQuestionnaireRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-questionnaire.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "templateUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "direction": {
+          "type": "string"
+        },
+        "counterpartyType": {
+          "type": "string"
+        },
+        "counterpartyRef": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "templateUuid",
+        "direction",
+        "counterpartyType"
+      ],
+      "unevaluatedProperties": false
+    },
+    "PolicyVersionCreateRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "PolicyVersionCreateRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-policy-version.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "policyUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "contentSha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "contentMarkdown": {
+          "type": "string"
+        },
+        "documentVersionUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "changeSummary": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "policyUuid",
+        "contentSha256"
+      ],
+      "unevaluatedProperties": false
+    },
+    "TrustCenterAccessDecisionRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrustCenterAccessDecisionRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.trust-access-decision.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "accessRequestUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "approved": {
+          "type": "boolean"
+        },
+        "resourceUuids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "accessRequestUuid",
+        "approved",
+        "resourceUuids"
+      ],
+      "unevaluatedProperties": false
+    }
+  }
+}
