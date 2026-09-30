@@ -130,6 +130,25 @@ established snake_case wire/storage naming where already part of the contract.
 Do not mechanically camelCase or regenerate one authority from another merely
 for stylistic uniformity.
 
+## GRC workspace contracts
+
+`canonical.grc-workspace.v1` is the portable customer/API projection for the
+broader compliance workspace used by app.canonical.plus, web.canonical.plus,
+api.canonical.plus, SDKs, Flutter, and MCP. It covers dashboard/program/control
+status, continuous-test summaries, evidence, assets, risk, policy lifecycle,
+vendors, questionnaires, auditor evidence requests, trust-center workflows,
+AI governance, and training.
+
+The GRC wire contract intentionally does not mirror private PostgreSQL tables
+one-for-one. Private persistence authority stays in `canonical-lib-core` and
+`canonical-orm-core`; the interface layer admits only bounded portable
+projections and idempotent mutation inputs. Tenant identity is derived from
+verified authorization context and is never accepted as a mutable request
+field.
+
+Like the readiness family, the GRC workspace uses independently authored
+TypeSpec and Draft 2020-12 JSON Schema peers with TJSV fail-closed admission.
+
 ## Readiness contracts
 
 The readiness contract family is being converged onto admitted peer authorities
