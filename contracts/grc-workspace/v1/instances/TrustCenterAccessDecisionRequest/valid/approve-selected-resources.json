@@ -1,0 +1,10 @@
+{
+  "specVersion": "canonical.grc.trust-access-decision.v1",
+  "requestId": "50000000-0000-4000-8000-000000000001",
+  "accessRequestUuid": "51000000-0000-4000-8000-000000000001",
+  "approved": true,
+  "resourceUuids": [
+    "52000000-0000-4000-8000-000000000001"
+  ],
+  "expiresAt": "2026-10-29T23:00:00Z"
+}
