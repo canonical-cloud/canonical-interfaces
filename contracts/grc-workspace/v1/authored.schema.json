@@ -1216,6 +1216,558 @@
         "resourceUuids"
       ],
       "unevaluatedProperties": false
+    },
+    "CustomFrameworkSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CustomFrameworkSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.custom-framework-summary.v1"
+        },
+        "customFrameworkUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "controlCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "customFrameworkUuid",
+        "name",
+        "version",
+        "controlCount",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "VendorAssessmentSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "VendorAssessmentSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.vendor-assessment-summary.v1"
+        },
+        "assessmentUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "vendorUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "questionnaireUuid": {
+          "type": "string"
+        },
+        "frameworkReleaseId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "riskScoreBasisPoints": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "nextReviewAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "assessmentUuid",
+        "vendorUuid",
+        "state",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "TrustCenterAccessRequestSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TrustCenterAccessRequestSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.trust-access-request-summary.v1"
+        },
+        "accessRequestUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "requesterEmail": {
+          "type": "string"
+        },
+        "requesterOrganization": {
+          "type": "string"
+        },
+        "requesterDomain": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "requestedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "decidedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "accessRequestUuid",
+        "requesterEmail",
+        "status",
+        "requestedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "AiUseCaseSummary": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "AiUseCaseSummary",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.ai-use-case-summary.v1"
+        },
+        "useCaseUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aiSystemUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scopeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "impactLevel": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "riskIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "useCaseUuid",
+        "aiSystemUuid",
+        "name",
+        "purpose",
+        "impactLevel",
+        "status",
+        "riskIds",
+        "updatedAt"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateComplianceProgramRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateComplianceProgramRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-program.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "frameworkReleaseIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "customFrameworkIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scopeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownerId": {
+          "type": "string"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "name",
+        "frameworkReleaseIds",
+        "customFrameworkIds",
+        "scopeIds"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateCustomFrameworkRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateCustomFrameworkRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-custom-framework.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "name",
+        "version"
+      ],
+      "unevaluatedProperties": false
+    },
+    "TriggerControlTestRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "TriggerControlTestRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.trigger-control-test.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "testKey": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId"
+      ],
+      "unevaluatedProperties": false
+    },
+    "PolicyAcknowledgementRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "PolicyAcknowledgementRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.policy-acknowledgement.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "policyVersionUuid": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "policyVersionUuid"
+      ],
+      "unevaluatedProperties": false
+    },
+    "StartVendorAssessmentRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "StartVendorAssessmentRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.start-vendor-assessment.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "vendorUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "questionnaireUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "frameworkReleaseId": {
+          "type": "string"
+        },
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "vendorUuid"
+      ],
+      "unevaluatedProperties": false
+    },
+    "QuestionnaireAnswerMutation": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "QuestionnaireAnswerMutation",
+      "type": "object",
+      "properties": {
+        "questionUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answerMarkdown": {
+          "type": "string"
+        },
+        "answerJson": {},
+        "evidenceUuids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "questionUuid",
+        "evidenceUuids"
+      ],
+      "unevaluatedProperties": false
+    },
+    "SubmitQuestionnaireAnswersRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "SubmitQuestionnaireAnswersRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.submit-questionnaire-answers.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "questionnaireUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "$ref": "QuestionnaireAnswerMutation"
+          }
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "questionnaireUuid",
+        "answers"
+      ],
+      "unevaluatedProperties": false
+    },
+    "SubmitAuditEvidenceRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "SubmitAuditEvidenceRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.submit-audit-evidence.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "auditEvidenceRequestUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "evidenceUuids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "auditEvidenceRequestUuid",
+        "evidenceUuids"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CreateAiUseCaseRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CreateAiUseCaseRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.create-ai-use-case.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "aiSystemUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scopeId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000
+        },
+        "impactLevel": {
+          "type": "string"
+        },
+        "ownerId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "aiSystemUuid",
+        "name",
+        "purpose",
+        "impactLevel"
+      ],
+      "unevaluatedProperties": false
+    },
+    "CompleteTrainingAssignmentRequest": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "CompleteTrainingAssignmentRequest",
+      "type": "object",
+      "properties": {
+        "specVersion": {
+          "type": "string",
+          "const": "canonical.grc.complete-training.v1"
+        },
+        "requestId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "assignmentUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "evidenceUuid": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "specVersion",
+        "requestId",
+        "assignmentUuid",
+        "completedAt"
+      ],
+      "unevaluatedProperties": false
     }
   }
 }
