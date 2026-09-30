@@ -1,0 +1,20 @@
+{
+  "specVersion": "canonical.grc.risk-summary.v1",
+  "riskUuid": "20000000-0000-4000-8000-000000000001",
+  "scopeId": "21000000-0000-4000-8000-000000000001",
+  "title": "Workforce account takeover",
+  "category": "identity",
+  "likelihood": 3,
+  "impact": 5,
+  "inherentScore": 15,
+  "residualScore": 6,
+  "status": "treating",
+  "ownerId": "22000000-0000-4000-8000-000000000001",
+  "treatmentCount": 2,
+  "linkedControlIds": [
+    "CC6.1",
+    "ISO27001-A.5.17"
+  ],
+  "reviewDueAt": "2026-10-31T23:59:59Z",
+  "updatedAt": "2026-09-29T23:00:00Z"
+}
