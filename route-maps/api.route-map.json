@@ -2,157 +2,1118 @@
   "schema_version": "1.0.0",
   "service": "canonical-api-server",
   "title": "Canonical Cloud API",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Typed route map for github.com/canonical-cloud. Keys compile in Rust/TS/Dart; opto-sync distributes this document (scope ores.api-docs.route-map).",
   "map": {
     "healthz": "/healthz",
     "register_pre_interest": {
       "path": "/v1/pre-interest-registrations",
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "summary": "Public write-only, enumeration-resistant pre-interest registration. No public list, read, update, or delete operation exists.",
       "request_schema": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["requestId", "email", "partyType", "interestAreas", "consentRevision", "consentedAt", "sourceHost", "registrationConsent", "marketingConsent"],
+        "required": [
+          "requestId",
+          "email",
+          "partyType",
+          "interestAreas",
+          "consentRevision",
+          "consentedAt",
+          "sourceHost",
+          "registrationConsent",
+          "marketingConsent"
+        ],
         "properties": {
-          "requestId": { "type": "string", "format": "uuid" },
-          "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 320 },
-          "partyType": { "type": "string", "enum": ["individual", "organization"] },
-          "organizationName": { "type": "string", "minLength": 1, "maxLength": 200 },
-          "interestAreas": { "type": "array", "minItems": 1, "maxItems": 9, "uniqueItems": true, "items": { "type": "string", "enum": ["readiness_assessment", "soc2", "iso_27001", "hipaa", "pci_dss_4", "fedramp", "nist", "gdpr", "cmmc"] } },
-          "consentRevision": { "type": "string", "minLength": 1, "maxLength": 64 },
-          "consentedAt": { "type": "string", "format": "date-time" },
-          "sourceHost": { "type": "string", "enum": ["user.canonical.plus", "org.canonical.plus"] },
-          "locale": { "type": "string", "minLength": 2, "maxLength": 35 },
-          "referralCode": { "type": "string", "minLength": 1, "maxLength": 64 },
-          "displayName": { "type": "string", "minLength": 1, "maxLength": 120 },
-          "websiteUrl": { "type": "string", "format": "uri", "minLength": 9, "maxLength": 2048 },
-          "registrationConsent": { "type": "boolean", "const": true },
-          "marketingConsent": { "type": "boolean" },
-          "marketingConsentRevision": { "type": "string", "minLength": 1, "maxLength": 64 }
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 3,
+            "maxLength": 320
+          },
+          "partyType": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "organization"
+            ]
+          },
+          "organizationName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "interestAreas": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 9,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "readiness_assessment",
+                "soc2",
+                "iso_27001",
+                "hipaa",
+                "pci_dss_4",
+                "fedramp",
+                "nist",
+                "gdpr",
+                "cmmc"
+              ]
+            }
+          },
+          "consentRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sourceHost": {
+            "type": "string",
+            "enum": [
+              "user.canonical.plus",
+              "org.canonical.plus"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 35
+          },
+          "referralCode": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "websiteUrl": {
+            "type": "string",
+            "format": "uri",
+            "minLength": 9,
+            "maxLength": 2048
+          },
+          "registrationConsent": {
+            "type": "boolean",
+            "const": true
+          },
+          "marketingConsent": {
+            "type": "boolean"
+          },
+          "marketingConsentRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
         }
       },
       "response_schema": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["receiptId", "status", "acceptedAt", "nextStepUrl"],
+        "required": [
+          "receiptId",
+          "status",
+          "acceptedAt",
+          "nextStepUrl"
+        ],
         "properties": {
-          "receiptId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string", "enum": ["accepted"] },
-          "acceptedAt": { "type": "string", "format": "date-time" },
-          "nextStepUrl": { "type": "string", "maxLength": 2048 }
+          "receiptId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nextStepUrl": {
+            "type": "string",
+            "maxLength": 2048
+          }
         }
       }
     },
     "list_quotes": {
       "path": "/api/v1/quotes",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "query_schema": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "cursor": { "type": "string", "minLength": 1, "maxLength": 4096 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 100, "default": 25 }
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
         }
       },
       "response_schema": {
         "type": "object",
-        "required": ["quotes"],
+        "required": [
+          "quotes"
+        ],
         "properties": {
-          "quotes": { "type": "array" },
-          "nextCursor": { "type": "string" }
+          "quotes": {
+            "type": "array"
+          },
+          "nextCursor": {
+            "type": "string"
+          }
         }
       }
     },
     "create_quote": {
       "path": "/api/v1/quotes",
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "request_schema": {
         "type": "object",
-        "required": ["organizationName", "contactEmail"],
+        "required": [
+          "organizationName",
+          "contactEmail"
+        ],
         "properties": {
-          "organizationName": { "type": "string", "minLength": 1 },
-          "contactEmail": { "type": "string", "format": "email" }
+          "organizationName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contactEmail": {
+            "type": "string",
+            "format": "email"
+          }
         }
       },
       "response_schema": {
         "type": "object",
-        "required": ["quoteId", "status"],
+        "required": [
+          "quoteId",
+          "status"
+        ],
         "properties": {
-          "quoteId": { "type": "string", "format": "uuid" },
-          "status": { "type": "string" }
+          "quoteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          }
         }
       }
     },
     "get_quote": {
       "path": "/api/v1/quotes/{quoteId}",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "path_params": {
         "type": "object",
-        "required": ["quoteId"],
-        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+        "required": [
+          "quoteId"
+        ],
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       }
     },
     "retry_quote": {
       "path": "/api/v1/quotes/{quoteId}/retry",
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "path_params": {
         "type": "object",
-        "required": ["quoteId"],
-        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+        "required": [
+          "quoteId"
+        ],
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       }
     },
     "quote_events": {
       "path": "/api/v1/quotes/{quoteId}/events",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "path_params": {
         "type": "object",
-        "required": ["quoteId"],
-        "properties": { "quoteId": { "type": "string", "format": "uuid" } }
+        "required": [
+          "quoteId"
+        ],
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       }
     },
     "list_readiness_frameworks": "/api/v1/readiness/frameworks",
     "get_readiness_framework": {
       "path": "/api/v1/readiness/frameworks/{frameworkId}",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "path_params": {
         "type": "object",
-        "required": ["frameworkId"],
-        "properties": { "frameworkId": { "type": "string", "minLength": 1 } }
+        "required": [
+          "frameworkId"
+        ],
+        "properties": {
+          "frameworkId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     },
-    "list_readiness_assessments": { "path": "/api/v1/readiness/assessments", "methods": ["GET"] },
-    "create_readiness_assessment": { "path": "/api/v1/readiness/assessments", "methods": ["POST"] },
+    "list_readiness_assessments": {
+      "path": "/api/v1/readiness/assessments",
+      "methods": [
+        "GET"
+      ]
+    },
+    "create_readiness_assessment": {
+      "path": "/api/v1/readiness/assessments",
+      "methods": [
+        "POST"
+      ]
+    },
     "get_readiness_assessment": {
       "path": "/api/v1/readiness/assessments/{assessmentId}",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "path_params": {
         "type": "object",
-        "required": ["assessmentId"],
-        "properties": { "assessmentId": { "type": "string", "format": "uuid" } }
+        "required": [
+          "assessmentId"
+        ],
+        "properties": {
+          "assessmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       }
     },
     "sync_changes": {
       "path": "/api/v1/sync/changes",
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "summary": "Authoritative opto-sync pull. The route map uses opto-sync; opto-sync does not use this RPC system.",
       "query_schema": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "cursor": { "type": "string", "minLength": 1, "maxLength": 4096 },
-          "limit": { "type": "integer", "minimum": 1, "maximum": 500, "default": 200 }
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 200
+          }
         }
       }
     },
     "sync_mutations": {
       "path": "/api/v1/sync/mutations",
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "summary": "Authoritative opto-sync push.",
       "request_schema": {
         "type": "object",
-        "required": ["operations"],
-        "properties": { "operations": { "type": "array", "minItems": 1, "maxItems": 50 } }
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50
+          }
+        }
+      }
+    },
+    "get_grc_dashboard": {
+      "path": "/api/v1/grc/dashboard",
+      "methods": [
+        "GET"
+      ],
+      "summary": "Tenant-scoped compliance workspace dashboard.",
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.GrcDashboardSummary"
+      }
+    },
+    "list_compliance_programs": {
+      "path": "/api/v1/grc/programs",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ComplianceProgramSummary[]"
+      }
+    },
+    "get_compliance_program": {
+      "path": "/api/v1/grc/programs/{programId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "programId"
+        ],
+        "properties": {
+          "programId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ComplianceProgramSummary"
+      }
+    },
+    "list_grc_controls": {
+      "path": "/api/v1/grc/controls",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ControlSummary[]"
+      }
+    },
+    "get_grc_control": {
+      "path": "/api/v1/grc/controls/{controlId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "controlId"
+        ],
+        "properties": {
+          "controlId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ControlSummary"
+      }
+    },
+    "list_control_test_runs": {
+      "path": "/api/v1/grc/controls/{controlId}/test-runs",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "controlId"
+        ],
+        "properties": {
+          "controlId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ControlTestRunSummary[]"
+      }
+    },
+    "trigger_control_test": {
+      "path": "/api/v1/grc/controls/{controlId}/test-runs",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "controlId"
+        ],
+        "properties": {
+          "controlId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.ControlTestRunSummary"
+      }
+    },
+    "list_grc_evidence": {
+      "path": "/api/v1/grc/evidence",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.EvidenceSummary[]"
+      }
+    },
+    "get_grc_evidence": {
+      "path": "/api/v1/grc/evidence/{evidenceId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evidenceId"
+        ],
+        "properties": {
+          "evidenceId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.EvidenceSummary"
+      }
+    },
+    "list_assets": {
+      "path": "/api/v1/grc/assets",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AssetSummary[]"
+      }
+    },
+    "get_asset": {
+      "path": "/api/v1/grc/assets/{assetId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assetId"
+        ],
+        "properties": {
+          "assetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AssetSummary"
+      }
+    },
+    "list_risks": {
+      "path": "/api/v1/grc/risks",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.RiskSummary[]"
+      }
+    },
+    "create_risk": {
+      "path": "/api/v1/grc/risks",
+      "methods": [
+        "POST"
+      ],
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateRiskRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.RiskSummary"
+      }
+    },
+    "get_risk": {
+      "path": "/api/v1/grc/risks/{riskId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "riskId"
+        ],
+        "properties": {
+          "riskId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.RiskSummary"
+      }
+    },
+    "list_policies": {
+      "path": "/api/v1/grc/policies",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.PolicySummary[]"
+      }
+    },
+    "get_policy": {
+      "path": "/api/v1/grc/policies/{policyId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policyId"
+        ],
+        "properties": {
+          "policyId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.PolicySummary"
+      }
+    },
+    "create_policy_version": {
+      "path": "/api/v1/grc/policies/{policyId}/versions",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policyId"
+        ],
+        "properties": {
+          "policyId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.PolicyVersionCreateRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.PolicySummary"
+      }
+    },
+    "acknowledge_policy": {
+      "path": "/api/v1/grc/policies/{policyId}/acknowledgements",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "policyId"
+        ],
+        "properties": {
+          "policyId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.PolicySummary"
+      }
+    },
+    "list_vendors": {
+      "path": "/api/v1/grc/vendors",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.VendorSummary[]"
+      }
+    },
+    "create_vendor": {
+      "path": "/api/v1/grc/vendors",
+      "methods": [
+        "POST"
+      ],
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateVendorRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.VendorSummary"
+      }
+    },
+    "get_vendor": {
+      "path": "/api/v1/grc/vendors/{vendorId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vendorId"
+        ],
+        "properties": {
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.VendorSummary"
+      }
+    },
+    "list_questionnaires": {
+      "path": "/api/v1/grc/questionnaires",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.QuestionnaireSummary[]"
+      }
+    },
+    "create_questionnaire": {
+      "path": "/api/v1/grc/questionnaires",
+      "methods": [
+        "POST"
+      ],
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateQuestionnaireRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.QuestionnaireSummary"
+      }
+    },
+    "get_questionnaire": {
+      "path": "/api/v1/grc/questionnaires/{questionnaireId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "questionnaireId"
+        ],
+        "properties": {
+          "questionnaireId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.QuestionnaireSummary"
+      }
+    },
+    "list_audit_evidence_requests": {
+      "path": "/api/v1/grc/audit-evidence-requests",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AuditEvidenceRequestSummary[]"
+      }
+    },
+    "get_audit_evidence_request": {
+      "path": "/api/v1/grc/audit-evidence-requests/{requestId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requestId"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AuditEvidenceRequestSummary"
+      }
+    },
+    "get_trust_center": {
+      "path": "/api/v1/grc/trust-center",
+      "methods": [
+        "GET"
+      ],
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.TrustCenterSummary"
+      }
+    },
+    "list_trust_center_access_requests": {
+      "path": "/api/v1/grc/trust-center/access-requests",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.TrustCenterSummary[]"
+      }
+    },
+    "decide_trust_center_access": {
+      "path": "/api/v1/grc/trust-center/access-requests/{accessRequestId}/decision",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accessRequestId"
+        ],
+        "properties": {
+          "accessRequestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.TrustCenterAccessDecisionRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.TrustCenterSummary"
+      }
+    },
+    "list_ai_systems": {
+      "path": "/api/v1/grc/ai-systems",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AiSystemSummary[]"
+      }
+    },
+    "get_ai_system": {
+      "path": "/api/v1/grc/ai-systems/{aiSystemId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "aiSystemId"
+        ],
+        "properties": {
+          "aiSystemId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AiSystemSummary"
+      }
+    },
+    "list_training_assignments": {
+      "path": "/api/v1/grc/training-assignments",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.TrainingAssignmentSummary[]"
+      }
+    },
+    "get_training_assignment": {
+      "path": "/api/v1/grc/training-assignments/{assignmentId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assignmentId"
+        ],
+        "properties": {
+          "assignmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.TrainingAssignmentSummary"
       }
     }
   }
