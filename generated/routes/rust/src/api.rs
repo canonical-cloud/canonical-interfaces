@@ -20,10 +20,43 @@ pub enum RouteKey {
     GetReadinessAssessment,
     SyncChanges,
     SyncMutations,
+    GetGrcDashboard,
+    ListCompliancePrograms,
+    GetComplianceProgram,
+    ListGrcControls,
+    GetGrcControl,
+    ListControlTestRuns,
+    TriggerControlTest,
+    ListGrcEvidence,
+    GetGrcEvidence,
+    ListAssets,
+    GetAsset,
+    ListRisks,
+    CreateRisk,
+    GetRisk,
+    ListPolicies,
+    GetPolicy,
+    CreatePolicyVersion,
+    AcknowledgePolicy,
+    ListVendors,
+    CreateVendor,
+    GetVendor,
+    ListQuestionnaires,
+    CreateQuestionnaire,
+    GetQuestionnaire,
+    ListAuditEvidenceRequests,
+    GetAuditEvidenceRequest,
+    GetTrustCenter,
+    ListTrustCenterAccessRequests,
+    DecideTrustCenterAccess,
+    ListAiSystems,
+    GetAiSystem,
+    ListTrainingAssignments,
+    GetTrainingAssignment,
 }
 
 impl RouteKey {
-    pub const ALL: &'static [Self] = &[Self::Healthz, Self::RegisterPreInterest, Self::ListQuotes, Self::CreateQuote, Self::GetQuote, Self::RetryQuote, Self::QuoteEvents, Self::ListReadinessFrameworks, Self::GetReadinessFramework, Self::ListReadinessAssessments, Self::CreateReadinessAssessment, Self::GetReadinessAssessment, Self::SyncChanges, Self::SyncMutations];
+    pub const ALL: &'static [Self] = &[Self::Healthz, Self::RegisterPreInterest, Self::ListQuotes, Self::CreateQuote, Self::GetQuote, Self::RetryQuote, Self::QuoteEvents, Self::ListReadinessFrameworks, Self::GetReadinessFramework, Self::ListReadinessAssessments, Self::CreateReadinessAssessment, Self::GetReadinessAssessment, Self::SyncChanges, Self::SyncMutations, Self::GetGrcDashboard, Self::ListCompliancePrograms, Self::GetComplianceProgram, Self::ListGrcControls, Self::GetGrcControl, Self::ListControlTestRuns, Self::TriggerControlTest, Self::ListGrcEvidence, Self::GetGrcEvidence, Self::ListAssets, Self::GetAsset, Self::ListRisks, Self::CreateRisk, Self::GetRisk, Self::ListPolicies, Self::GetPolicy, Self::CreatePolicyVersion, Self::AcknowledgePolicy, Self::ListVendors, Self::CreateVendor, Self::GetVendor, Self::ListQuestionnaires, Self::CreateQuestionnaire, Self::GetQuestionnaire, Self::ListAuditEvidenceRequests, Self::GetAuditEvidenceRequest, Self::GetTrustCenter, Self::ListTrustCenterAccessRequests, Self::DecideTrustCenterAccess, Self::ListAiSystems, Self::GetAiSystem, Self::ListTrainingAssignments, Self::GetTrainingAssignment];
 
     #[must_use]
     pub fn as_str(self) -> &'static str {
@@ -42,6 +75,39 @@ impl RouteKey {
             Self::GetReadinessAssessment => "get_readiness_assessment",
             Self::SyncChanges => "sync_changes",
             Self::SyncMutations => "sync_mutations",
+            Self::GetGrcDashboard => "get_grc_dashboard",
+            Self::ListCompliancePrograms => "list_compliance_programs",
+            Self::GetComplianceProgram => "get_compliance_program",
+            Self::ListGrcControls => "list_grc_controls",
+            Self::GetGrcControl => "get_grc_control",
+            Self::ListControlTestRuns => "list_control_test_runs",
+            Self::TriggerControlTest => "trigger_control_test",
+            Self::ListGrcEvidence => "list_grc_evidence",
+            Self::GetGrcEvidence => "get_grc_evidence",
+            Self::ListAssets => "list_assets",
+            Self::GetAsset => "get_asset",
+            Self::ListRisks => "list_risks",
+            Self::CreateRisk => "create_risk",
+            Self::GetRisk => "get_risk",
+            Self::ListPolicies => "list_policies",
+            Self::GetPolicy => "get_policy",
+            Self::CreatePolicyVersion => "create_policy_version",
+            Self::AcknowledgePolicy => "acknowledge_policy",
+            Self::ListVendors => "list_vendors",
+            Self::CreateVendor => "create_vendor",
+            Self::GetVendor => "get_vendor",
+            Self::ListQuestionnaires => "list_questionnaires",
+            Self::CreateQuestionnaire => "create_questionnaire",
+            Self::GetQuestionnaire => "get_questionnaire",
+            Self::ListAuditEvidenceRequests => "list_audit_evidence_requests",
+            Self::GetAuditEvidenceRequest => "get_audit_evidence_request",
+            Self::GetTrustCenter => "get_trust_center",
+            Self::ListTrustCenterAccessRequests => "list_trust_center_access_requests",
+            Self::DecideTrustCenterAccess => "decide_trust_center_access",
+            Self::ListAiSystems => "list_ai_systems",
+            Self::GetAiSystem => "get_ai_system",
+            Self::ListTrainingAssignments => "list_training_assignments",
+            Self::GetTrainingAssignment => "get_training_assignment",
         }
     }
 
@@ -62,6 +128,39 @@ impl RouteKey {
             "get_readiness_assessment" => Some(Self::GetReadinessAssessment),
             "sync_changes" => Some(Self::SyncChanges),
             "sync_mutations" => Some(Self::SyncMutations),
+            "get_grc_dashboard" => Some(Self::GetGrcDashboard),
+            "list_compliance_programs" => Some(Self::ListCompliancePrograms),
+            "get_compliance_program" => Some(Self::GetComplianceProgram),
+            "list_grc_controls" => Some(Self::ListGrcControls),
+            "get_grc_control" => Some(Self::GetGrcControl),
+            "list_control_test_runs" => Some(Self::ListControlTestRuns),
+            "trigger_control_test" => Some(Self::TriggerControlTest),
+            "list_grc_evidence" => Some(Self::ListGrcEvidence),
+            "get_grc_evidence" => Some(Self::GetGrcEvidence),
+            "list_assets" => Some(Self::ListAssets),
+            "get_asset" => Some(Self::GetAsset),
+            "list_risks" => Some(Self::ListRisks),
+            "create_risk" => Some(Self::CreateRisk),
+            "get_risk" => Some(Self::GetRisk),
+            "list_policies" => Some(Self::ListPolicies),
+            "get_policy" => Some(Self::GetPolicy),
+            "create_policy_version" => Some(Self::CreatePolicyVersion),
+            "acknowledge_policy" => Some(Self::AcknowledgePolicy),
+            "list_vendors" => Some(Self::ListVendors),
+            "create_vendor" => Some(Self::CreateVendor),
+            "get_vendor" => Some(Self::GetVendor),
+            "list_questionnaires" => Some(Self::ListQuestionnaires),
+            "create_questionnaire" => Some(Self::CreateQuestionnaire),
+            "get_questionnaire" => Some(Self::GetQuestionnaire),
+            "list_audit_evidence_requests" => Some(Self::ListAuditEvidenceRequests),
+            "get_audit_evidence_request" => Some(Self::GetAuditEvidenceRequest),
+            "get_trust_center" => Some(Self::GetTrustCenter),
+            "list_trust_center_access_requests" => Some(Self::ListTrustCenterAccessRequests),
+            "decide_trust_center_access" => Some(Self::DecideTrustCenterAccess),
+            "list_ai_systems" => Some(Self::ListAiSystems),
+            "get_ai_system" => Some(Self::GetAiSystem),
+            "list_training_assignments" => Some(Self::ListTrainingAssignments),
+            "get_training_assignment" => Some(Self::GetTrainingAssignment),
             _ => None,
         }
     }
@@ -83,6 +182,39 @@ impl RouteKey {
             Self::GetReadinessAssessment => "/api/v1/readiness/assessments/{assessmentId}",
             Self::SyncChanges => "/api/v1/sync/changes",
             Self::SyncMutations => "/api/v1/sync/mutations",
+            Self::GetGrcDashboard => "/api/v1/grc/dashboard",
+            Self::ListCompliancePrograms => "/api/v1/grc/programs",
+            Self::GetComplianceProgram => "/api/v1/grc/programs/{programId}",
+            Self::ListGrcControls => "/api/v1/grc/controls",
+            Self::GetGrcControl => "/api/v1/grc/controls/{controlId}",
+            Self::ListControlTestRuns => "/api/v1/grc/controls/{controlId}/test-runs",
+            Self::TriggerControlTest => "/api/v1/grc/controls/{controlId}/test-runs",
+            Self::ListGrcEvidence => "/api/v1/grc/evidence",
+            Self::GetGrcEvidence => "/api/v1/grc/evidence/{evidenceId}",
+            Self::ListAssets => "/api/v1/grc/assets",
+            Self::GetAsset => "/api/v1/grc/assets/{assetId}",
+            Self::ListRisks => "/api/v1/grc/risks",
+            Self::CreateRisk => "/api/v1/grc/risks",
+            Self::GetRisk => "/api/v1/grc/risks/{riskId}",
+            Self::ListPolicies => "/api/v1/grc/policies",
+            Self::GetPolicy => "/api/v1/grc/policies/{policyId}",
+            Self::CreatePolicyVersion => "/api/v1/grc/policies/{policyId}/versions",
+            Self::AcknowledgePolicy => "/api/v1/grc/policies/{policyId}/acknowledgements",
+            Self::ListVendors => "/api/v1/grc/vendors",
+            Self::CreateVendor => "/api/v1/grc/vendors",
+            Self::GetVendor => "/api/v1/grc/vendors/{vendorId}",
+            Self::ListQuestionnaires => "/api/v1/grc/questionnaires",
+            Self::CreateQuestionnaire => "/api/v1/grc/questionnaires",
+            Self::GetQuestionnaire => "/api/v1/grc/questionnaires/{questionnaireId}",
+            Self::ListAuditEvidenceRequests => "/api/v1/grc/audit-evidence-requests",
+            Self::GetAuditEvidenceRequest => "/api/v1/grc/audit-evidence-requests/{requestId}",
+            Self::GetTrustCenter => "/api/v1/grc/trust-center",
+            Self::ListTrustCenterAccessRequests => "/api/v1/grc/trust-center/access-requests",
+            Self::DecideTrustCenterAccess => "/api/v1/grc/trust-center/access-requests/{accessRequestId}/decision",
+            Self::ListAiSystems => "/api/v1/grc/ai-systems",
+            Self::GetAiSystem => "/api/v1/grc/ai-systems/{aiSystemId}",
+            Self::ListTrainingAssignments => "/api/v1/grc/training-assignments",
+            Self::GetTrainingAssignment => "/api/v1/grc/training-assignments/{assignmentId}",
         }
     }
 
@@ -103,6 +235,39 @@ impl RouteKey {
             Self::GetReadinessAssessment => &["GET"],
             Self::SyncChanges => &["GET"],
             Self::SyncMutations => &["POST"],
+            Self::GetGrcDashboard => &["GET"],
+            Self::ListCompliancePrograms => &["GET"],
+            Self::GetComplianceProgram => &["GET"],
+            Self::ListGrcControls => &["GET"],
+            Self::GetGrcControl => &["GET"],
+            Self::ListControlTestRuns => &["GET"],
+            Self::TriggerControlTest => &["POST"],
+            Self::ListGrcEvidence => &["GET"],
+            Self::GetGrcEvidence => &["GET"],
+            Self::ListAssets => &["GET"],
+            Self::GetAsset => &["GET"],
+            Self::ListRisks => &["GET"],
+            Self::CreateRisk => &["POST"],
+            Self::GetRisk => &["GET"],
+            Self::ListPolicies => &["GET"],
+            Self::GetPolicy => &["GET"],
+            Self::CreatePolicyVersion => &["POST"],
+            Self::AcknowledgePolicy => &["POST"],
+            Self::ListVendors => &["GET"],
+            Self::CreateVendor => &["POST"],
+            Self::GetVendor => &["GET"],
+            Self::ListQuestionnaires => &["GET"],
+            Self::CreateQuestionnaire => &["POST"],
+            Self::GetQuestionnaire => &["GET"],
+            Self::ListAuditEvidenceRequests => &["GET"],
+            Self::GetAuditEvidenceRequest => &["GET"],
+            Self::GetTrustCenter => &["GET"],
+            Self::ListTrustCenterAccessRequests => &["GET"],
+            Self::DecideTrustCenterAccess => &["POST"],
+            Self::ListAiSystems => &["GET"],
+            Self::GetAiSystem => &["GET"],
+            Self::ListTrainingAssignments => &["GET"],
+            Self::GetTrainingAssignment => &["GET"],
         }
     }
 }
@@ -217,5 +382,179 @@ pub struct SyncChangesQuery {
 #[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct SyncMutationsRequest {
     pub operations: Vec<serde_json::Value>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListComplianceProgramsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetComplianceProgramPath {
+    #[serde(rename = "programId")]
+    pub program_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListGrcControlsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetGrcControlPath {
+    #[serde(rename = "controlId")]
+    pub control_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListControlTestRunsPath {
+    #[serde(rename = "controlId")]
+    pub control_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListControlTestRunsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct TriggerControlTestPath {
+    #[serde(rename = "controlId")]
+    pub control_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListGrcEvidenceQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetGrcEvidencePath {
+    #[serde(rename = "evidenceId")]
+    pub evidence_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListAssetsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetAssetPath {
+    #[serde(rename = "assetId")]
+    pub asset_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListRisksQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetRiskPath {
+    #[serde(rename = "riskId")]
+    pub risk_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListPoliciesQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetPolicyPath {
+    #[serde(rename = "policyId")]
+    pub policy_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct CreatePolicyVersionPath {
+    #[serde(rename = "policyId")]
+    pub policy_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct AcknowledgePolicyPath {
+    #[serde(rename = "policyId")]
+    pub policy_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListVendorsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetVendorPath {
+    #[serde(rename = "vendorId")]
+    pub vendor_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListQuestionnairesQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetQuestionnairePath {
+    #[serde(rename = "questionnaireId")]
+    pub questionnaire_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListAuditEvidenceRequestsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetAuditEvidenceRequestPath {
+    #[serde(rename = "requestId")]
+    pub request_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListTrustCenterAccessRequestsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct DecideTrustCenterAccessPath {
+    #[serde(rename = "accessRequestId")]
+    pub access_request_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListAiSystemsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetAiSystemPath {
+    #[serde(rename = "aiSystemId")]
+    pub ai_system_id: String,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct ListTrainingAssignmentsQuery {
+    pub cursor: Option<String>,
+    pub limit: Option<i64>,
+}
+
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
+pub struct GetTrainingAssignmentPath {
+    #[serde(rename = "assignmentId")]
+    pub assignment_id: String,
 }
 
