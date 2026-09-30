@@ -1,0 +1,9 @@
+{
+  "specVersion": "canonical.grc.create-vendor.v1",
+  "requestId": "30000000-0000-4000-8000-000000000001",
+  "name": "Example Cloud",
+  "domain": "cloud.example",
+  "category": "infrastructure",
+  "criticality": "high",
+  "ownerId": "31000000-0000-4000-8000-000000000001"
+}
