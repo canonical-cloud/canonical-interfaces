@@ -64,8 +64,8 @@ union ControlTestOutcome {
   indeterminate: "indeterminate",
 }
 
+// Tenant ownership is authenticated request context, never a body field.
 model RecordControlTestRun {
-  tenant_id: string;
   control_test_id: string;
   run_id: string;
   outcome: ControlTestOutcome;
@@ -83,7 +83,6 @@ union RiskTreatment {
 }
 
 model DecideRiskTreatment {
-  tenant_id: string;
   risk_id: string;
   treatment: RiskTreatment;
   owner_subject: string;
@@ -100,7 +99,6 @@ union VendorDecision {
 }
 
 model DecideVendorAssessment {
-  tenant_id: string;
   vendor_assessment_id: string;
   decision: VendorDecision;
   rationale: string;
@@ -117,7 +115,6 @@ union AccessDecision {
 }
 
 model DecideAccessReviewItem {
-  tenant_id: string;
   campaign_id: string;
   item_id: string;
   decision: AccessDecision;
@@ -128,7 +125,6 @@ model DecideAccessReviewItem {
 }
 
 model ApproveQuestionnaireAnswer {
-  tenant_id: string;
   questionnaire_id: string;
   question_id: string;
   answer: string;
@@ -143,7 +139,6 @@ union TrustResourceAccessLevel {
 }
 
 model PublishTrustCenterResource {
-  tenant_id: string;
   trust_center_id: string;
   resource_id: string;
   access_level: TrustResourceAccessLevel;
@@ -161,7 +156,6 @@ union AiRiskTier {
 }
 
 model RegisterAiSystem {
-  tenant_id: string;
   ai_system_id: string;
   name: string;
   owner_subject: string;
