@@ -1,0 +1,19 @@
+{
+  "specVersion": "canonical.grc.dashboard-summary.v1",
+  "tenantUuid": "10000000-0000-4000-8000-000000000001",
+  "activeProgramCount": 2,
+  "controls": {
+    "implemented": 42,
+    "partiallyImplemented": 3,
+    "planned": 5,
+    "notApplicable": 2,
+    "failingTests": 1
+  },
+  "openRiskCount": 4,
+  "criticalVendorCount": 1,
+  "pendingQuestionnaireCount": 2,
+  "openAuditRequestCount": 3,
+  "expiringEvidenceCount": 6,
+  "trainingOverdueCount": 1,
+  "calculatedAt": "2026-09-29T23:00:00Z"
+}
