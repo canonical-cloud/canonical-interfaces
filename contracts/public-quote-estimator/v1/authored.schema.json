@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:canonical-cloud:public-quote-estimator:v1",
+  "$defs": {
+    "NineWeekSpeed": {
+      "type": "object",
+      "properties": {
+        "weeks": { "type": "number", "const": 9 },
+        "label": { "type": "string", "const": "9 weeks" },
+        "baseUsd": { "type": "number", "const": 5000 },
+        "note": { "type": "string" }
+      },
+      "required": ["weeks", "label", "baseUsd", "note"],
+      "unevaluatedProperties": false
+    },
+    "FiveWeekSpeed": {
+      "type": "object",
+      "properties": {
+        "weeks": { "type": "number", "const": 5 },
+        "label": { "type": "string", "const": "5 weeks" },
+        "baseUsd": { "type": "number", "const": 7500 },
+        "note": { "type": "string" }
+      },
+      "required": ["weeks", "label", "baseUsd", "note"],
+      "unevaluatedProperties": false
+    },
+    "ThreeWeekSpeed": {
+      "type": "object",
+      "properties": {
+        "weeks": { "type": "number", "const": 3 },
+        "label": { "type": "string", "const": "3 weeks" },
+        "baseUsd": { "type": "number", "const": 10500 },
+        "note": { "type": "string" }
+      },
+      "required": ["weeks", "label", "baseUsd", "note"],
+      "unevaluatedProperties": false
+    },
+    "Soc2Standard": { "type": "object", "properties": { "id": { "const": "soc2" }, "label": { "const": "SOC 2" }, "amountUsd": { "const": 0 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "Iso27001Standard": { "type": "object", "properties": { "id": { "const": "iso27001" }, "label": { "const": "ISO 27001" }, "amountUsd": { "const": 750 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "NistStandard": { "type": "object", "properties": { "id": { "const": "nist" }, "label": { "const": "NIST CSF / 800-series" }, "amountUsd": { "const": 500 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "GdprStandard": { "type": "object", "properties": { "id": { "const": "gdpr" }, "label": { "const": "GDPR" }, "amountUsd": { "const": 750 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "HipaaStandard": { "type": "object", "properties": { "id": { "const": "hipaa" }, "label": { "const": "HIPAA" }, "amountUsd": { "const": 1000 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "PciStandard": { "type": "object", "properties": { "id": { "const": "pci" }, "label": { "const": "PCI DSS" }, "amountUsd": { "const": 1000 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "FedRampStandard": { "type": "object", "properties": { "id": { "const": "fedramp" }, "label": { "const": "FedRAMP" }, "amountUsd": { "const": 1750 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "CisStandard": { "type": "object", "properties": { "id": { "const": "cis" }, "label": { "const": "CIS Controls" }, "amountUsd": { "const": 350 } }, "required": ["id", "label", "amountUsd"], "unevaluatedProperties": false },
+    "AdvisoryDepth": { "type": "object", "properties": { "id": { "const": "advisory" }, "label": { "const": "Advisory" }, "amountUsd": { "const": 0 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "ManagedDepth": { "type": "object", "properties": { "id": { "const": "managed" }, "label": { "const": "Managed readiness" }, "amountUsd": { "const": 1500 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "RemediationDepth": { "type": "object", "properties": { "id": { "const": "remediation" }, "label": { "const": "Hands-on remediation" }, "amountUsd": { "const": 3000 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "FocusedComplexity": { "type": "object", "properties": { "id": { "const": "focused" }, "label": { "const": "Focused scope" }, "amountUsd": { "const": 0 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "GrowingComplexity": { "type": "object", "properties": { "id": { "const": "growing" }, "label": { "const": "Growing environment" }, "amountUsd": { "const": 1000 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "ComplexComplexity": { "type": "object", "properties": { "id": { "const": "complex" }, "label": { "const": "Complex / regulated" }, "amountUsd": { "const": 2000 }, "note": { "type": "string" } }, "required": ["id", "label", "amountUsd", "note"], "unevaluatedProperties": false },
+    "EstimatorDefaults": {
+      "type": "object",
+      "properties": {
+        "speedWeeks": { "const": 5 },
+        "standardIds": {
+          "type": "array",
+          "prefixItems": [{ "const": "soc2" }, { "const": "iso27001" }],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "deliveryDepthId": { "const": "managed" },
+        "complexityId": { "const": "growing" }
+      },
+      "required": ["speedWeeks", "standardIds", "deliveryDepthId", "complexityId"],
+      "unevaluatedProperties": false
+    },
+    "PublicQuoteEstimatorConfig": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "const": 1 },
+        "currency": { "const": "USD" },
+        "estimateFloorUsd": { "const": 5000 },
+        "estimateCeilingUsd": { "const": 15000 },
+        "midpointFloorUsd": { "const": 5500 },
+        "midpointCeilingUsd": { "const": 13500 },
+        "roundToUsd": { "const": 500 },
+        "lowerFactor": { "const": 0.9 },
+        "upperFactor": { "const": 1.12 },
+        "speeds": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/NineWeekSpeed" }, { "$ref": "#/$defs/FiveWeekSpeed" }, { "$ref": "#/$defs/ThreeWeekSpeed" }], "items": false, "minItems": 3, "maxItems": 3 },
+        "standards": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/Soc2Standard" }, { "$ref": "#/$defs/Iso27001Standard" }, { "$ref": "#/$defs/NistStandard" }, { "$ref": "#/$defs/GdprStandard" }, { "$ref": "#/$defs/HipaaStandard" }, { "$ref": "#/$defs/PciStandard" }, { "$ref": "#/$defs/FedRampStandard" }, { "$ref": "#/$defs/CisStandard" }], "items": false, "minItems": 8, "maxItems": 8 },
+        "deliveryDepths": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/AdvisoryDepth" }, { "$ref": "#/$defs/ManagedDepth" }, { "$ref": "#/$defs/RemediationDepth" }], "items": false, "minItems": 3, "maxItems": 3 },
+        "complexities": { "type": "array", "prefixItems": [{ "$ref": "#/$defs/FocusedComplexity" }, { "$ref": "#/$defs/GrowingComplexity" }, { "$ref": "#/$defs/ComplexComplexity" }], "items": false, "minItems": 3, "maxItems": 3 },
+        "defaults": { "$ref": "#/$defs/EstimatorDefaults" }
+      },
+      "required": ["schemaVersion", "currency", "estimateFloorUsd", "estimateCeilingUsd", "midpointFloorUsd", "midpointCeilingUsd", "roundToUsd", "lowerFactor", "upperFactor", "speeds", "standards", "deliveryDepths", "complexities", "defaults"],
+      "unevaluatedProperties": false
+    }
+  }
+}
