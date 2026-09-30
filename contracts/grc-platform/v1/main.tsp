@@ -43,3 +43,125 @@ model GrcCapabilityCatalog {
   schema_version: 1;
   capabilities: GrcCapabilityDescriptor[];
 }
+
+model EvidenceProvenance {
+  source_system: string;
+  source_locator_sha256: string;
+  payload_sha256: string;
+  collected_at: string;
+}
+
+model Approval {
+  actor_subject: string;
+  approved_at: string;
+  rationale?: string;
+}
+
+union ControlTestOutcome {
+  passed: "passed",
+  failed: "failed",
+  indeterminate: "indeterminate",
+}
+
+model RecordControlTestRun {
+  tenant_id: string;
+  control_test_id: string;
+  run_id: string;
+  outcome: ControlTestOutcome;
+  observed_at: string;
+  actor_subject: string;
+  evidence: EvidenceProvenance[];
+}
+
+union RiskTreatment {
+  avoid: "avoid",
+  accept: "accept",
+  mitigate: "mitigate",
+  transfer: "transfer",
+}
+
+model DecideRiskTreatment {
+  tenant_id: string;
+  risk_id: string;
+  treatment: RiskTreatment;
+  owner_subject: string;
+  due_at?: string;
+  rationale: string;
+  approval: Approval;
+}
+
+union VendorDecision {
+  approved: "approved",
+  conditionally_approved: "conditionally_approved",
+  needs_follow_up: "needs_follow_up",
+  rejected: "rejected",
+}
+
+model DecideVendorAssessment {
+  tenant_id: string;
+  vendor_assessment_id: string;
+  decision: VendorDecision;
+  rationale: string;
+  evidence: EvidenceProvenance[];
+  approval: Approval;
+}
+
+union AccessDecision {
+  keep: "keep",
+  modify: "modify",
+  revoke: "revoke",
+  investigate: "investigate",
+}
+
+model DecideAccessReviewItem {
+  tenant_id: string;
+  campaign_id: string;
+  item_id: string;
+  decision: AccessDecision;
+  reviewer_subject: string;
+  rationale: string;
+  evidence: EvidenceProvenance[];
+  approval: Approval;
+}
+
+model ApproveQuestionnaireAnswer {
+  tenant_id: string;
+  questionnaire_id: string;
+  question_id: string;
+  answer: string;
+  sources: EvidenceProvenance[];
+  approval: Approval;
+}
+
+union TrustVisibility {
+  public: "public",
+  gated: "gated",
+}
+
+model PublishTrustCenterResource {
+  tenant_id: string;
+  trust_center_id: string;
+  resource_id: string;
+  visibility: TrustVisibility;
+  nda_required: boolean;
+  expires_at?: string;
+  approval: Approval;
+}
+
+union AiRiskTier {
+  low: "low",
+  moderate: "moderate",
+  high: "high",
+  critical: "critical",
+}
+
+model RegisterAiSystem {
+  tenant_id: string;
+  ai_system_id: string;
+  name: string;
+  owner_subject: string;
+  purpose: string;
+  data_classes: string[];
+  risk_tier: AiRiskTier;
+  approval?: Approval;
+}
