@@ -78,6 +78,182 @@
       },
       "required": ["schema_version", "capabilities"],
       "unevaluatedProperties": false
+    },
+    "EvidenceProvenance": {
+      "type": "object",
+      "properties": {
+        "source_system": { "type": "string" },
+        "source_locator_sha256": { "type": "string" },
+        "payload_sha256": { "type": "string" },
+        "collected_at": { "type": "string" }
+      },
+      "required": ["source_system", "source_locator_sha256", "payload_sha256", "collected_at"],
+      "unevaluatedProperties": false
+    },
+    "Approval": {
+      "type": "object",
+      "properties": {
+        "actor_subject": { "type": "string" },
+        "approved_at": { "type": "string" },
+        "rationale": { "type": "string" }
+      },
+      "required": ["actor_subject", "approved_at"],
+      "unevaluatedProperties": false
+    },
+    "ControlTestOutcome": {
+      "anyOf": [
+        { "type": "string", "const": "passed" },
+        { "type": "string", "const": "failed" },
+        { "type": "string", "const": "indeterminate" }
+      ]
+    },
+    "RecordControlTestRun": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "control_test_id": { "type": "string" },
+        "run_id": { "type": "string" },
+        "outcome": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/ControlTestOutcome" },
+        "observed_at": { "type": "string" },
+        "actor_subject": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/EvidenceProvenance" }
+        }
+      },
+      "required": ["tenant_id", "control_test_id", "run_id", "outcome", "observed_at", "actor_subject", "evidence"],
+      "unevaluatedProperties": false
+    },
+    "RiskTreatment": {
+      "anyOf": [
+        { "type": "string", "const": "avoid" },
+        { "type": "string", "const": "accept" },
+        { "type": "string", "const": "mitigate" },
+        { "type": "string", "const": "transfer" }
+      ]
+    },
+    "DecideRiskTreatment": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "risk_id": { "type": "string" },
+        "treatment": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/RiskTreatment" },
+        "owner_subject": { "type": "string" },
+        "due_at": { "type": "string" },
+        "rationale": { "type": "string" },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "risk_id", "treatment", "owner_subject", "rationale", "approval"],
+      "unevaluatedProperties": false
+    },
+    "VendorDecision": {
+      "anyOf": [
+        { "type": "string", "const": "approved" },
+        { "type": "string", "const": "conditionally_approved" },
+        { "type": "string", "const": "needs_follow_up" },
+        { "type": "string", "const": "rejected" }
+      ]
+    },
+    "DecideVendorAssessment": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "vendor_assessment_id": { "type": "string" },
+        "decision": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/VendorDecision" },
+        "rationale": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/EvidenceProvenance" }
+        },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "vendor_assessment_id", "decision", "rationale", "evidence", "approval"],
+      "unevaluatedProperties": false
+    },
+    "AccessDecision": {
+      "anyOf": [
+        { "type": "string", "const": "keep" },
+        { "type": "string", "const": "modify" },
+        { "type": "string", "const": "revoke" },
+        { "type": "string", "const": "investigate" }
+      ]
+    },
+    "DecideAccessReviewItem": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "campaign_id": { "type": "string" },
+        "item_id": { "type": "string" },
+        "decision": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/AccessDecision" },
+        "reviewer_subject": { "type": "string" },
+        "rationale": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/EvidenceProvenance" }
+        },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "campaign_id", "item_id", "decision", "reviewer_subject", "rationale", "evidence", "approval"],
+      "unevaluatedProperties": false
+    },
+    "ApproveQuestionnaireAnswer": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "questionnaire_id": { "type": "string" },
+        "question_id": { "type": "string" },
+        "answer": { "type": "string" },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/EvidenceProvenance" }
+        },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "questionnaire_id", "question_id", "answer", "sources", "approval"],
+      "unevaluatedProperties": false
+    },
+    "TrustVisibility": {
+      "anyOf": [
+        { "type": "string", "const": "public" },
+        { "type": "string", "const": "gated" }
+      ]
+    },
+    "PublishTrustCenterResource": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "trust_center_id": { "type": "string" },
+        "resource_id": { "type": "string" },
+        "visibility": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/TrustVisibility" },
+        "nda_required": { "type": "boolean" },
+        "expires_at": { "type": "string" },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "trust_center_id", "resource_id", "visibility", "nda_required", "approval"],
+      "unevaluatedProperties": false
+    },
+    "AiRiskTier": {
+      "anyOf": [
+        { "type": "string", "const": "low" },
+        { "type": "string", "const": "moderate" },
+        { "type": "string", "const": "high" },
+        { "type": "string", "const": "critical" }
+      ]
+    },
+    "RegisterAiSystem": {
+      "type": "object",
+      "properties": {
+        "tenant_id": { "type": "string" },
+        "ai_system_id": { "type": "string" },
+        "name": { "type": "string" },
+        "owner_subject": { "type": "string" },
+        "purpose": { "type": "string" },
+        "data_classes": { "type": "array", "items": { "type": "string" } },
+        "risk_tier": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/AiRiskTier" },
+        "approval": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/Approval" }
+      },
+      "required": ["tenant_id", "ai_system_id", "name", "owner_subject", "purpose", "data_classes", "risk_tier"],
+      "unevaluatedProperties": false
     }
   }
 }
