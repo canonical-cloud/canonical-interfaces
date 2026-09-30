@@ -60,6 +60,7 @@ model Approval {
 union ControlTestOutcome {
   passed: "passed",
   failed: "failed",
+  stale: "stale",
   indeterminate: "indeterminate",
 }
 
@@ -78,6 +79,7 @@ union RiskTreatment {
   accept: "accept",
   mitigate: "mitigate",
   transfer: "transfer",
+  monitor: "monitor",
 }
 
 model DecideRiskTreatment {
@@ -107,10 +109,11 @@ model DecideVendorAssessment {
 }
 
 union AccessDecision {
-  keep: "keep",
+  approve: "approve",
   modify: "modify",
   revoke: "revoke",
   investigate: "investigate",
+  not_applicable: "not_applicable",
 }
 
 model DecideAccessReviewItem {
@@ -133,22 +136,24 @@ model ApproveQuestionnaireAnswer {
   approval: Approval;
 }
 
-union TrustVisibility {
+union TrustResourceAccessLevel {
   public: "public",
-  gated: "gated",
+  request_access: "request_access",
+  approved_only: "approved_only",
 }
 
 model PublishTrustCenterResource {
   tenant_id: string;
   trust_center_id: string;
   resource_id: string;
-  visibility: TrustVisibility;
+  access_level: TrustResourceAccessLevel;
   nda_required: boolean;
   expires_at?: string;
   approval: Approval;
 }
 
 union AiRiskTier {
+  unclassified: "unclassified",
   low: "low",
   moderate: "moderate",
   high: "high",
