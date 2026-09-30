@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:canonical-cloud:grc-platform:v1",
+  "$defs": {
+    "GrcCapabilityKey": {
+      "anyOf": [
+        { "type": "string", "const": "controls_evidence" },
+        { "type": "string", "const": "framework_crosswalks" },
+        { "type": "string", "const": "policies_people_training" },
+        { "type": "string", "const": "risk_management" },
+        { "type": "string", "const": "asset_vulnerability" },
+        { "type": "string", "const": "vendor_risk" },
+        { "type": "string", "const": "access_reviews" },
+        { "type": "string", "const": "audit_collaboration" },
+        { "type": "string", "const": "trust_center" },
+        { "type": "string", "const": "security_questionnaires" },
+        { "type": "string", "const": "integrations_automation" },
+        { "type": "string", "const": "ai_governance" },
+        { "type": "string", "const": "commercial_entitlements" }
+      ]
+    },
+    "GrcCapabilityDescriptor": {
+      "type": "object",
+      "properties": {
+        "key": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/GrcCapabilityKey" },
+        "api_path": { "type": "string" },
+        "app_path": { "type": "string" },
+        "persistence_tables": { "type": "array", "items": { "type": "string" } },
+        "continuous_monitoring": { "type": "boolean" },
+        "evidence_provenance": { "type": "boolean" },
+        "human_approval": { "type": "boolean" }
+      },
+      "required": [
+        "key",
+        "api_path",
+        "app_path",
+        "persistence_tables",
+        "continuous_monitoring",
+        "evidence_provenance",
+        "human_approval"
+      ],
+      "unevaluatedProperties": false
+    },
+    "GrcModuleSnapshot": {
+      "type": "object",
+      "properties": {
+        "key": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/GrcCapabilityKey" },
+        "open_items": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "overdue_items": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "failing_automated_checks": { "type": "integer", "minimum": -2147483648, "maximum": 2147483647 },
+        "last_updated_at": { "type": "string" }
+      },
+      "required": ["key", "open_items", "overdue_items", "failing_automated_checks", "last_updated_at"],
+      "unevaluatedProperties": false
+    },
+    "GrcDashboardSnapshot": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "type": "number", "const": 1 },
+        "tenant_id": { "type": "string" },
+        "generated_at": { "type": "string" },
+        "modules": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/GrcModuleSnapshot" }
+        }
+      },
+      "required": ["schema_version", "tenant_id", "generated_at", "modules"],
+      "unevaluatedProperties": false
+    },
+    "GrcCapabilityCatalog": {
+      "type": "object",
+      "properties": {
+        "schema_version": { "type": "number", "const": 1 },
+        "capabilities": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:grc-platform:v1#/$defs/GrcCapabilityDescriptor" }
+        }
+      },
+      "required": ["schema_version", "capabilities"],
+      "unevaluatedProperties": false
+    }
+  }
+}
