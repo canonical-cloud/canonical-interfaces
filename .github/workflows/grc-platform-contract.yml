@@ -1,0 +1,100 @@
+name: GRC platform peer-authority contract
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/grc-platform/**'
+      - '.github/workflows/grc-platform-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/grc-platform/**'
+      - '.github/workflows/grc-platform-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: grc-platform-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tjsv:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          show-progress: false
+
+      - name: Check out pinned TJSV
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ORESoftware/typespec-json-schema-validator
+          ref: 5bab34e08856c47af3600adf40a4aa860fa71c01
+          path: .deps/tjsv
+          persist-credentials: false
+          show-progress: false
+
+      - name: Set up Node 22.16
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22.16.0'
+
+      - name: Install TJSV and pinned native dependency
+        working-directory: .deps/tjsv
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm rebuild @oresoftware/f2e
+          test -s node_modules/@oresoftware/f2e/clients/nodejs/build/Release/flags2env.node
+
+      - name: Check independent TypeSpec and JSON Schema authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/grc-platform/v1/main.tsp \
+            --schema=contracts/grc-platform/v1/authored.schema.json \
+            --instances=contracts/grc-platform/v1/instances \
+            --report=artifacts/grc-platform.parity.json \
+            --max-probes=256
+          jq -e '.status == "passed"' artifacts/grc-platform.parity.json >/dev/null
+          jq -e '(.findings | length) == 0' artifacts/grc-platform.parity.json >/dev/null
+
+      - name: Verify the target catalog names every platform domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const catalog = JSON.parse(readFileSync('contracts/grc-platform/v1/instances/GrcCapabilityCatalog/valid/feature-parity-target.json', 'utf8'));
+          const expected = [
+            'controls_evidence', 'framework_crosswalks', 'policies_people_training',
+            'risk_management', 'asset_vulnerability', 'vendor_risk', 'access_reviews',
+            'audit_collaboration', 'trust_center', 'security_questionnaires',
+            'integrations_automation', 'ai_governance', 'commercial_entitlements'
+          ];
+          assert.deepEqual(catalog.capabilities.map((entry) => entry.key).sort(), expected.sort());
+          for (const entry of catalog.capabilities) {
+            assert.ok(entry.api_path.startsWith('/v1/grc/'));
+            assert.ok(entry.app_path.startsWith('/app/compliance/'));
+            assert.ok(entry.persistence_tables.length > 0);
+          }
+          NODE
+
+      - name: Upload deterministic parity receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: grc-platform-tjsv
+          path: artifacts/grc-platform.parity.json
+          if-no-files-found: warn
+          retention-days: 14
