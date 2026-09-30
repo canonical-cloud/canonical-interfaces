@@ -538,6 +538,9 @@
         }
       },
       "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.TriggerControlTestRequest"
+        ],
         "return_type": "Canonical.GrcWorkspace.V1.ControlTestRunSummary"
       }
     },
@@ -789,6 +792,9 @@
         }
       },
       "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.PolicyAcknowledgementRequest"
+        ],
         "return_type": "Canonical.GrcWorkspace.V1.PolicySummary"
       }
     },
@@ -992,7 +998,7 @@
         }
       },
       "binding": {
-        "return_type": "Canonical.GrcWorkspace.V1.TrustCenterSummary[]"
+        "return_type": "Canonical.GrcWorkspace.V1.TrustCenterAccessRequestSummary[]"
       }
     },
     "decide_trust_center_access": {
@@ -1113,6 +1119,281 @@
         }
       },
       "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.TrainingAssignmentSummary"
+      }
+    },
+    "create_compliance_program": {
+      "path": "/api/v1/grc/programs",
+      "methods": [
+        "POST"
+      ],
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateComplianceProgramRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.ComplianceProgramSummary"
+      }
+    },
+    "list_custom_frameworks": {
+      "path": "/api/v1/grc/custom-frameworks",
+      "methods": [
+        "GET"
+      ],
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.CustomFrameworkSummary[]"
+      }
+    },
+    "create_custom_framework": {
+      "path": "/api/v1/grc/custom-frameworks",
+      "methods": [
+        "POST"
+      ],
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateCustomFrameworkRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.CustomFrameworkSummary"
+      }
+    },
+    "get_custom_framework": {
+      "path": "/api/v1/grc/custom-frameworks/{customFrameworkId}",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "customFrameworkId"
+        ],
+        "properties": {
+          "customFrameworkId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.CustomFrameworkSummary"
+      }
+    },
+    "list_vendor_assessments": {
+      "path": "/api/v1/grc/vendors/{vendorId}/assessments",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vendorId"
+        ],
+        "properties": {
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.VendorAssessmentSummary[]"
+      }
+    },
+    "start_vendor_assessment": {
+      "path": "/api/v1/grc/vendors/{vendorId}/assessments",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vendorId"
+        ],
+        "properties": {
+          "vendorId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.StartVendorAssessmentRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.VendorAssessmentSummary"
+      }
+    },
+    "submit_questionnaire_answers": {
+      "path": "/api/v1/grc/questionnaires/{questionnaireId}/answers",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "questionnaireId"
+        ],
+        "properties": {
+          "questionnaireId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.SubmitQuestionnaireAnswersRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.QuestionnaireSummary"
+      }
+    },
+    "submit_audit_evidence": {
+      "path": "/api/v1/grc/audit-evidence-requests/{requestId}/submissions",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "requestId"
+        ],
+        "properties": {
+          "requestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.SubmitAuditEvidenceRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.AuditEvidenceRequestSummary"
+      }
+    },
+    "list_ai_use_cases": {
+      "path": "/api/v1/grc/ai-systems/{aiSystemId}/use-cases",
+      "methods": [
+        "GET"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "aiSystemId"
+        ],
+        "properties": {
+          "aiSystemId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "query_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 25
+          }
+        }
+      },
+      "binding": {
+        "return_type": "Canonical.GrcWorkspace.V1.AiUseCaseSummary[]"
+      }
+    },
+    "create_ai_use_case": {
+      "path": "/api/v1/grc/ai-systems/{aiSystemId}/use-cases",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "aiSystemId"
+        ],
+        "properties": {
+          "aiSystemId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CreateAiUseCaseRequest"
+        ],
+        "return_type": "Canonical.GrcWorkspace.V1.AiUseCaseSummary"
+      }
+    },
+    "complete_training_assignment": {
+      "path": "/api/v1/grc/training-assignments/{assignmentId}/completion",
+      "methods": [
+        "POST"
+      ],
+      "path_params": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assignmentId"
+        ],
+        "properties": {
+          "assignmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "binding": {
+        "param_types": [
+          "Canonical.GrcWorkspace.V1.CompleteTrainingAssignmentRequest"
+        ],
         "return_type": "Canonical.GrcWorkspace.V1.TrainingAssignmentSummary"
       }
     }
