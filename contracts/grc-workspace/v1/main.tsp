@@ -459,3 +459,188 @@ model TrustCenterAccessDecisionRequest {
   resourceUuids: string[];
   expiresAt?: utcDateTime;
 }
+
+@id("CustomFrameworkSummary")
+model CustomFrameworkSummary {
+  specVersion: "canonical.grc.custom-framework-summary.v1";
+  @format("uuid")
+  customFrameworkUuid: string;
+  name: string;
+  version: string;
+  description?: string;
+  @minValue(0)
+  controlCount: int64;
+  updatedAt: utcDateTime;
+}
+
+@id("VendorAssessmentSummary")
+model VendorAssessmentSummary {
+  specVersion: "canonical.grc.vendor-assessment-summary.v1";
+  @format("uuid")
+  assessmentUuid: string;
+  @format("uuid")
+  vendorUuid: string;
+  questionnaireUuid?: string;
+  frameworkReleaseId?: string;
+  state: string;
+  @minValue(0)
+  @maxValue(10000)
+  riskScoreBasisPoints?: int32;
+  startedAt?: utcDateTime;
+  completedAt?: utcDateTime;
+  nextReviewAt?: utcDateTime;
+  updatedAt: utcDateTime;
+}
+
+@id("TrustCenterAccessRequestSummary")
+model TrustCenterAccessRequestSummary {
+  specVersion: "canonical.grc.trust-access-request-summary.v1";
+  @format("uuid")
+  accessRequestUuid: string;
+  requesterEmail: string;
+  requesterOrganization?: string;
+  requesterDomain?: string;
+  purpose?: string;
+  status: string;
+  requestedAt: utcDateTime;
+  decidedAt?: utcDateTime;
+}
+
+@id("AiUseCaseSummary")
+model AiUseCaseSummary {
+  specVersion: "canonical.grc.ai-use-case-summary.v1";
+  @format("uuid")
+  useCaseUuid: string;
+  @format("uuid")
+  aiSystemUuid: string;
+  @format("uuid")
+  scopeId?: string;
+  name: string;
+  purpose: string;
+  impactLevel: string;
+  status: string;
+  ownerId?: string;
+  riskIds: string[];
+  updatedAt: utcDateTime;
+}
+
+@id("CreateComplianceProgramRequest")
+model CreateComplianceProgramRequest {
+  specVersion: "canonical.grc.create-program.v1";
+  @format("uuid")
+  requestId: string;
+  @minLength(1)
+  @maxLength(200)
+  name: string;
+  frameworkReleaseIds: string[];
+  customFrameworkIds: string[];
+  scopeIds: string[];
+  ownerId?: string;
+  targetDate?: plainDate;
+}
+
+@id("CreateCustomFrameworkRequest")
+model CreateCustomFrameworkRequest {
+  specVersion: "canonical.grc.create-custom-framework.v1";
+  @format("uuid")
+  requestId: string;
+  @minLength(1)
+  @maxLength(200)
+  name: string;
+  @minLength(1)
+  @maxLength(100)
+  version: string;
+  description?: string;
+}
+
+@id("TriggerControlTestRequest")
+model TriggerControlTestRequest {
+  specVersion: "canonical.grc.trigger-control-test.v1";
+  @format("uuid")
+  requestId: string;
+  testKey?: string;
+}
+
+@id("PolicyAcknowledgementRequest")
+model PolicyAcknowledgementRequest {
+  specVersion: "canonical.grc.policy-acknowledgement.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  policyVersionUuid: string;
+}
+
+@id("StartVendorAssessmentRequest")
+model StartVendorAssessmentRequest {
+  specVersion: "canonical.grc.start-vendor-assessment.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  vendorUuid: string;
+  @format("uuid")
+  questionnaireUuid?: string;
+  frameworkReleaseId?: string;
+  dueAt?: utcDateTime;
+}
+
+@id("QuestionnaireAnswerMutation")
+model QuestionnaireAnswerMutation {
+  @format("uuid")
+  questionUuid: string;
+  answerMarkdown?: string;
+  answerJson?: unknown;
+  evidenceUuids: string[];
+}
+
+@id("SubmitQuestionnaireAnswersRequest")
+model SubmitQuestionnaireAnswersRequest {
+  specVersion: "canonical.grc.submit-questionnaire-answers.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  questionnaireUuid: string;
+  answers: QuestionnaireAnswerMutation[];
+}
+
+@id("SubmitAuditEvidenceRequest")
+model SubmitAuditEvidenceRequest {
+  specVersion: "canonical.grc.submit-audit-evidence.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  auditEvidenceRequestUuid: string;
+  evidenceUuids: string[];
+  note?: string;
+}
+
+@id("CreateAiUseCaseRequest")
+model CreateAiUseCaseRequest {
+  specVersion: "canonical.grc.create-ai-use-case.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  aiSystemUuid: string;
+  @format("uuid")
+  scopeId?: string;
+  @minLength(1)
+  @maxLength(200)
+  name: string;
+  @minLength(1)
+  @maxLength(4000)
+  purpose: string;
+  impactLevel: string;
+  ownerId?: string;
+}
+
+@id("CompleteTrainingAssignmentRequest")
+model CompleteTrainingAssignmentRequest {
+  specVersion: "canonical.grc.complete-training.v1";
+  @format("uuid")
+  requestId: string;
+  @format("uuid")
+  assignmentUuid: string;
+  @format("uuid")
+  evidenceUuid?: string;
+  completedAt: utcDateTime;
+}
+
