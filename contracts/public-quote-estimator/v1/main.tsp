@@ -19,6 +19,12 @@ model ThreeWeekSpeed {
   note: string;
 }
 
+union Speed {
+  nineWeek: NineWeekSpeed,
+  fiveWeek: FiveWeekSpeed,
+  threeWeek: ThreeWeekSpeed,
+}
+
 model Soc2Standard {
   id: "soc2";
   label: "SOC 2";
@@ -67,6 +73,17 @@ model CisStandard {
   amountUsd: 350;
 }
 
+union Standard {
+  soc2: Soc2Standard,
+  iso27001: Iso27001Standard,
+  nist: NistStandard,
+  gdpr: GdprStandard,
+  hipaa: HipaaStandard,
+  pci: PciStandard,
+  fedramp: FedRampStandard,
+  cis: CisStandard,
+}
+
 model AdvisoryDepth {
   id: "advisory";
   label: "Advisory";
@@ -86,6 +103,12 @@ model RemediationDepth {
   label: "Hands-on remediation";
   amountUsd: 3000;
   note: string;
+}
+
+union DeliveryDepth {
+  advisory: AdvisoryDepth,
+  managed: ManagedDepth,
+  remediation: RemediationDepth,
 }
 
 model FocusedComplexity {
@@ -109,9 +132,20 @@ model ComplexComplexity {
   note: string;
 }
 
+union Complexity {
+  focused: FocusedComplexity,
+  growing: GrowingComplexity,
+  complex: ComplexComplexity,
+}
+
+union DefaultStandardId {
+  soc2: "soc2",
+  iso27001: "iso27001",
+}
+
 model EstimatorDefaults {
   speedWeeks: 5;
-  standardIds: ["soc2", "iso27001"];
+  standardIds: DefaultStandardId[];
   deliveryDepthId: "managed";
   complexityId: "growing";
 }
@@ -126,9 +160,9 @@ model PublicQuoteEstimatorConfig {
   roundToUsd: 500;
   lowerFactor: 0.9;
   upperFactor: 1.12;
-  speeds: [NineWeekSpeed, FiveWeekSpeed, ThreeWeekSpeed];
-  standards: [Soc2Standard, Iso27001Standard, NistStandard, GdprStandard, HipaaStandard, PciStandard, FedRampStandard, CisStandard];
-  deliveryDepths: [AdvisoryDepth, ManagedDepth, RemediationDepth];
-  complexities: [FocusedComplexity, GrowingComplexity, ComplexComplexity];
+  speeds: Speed[];
+  standards: Standard[];
+  deliveryDepths: DeliveryDepth[];
+  complexities: Complexity[];
   defaults: EstimatorDefaults;
 }
