@@ -5,17 +5,28 @@
   "type": "module",
   "description": "JSON Schema typed I/O, TypeSpec, Protobuf, SQL, and generated language adapters for canonical.cloud.",
   "scripts": {
-    "project:pre-interest": "node scripts/project-pre-interest-contract.mjs --write",
-    "check:pre-interest": "node scripts/project-pre-interest-contract.mjs --check",
     "generate": "node scripts/project-pre-interest-contract.mjs --write && node src/generate-output.mjs",
     "check": "node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check",
-    "test": "node --test src/*.test.mjs scripts/project-pre-interest-contract.test.mjs && node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check"
+    "test": "node --test src/*.test.mjs scripts/project-pre-interest-contract.test.mjs && node scripts/project-pre-interest-contract.mjs --check && node src/generate-output.mjs --check",
+    "lint:ores": "if [ -f .ores-lint/lint.sh ]; then sh .ores-lint/lint.sh; else echo 'ores-lint not installed'; fi",
+    "prepublishOnly": "npm run lint:ores",
+    "project:pre-interest": "node scripts/project-pre-interest-contract.mjs --write",
+    "check:pre-interest": "node scripts/project-pre-interest-contract.mjs --check"
   },
   "exports": {
     "./schema": "./schema/index.json",
     "./quote-schema": "./schema/quote.schema.json",
     "./pre-interest-schema": "./schema/pre-interest.schema.json",
     "./pre-interest-contract": "./contracts/pre-interest/v1/pre-interest.schema.json",
+    "./compliance-rpc-schema": "./contracts/compliance-rpc/v1/authored.schema.json",
+    "./compliance-rpc-typespec": "./contracts/compliance-rpc/v1/main.tsp",
+    "./adversarial-readiness-schema": "./contracts/adversarial-readiness/v1/authored.schema.json",
+    "./adversarial-readiness-typespec": "./contracts/adversarial-readiness/v1/main.tsp",
+    "./reachability-probe-schema": "./contracts/reachability-probe/v1/authored.schema.json",
+    "./reachability-probe-typespec": "./contracts/reachability-probe/v1/main.tsp",
+    "./public-quote-estimator-schema": "./contracts/public-quote-estimator/v1/authored.schema.json",
+    "./public-quote-estimator-typespec": "./contracts/public-quote-estimator/v1/main.tsp",
+    "./public-quote-estimator-fixture": "./contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json",
     "./quote-fixtures": "./fixtures/quote-v1",
     "./sql": "./sql/schema.sql",
     "./typescript": "./generated/typescript/index.ts",
@@ -23,5 +34,13 @@
     "./dart": "./generated/dart/lib/canonical_interfaces.dart",
     "./python": "./generated/python/canonical_interfaces.py",
     "./go": "./generated/go/interfaces.go"
+  },
+  "oresLint": {
+    "note": "Declared, not installed. ores-lint resolves these from a global install - see .ores-lint/README.md",
+    "requires": {
+      "eslint": ">=9",
+      "typescript-eslint": ">=8 (optional; without it .ts files are skipped)"
+    },
+    "install": "npm i -g eslint typescript-eslint"
   }
 }

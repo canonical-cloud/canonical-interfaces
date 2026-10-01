@@ -2,6 +2,7 @@
 org = "canonical-cloud"
 name = "canonical-interfaces"
 version = "0.1.0"
+kind = "contracts"
 description = "Canonical Cloud API, compliance, quote, pre-interest, sync, SQL, and generated language contracts"
 license = "MIT"
 keywords = ["interfaces", "compliance", "quote", "pre-interest", "json-schema", "typespec", "protobuf", "sync", "polyglot"]
@@ -13,7 +14,7 @@ url = "https://github.com/canonical-cloud/canonical-interfaces"
 [publish]
 include_readme = true
 tag_format = "v{version}"
-smoke_test = "test -f \"$ZED_PKG_TEST_TARGET/schema/index.json\" && test -f \"$ZED_PKG_TEST_TARGET/schema/quote.schema.json\" && test -f \"$ZED_PKG_TEST_TARGET/schema/pre-interest.schema.json\" && test -f \"$ZED_PKG_TEST_TARGET/contracts/pre-interest/v1/main.tsp\" && test -f \"$ZED_PKG_TEST_TARGET/contracts/pre-interest/v1/pre_interest.proto\" && grep -q PreInterestRegistrationRequest \"$ZED_PKG_TEST_TARGET/generated/rust/src/lib.rs\" && test -f \"$ZED_PKG_TEST_TARGET/generated/dart/lib/quote_v1.dart\" && test -f \"$ZED_PKG_TEST_TARGET/sql/schema.sql\""
+smoke_test = "sh \"$ZED_PKG_TEST_TARGET/scripts/tests/smoke-published-artifact.sh\""
 exclude = [".env", ".env.*", ".direnv/**", ".zed/**", ".zed-pack/**", "tmp/**", "**/*.log", ".DS_Store", "**/target/**", "**/node_modules/**"]
 
 [targets.repository]

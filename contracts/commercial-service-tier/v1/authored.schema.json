@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:canonical-cloud:commercial-service-tier:v1",
+  "$defs": {
+    "FoundationReadinessTier": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "const": "foundation-readiness" },
+        "name": { "type": "string", "const": "Foundation Readiness" },
+        "monthlyUsd": { "type": "number", "const": 2500 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "ManagedReadinessTier": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "const": "managed-readiness" },
+        "name": { "type": "string", "const": "Managed Readiness" },
+        "monthlyUsd": { "type": "number", "const": 7500 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "AssuranceEngineeringTier": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "const": "assurance-engineering" },
+        "name": { "type": "string", "const": "Assurance Engineering" },
+        "monthlyUsd": { "type": "number", "const": 20000 }
+      },
+      "required": ["id", "name", "monthlyUsd"],
+      "unevaluatedProperties": false
+    },
+    "ServiceTier": {
+      "anyOf": [
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/FoundationReadinessTier" },
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/ManagedReadinessTier" },
+        { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/AssuranceEngineeringTier" }
+      ]
+    },
+    "PublicationStatus": {
+      "anyOf": [
+        { "type": "string", "const": "approved" },
+        { "type": "string", "const": "proposed" },
+        { "type": "string", "const": "retired" }
+      ]
+    },
+    "ServiceTierCatalog": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "type": "number", "const": 1 },
+        "publicationStatus": { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/PublicationStatus" },
+        "currency": { "type": "string", "const": "USD" },
+        "asOf": { "type": "string" },
+        "tiers": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:commercial-service-tier:v1#/$defs/ServiceTier" }
+        }
+      },
+      "required": ["schemaVersion", "publicationStatus", "currency", "asOf", "tiers"],
+      "unevaluatedProperties": false
+    }
+  }
+}

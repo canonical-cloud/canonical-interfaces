@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.adversarial-readiness.v1.authored.schema.json",
+  "$defs": {
+    "AdversarialFindingStatus": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialFindingStatus","type":"string","enum":["pass","finding","unknown","error"]},
+    "AdversarialSeverity": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialSeverity","type":"string","enum":["low","medium","high","critical"]},
+    "AdversarialRecommendationPriority": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialRecommendationPriority","type":"string","enum":["urgent","high","medium","low"]},
+    "AdversarialExpectedDisposition": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialExpectedDisposition","type":"string","enum":["allow","deny","baseline"]},
+    "AdversarialExecutionPrivilege": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialExecutionPrivilege","type":"string","enum":["root","non-root","any"]},
+    "AdversarialObservedPrivilege": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialObservedPrivilege","type":"string","enum":["root","non-root","unknown"]},
+    "AdversarialEvidenceLayer": {"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialEvidenceLayer","type":"string","enum":["service-session","network-boundary","provider-path-analysis","effective-file-access","filesystem-metadata","execution-context","static-configuration","transport-identity"]},
+    "AdversarialPerspective": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialPerspective","type":"object",
+      "properties":{"perspectiveId":{"type":"string"},"trustZone":{"type":"string"},"expectedPrivilege":{"$ref":"AdversarialExecutionPrivilege"}},
+      "required":["perspectiveId","trustZone","expectedPrivilege"],"unevaluatedProperties":false
+    },
+    "AdversarialTargetRef": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialTargetRef","type":"object",
+      "properties":{"targetId":{"type":"string"},"kind":{"type":"string"},"locatorSha256":{"type":"string"}},
+      "required":["targetId","kind","locatorSha256"],"unevaluatedProperties":false
+    },
+    "AdversarialRecommendationRef": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialRecommendationRef","type":"object",
+      "properties":{"catalogKey":{"type":"string"},"priority":{"$ref":"AdversarialRecommendationPriority"},"controlLayers":{"type":"array","items":{"type":"string"}},"verification":{"type":"string"}},
+      "required":["catalogKey","priority","controlLayers","verification"],"unevaluatedProperties":false
+    },
+    "AdversarialResult": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialResult","type":"object",
+      "properties":{
+        "checkId":{"type":"string"},"title":{"type":"string"},"severity":{"$ref":"AdversarialSeverity"},"kind":{"type":"string"},"targetId":{"type":"string"},
+        "status":{"$ref":"AdversarialFindingStatus"},"expected":{"$ref":"AdversarialExpectedDisposition"},"observed":{"type":"string"},"evidenceLayer":{"$ref":"AdversarialEvidenceLayer"},
+        "sourceObservationIds":{"type":"array","items":{"type":"string"}},"recommendation":{"$ref":"AdversarialRecommendationRef"}
+      },
+      "required":["checkId","title","severity","kind","targetId","status","expected","observed","evidenceLayer","sourceObservationIds"],"unevaluatedProperties":false
+    },
+    "AdversarialSummary": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialSummary","type":"object",
+      "properties":{"passed":{"type":"integer"},"findings":{"type":"integer"},"unknownCount":{"type":"integer"},"errors":{"type":"integer"}},
+      "required":["passed","findings","unknownCount","errors"],"unevaluatedProperties":false
+    },
+    "AdversarialEvidenceReport": {
+      "$schema":"https://json-schema.org/draft/2020-12/schema","$id":"AdversarialEvidenceReport","type":"object",
+      "properties":{
+        "specVersion":{"type":"string","const":"canonical.adversarial-readiness.evidence.v1"},"reportId":{"type":"string"},"planId":{"type":"string"},"authorizationRefSha256":{"type":"string"},
+        "perspective":{"$ref":"AdversarialPerspective"},"observedPrivilege":{"$ref":"AdversarialObservedPrivilege"},"generatedAt":{"type":"string"},
+        "targets":{"type":"array","items":{"$ref":"AdversarialTargetRef"}},"results":{"type":"array","items":{"$ref":"AdversarialResult"}},"summary":{"$ref":"AdversarialSummary"},"boundary":{"type":"string"}
+      },
+      "required":["specVersion","reportId","planId","authorizationRefSha256","perspective","observedPrivilege","generatedAt","targets","results","summary","boundary"],"unevaluatedProperties":false
+    }
+  }
+}

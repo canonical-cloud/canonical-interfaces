@@ -1,0 +1,13 @@
+{
+  "specVersion": "canonical.audit.report.metadata.v1",
+  "owner": {
+    "kind": "org",
+    "id": "org_example_01"
+  },
+  "programId": "canonical.company-readiness",
+  "programVersion": "1.4.0",
+  "programDigest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "reportDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+  "createdAt": "2026-09-14T20:05:00Z",
+  "source": "canonical-company-auditor"
+}

@@ -1,0 +1,29 @@
+{
+  "specVersion": "canonical.adversarial-readiness.evidence.v1",
+  "reportId": "adv-bad-01",
+  "planId": "prod-boundaries-external",
+  "authorizationRefSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "perspective": {
+    "perspectiveId": "external-runner",
+    "trustZone": "external",
+    "expectedPrivilege": "non-root"
+  },
+  "observedPrivilege": "non-root",
+  "generatedAt": "2026-09-18T18:00:00Z",
+  "targets": [
+    {
+      "targetId": "prod-db-5432",
+      "kind": "tcp-service",
+      "locatorSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "locator": "db.internal.example:5432"
+    }
+  ],
+  "results": [],
+  "summary": {
+    "passed": 0,
+    "findings": 0,
+    "unknownCount": 0,
+    "errors": 0
+  },
+  "boundary": "invalid raw target locator"
+}

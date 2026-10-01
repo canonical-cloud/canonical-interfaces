@@ -1,0 +1,34 @@
+{
+  "specVersion": "canonical.readiness.observation.v1",
+  "eventId": "evt_01JTEST000000000000000001",
+  "sourceId": "customer-ci",
+  "sourceSequence": 42,
+  "organization": "org:example",
+  "observedAt": "2026-09-08T23:00:00Z",
+  "assertions": [
+    {
+      "frameworkId": "soc2-tsc",
+      "controlId": "CC6.1",
+      "reportedStatus": "observed",
+      "statement": "Access review evidence was collected by the customer system.",
+      "evidenceIds": ["ev_01JTEST000000000000000001"]
+    },
+    {
+      "frameworkId": "iso-iec-27001-2022",
+      "controlId": "A.5.18",
+      "reportedStatus": "unknown",
+      "evidenceIds": ["ev_01JTEST000000000000000001"]
+    }
+  ],
+  "evidence": [
+    {
+      "evidenceId": "ev_01JTEST000000000000000001",
+      "kind": "configuration-snapshot",
+      "sha256": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "collectedAt": "2026-09-08T22:59:00Z",
+      "locator": "urn:customer-evidence:access-review:42",
+      "contentType": "application/json",
+      "sizeBytes": 2048
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canonical.worker.reachability-probe.v1.authored.schema.json",
+  "$defs": {
+    "ReachabilityObservation": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReachabilityObservation",
+      "type": "string",
+      "enum": ["connected", "refused", "timed_out", "unreachable", "unresolved"]
+    },
+    "ReachabilityTarget": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReachabilityTarget",
+      "type": "object",
+      "properties": {
+        "targetId": {"type": "string"},
+        "host": {"type": "string"},
+        "port": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647}
+      },
+      "required": ["targetId", "host", "port"],
+      "unevaluatedProperties": false
+    },
+    "ReachabilityProbePlan": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReachabilityProbePlan",
+      "type": "object",
+      "properties": {
+        "specVersion": {"type": "string", "const": "canonical.worker.reachability-probe.v1"},
+        "authorizationRefSha256": {"type": "string"},
+        "planSha256": {"type": "string"},
+        "perspectiveId": {"type": "string"},
+        "trustZone": {"type": "string"},
+        "timeoutSeconds": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647},
+        "concurrency": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647},
+        "targets": {"type": "array", "items": {"$ref": "ReachabilityTarget"}}
+      },
+      "required": ["specVersion", "authorizationRefSha256", "planSha256", "perspectiveId", "trustZone", "timeoutSeconds", "concurrency", "targets"],
+      "unevaluatedProperties": false
+    },
+    "ReachabilityProbeResult": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReachabilityProbeResult",
+      "type": "object",
+      "properties": {
+        "targetId": {"type": "string"},
+        "observation": {"$ref": "ReachabilityObservation"},
+        "elapsedMillis": {"type": "integer"}
+      },
+      "required": ["targetId", "observation", "elapsedMillis"],
+      "unevaluatedProperties": false
+    },
+    "ReachabilityProbeResultSet": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "ReachabilityProbeResultSet",
+      "type": "object",
+      "properties": {
+        "specVersion": {"type": "string", "const": "canonical.worker.reachability-probe-result.v1"},
+        "planSha256": {"type": "string"},
+        "perspectiveId": {"type": "string"},
+        "runnerIdentitySha256": {"type": "string"},
+        "observedAt": {"type": "string"},
+        "results": {"type": "array", "items": {"$ref": "ReachabilityProbeResult"}}
+      },
+      "required": ["specVersion", "planSha256", "perspectiveId", "runnerIdentitySha256", "observedAt", "results"],
+      "unevaluatedProperties": false
+    }
+  }
+}

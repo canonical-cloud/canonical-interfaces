@@ -1,0 +1,13 @@
+{
+  "specVersion": "canonical.audit.report.metadata.v1",
+  "owner": {
+    "kind": "team",
+    "id": "team_example_01"
+  },
+  "programId": "canonical.host-baseline",
+  "programVersion": "1.0.0",
+  "programDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "reportDigest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "createdAt": "2026-09-14T20:00:00Z",
+  "source": "canonical-cli"
+}

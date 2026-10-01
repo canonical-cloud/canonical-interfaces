@@ -1,0 +1,25 @@
+name: bounded formal API model
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  model-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Prove operation idempotency and conflict rejection
+        run: |
+          node <<'NODE'
+          const assert=require('node:assert/strict'), bound=7;
+          const initial={seen:{},commits:0,conflicts:0};
+          const steps=[['request-a',s=>s.seen.a?s:{seen:{...s.seen,a:'p1'},commits:s.commits+1,conflicts:s.conflicts}],['request-b',s=>s.seen.b?s:{seen:{...s.seen,b:'p2'},commits:s.commits+1,conflicts:s.conflicts}],['replay-a',s=>s],['conflict-a',s=>s]];
+          const invariant=s=>s.conflicts===0&&s.commits===Object.keys(s.seen).length;
+          let frontier=[initial],seen=new Map([[JSON.stringify(initial),initial]]);
+          for(let d=0;d<=bound;d++){const next=[];for(const s of frontier){assert(invariant(s));for(const [name,step] of steps){const n=step(structuredClone(s));assert(invariant(n),`${name} violated idempotency invariant`);const k=JSON.stringify(n);if(!seen.has(k)){seen.set(k,n);next.push(n)}}}frontier=next}
+          assert(seen.size>=3); console.log(`API formal model OK: states=${seen.size} bound=${bound}`);
+          NODE

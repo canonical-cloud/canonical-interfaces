@@ -1,0 +1,25 @@
+{
+  "specVersion": "canonical.readiness.assessment.v1",
+  "assessmentReportId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "scopeId": "organization/acme",
+  "generatedAt": "2026-09-14T22:15:00Z",
+  "engineId": "canonical-cli/readiness-scan",
+  "engineVersion": "0.2.0",
+  "sourceObservationIds": [],
+  "evidence": [],
+  "targets": [{"targetId":"target-1","kind":"https-endpoint"}],
+  "findings": [{
+    "findingId":"finding-1",
+    "checkId":"transport",
+    "status":"certified",
+    "severity":"high",
+    "title":"Unsupported assurance claim",
+    "summary":"Certification is not a machine finding state.",
+    "targetId":"target-1",
+    "evidenceIds":[],
+    "mappings":[]
+  }],
+  "recommendations": [],
+  "counts": {"passed":0,"failed":0,"unknownCount":0,"errors":0,"highOrCriticalFailures":0},
+  "boundary": "Pre-audit/readiness evidence only; not an audit, attestation, certification, or legal conclusion."
+}

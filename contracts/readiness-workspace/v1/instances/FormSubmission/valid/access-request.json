@@ -1,0 +1,14 @@
+{
+  "specVersion": "canonical.readiness.form-submission.v1",
+  "submissionUuid": "44444444-4444-4444-8444-444444444444",
+  "formUuid": "55555555-5555-4555-8555-555555555555",
+  "formVersion": 3,
+  "tenantUuid": "11111111-1111-4111-8111-111111111111",
+  "scopeId": "organization/acme",
+  "submittedBy": "user/alice",
+  "submittedAt": "2026-09-09T15:05:00Z",
+  "sourceIpToken": "ip-hmac:v1:76ac34c3b7ee3fb64972f052155baa71",
+  "payloadObjectKey": "forms/v1/2026/09/09/55555555-5555-4555-8555-555555555555/44444444-4444-4444-8444-444444444444.json",
+  "payloadSha256": "d9fe93b9587a0bb53fc09cd7760f2317b7886bc390a272f80ed92f26f40e4f12",
+  "state": "submitted"
+}

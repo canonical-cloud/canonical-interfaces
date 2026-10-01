@@ -1,0 +1,76 @@
+name: Readiness observation TypeSpec and JSON Schema parity
+
+on:
+  pull_request:
+    paths:
+      - "contracts/readiness-observation/v1/**"
+      - ".github/workflows/readiness-observation-contract.yml"
+  push:
+    branches: [main, dev]
+    paths:
+      - "contracts/readiness-observation/v1/**"
+      - ".github/workflows/readiness-observation-contract.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readiness-observation-contract-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify checked-out revision
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+      - name: Compare independently authored readiness authorities
+        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        with:
+          typespec: contracts/readiness-observation/v1/main.tsp
+          schema: contracts/readiness-observation/v1/authored.schema.json
+          instances: contracts/readiness-observation/v1/instances
+          report: .typespec-json-schema-validator/readiness-observation-report.json
+          sarif: .typespec-json-schema-validator/readiness-observation.sarif
+          contract_ir: .typespec-json-schema-validator/readiness-observation.contract-ir.json
+          output_dir: .typespec-json-schema-validator/readiness-observation-generated
+          int64_strategy: number
+          max_probes: "96"
+      - name: Verify admissible exact-head evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import assert from "node:assert/strict";
+          import { readFileSync } from "node:fs";
+          const report = JSON.parse(readFileSync(".typespec-json-schema-validator/readiness-observation-report.json", "utf8"));
+          const ir = JSON.parse(readFileSync(".typespec-json-schema-validator/readiness-observation.contract-ir.json", "utf8"));
+          assert.equal(report.schema, "ores.typespec-json-schema-validator.report/v1");
+          assert.equal(report.status, "passed");
+          assert.equal(report.zeroUnexplainedFindings, true);
+          assert.deepEqual(report.findings, []);
+          assert.equal(ir.status, "passed");
+          assert.equal(ir.admissible, true);
+          assert.equal(ir.editableAuthority, false);
+          assert.equal(ir.authorities.precedence, "none");
+          assert.equal(ir.admission.receipt.runId, report.runId);
+          assert.ok(ir.admission.scope.admittedDeclarations >= 9);
+          NODE
+      - name: Retain parity receipt, Contract IR, SARIF and generated witness
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: readiness-observation-contract-${{ github.run_id }}
+          path: .typespec-json-schema-validator/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
