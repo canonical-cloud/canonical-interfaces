@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Literal
 
+__all__ = ["HealthStatus", "ServiceInfo", "AuditEngagement", "QuoteRequest", "QuoteSubmissionResponse", "QuoteEstimate", "QuoteProblem", "QuoteStatusEvent", "QuoteSummary", "QuoteDetail", "QuoteListQuery", "QuoteListResponse", "QuoteRetryResponse", "PreInterestRegistrationRequest", "PreInterestRegistrationResponse", "PreInterestProblem"]
+
 @dataclass
 class HealthStatus:
     """Legacy-compatible response of GET /api/health and GET /api/v1/health."""
@@ -18,76 +20,12 @@ class ServiceInfo:
     stack: List[str]
 
 @dataclass
-class DraftNoteValue:
-    """Schema-version-1 value for the only record kind accepted by the initial sync protocol."""
-    title: str
-    body: str
-
-@dataclass
-class DraftNoteKey:
-    """Owner-scoped key for a draft-note sync record."""
-    kind: Literal["draft_note"]
-    id: str
-
-@dataclass
-class MutationOperation:
-    """One idempotent compare-and-swap operation in a draft-note mutation batch."""
-    mutationId: str
-    key: DraftNoteKey
-    action: Literal["put", "delete"]
-    baseVersion: Optional[str]
-    schemaVersion: int
-    value: Optional[DraftNoteValue] = None
-
-@dataclass
-class MutationRequest:
-    """Body of POST /api/v1/sync/mutations."""
-    protocolVersion: int
-    clientId: str
-    operations: List[MutationOperation]
-
-@dataclass
-class WireRecord:
-    """Authoritative server snapshot of a draft-note record or tombstone."""
-    key: DraftNoteKey
-    version: str
-    schemaVersion: int
-    deleted: bool
-    value: Optional[DraftNoteValue] = None
-
-@dataclass
-class MutationResult:
-    """Per-operation result returned in the same order as the mutation request."""
-    mutationId: str
-    status: Literal["applied", "conflict", "gone", "invalid", "idempotency_key_reused"]
-    record: Optional[WireRecord] = None
-    message: Optional[str] = None
-
-@dataclass
-class MutationResponse:
-    """Response of POST /api/v1/sync/mutations."""
-    results: List[MutationResult]
-
-@dataclass
-class ChangesQuery:
-    """Query parameters accepted by GET /api/v1/sync/changes."""
-    cursor: Optional[str] = None
-    limit: Optional[int] = None
-
-@dataclass
-class ChangesResponse:
-    """Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints."""
-    changes: List[WireRecord]
-    nextCursor: str
-    caughtUp: bool
-
-@dataclass
 class AuditEngagement:
-    """A single compliance-audit engagement for a customer company."""
+    """A single readiness engagement preparing a customer company for independent review against a framework."""
     id: str
     company: str
-    framework: Literal["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"]
-    status: Literal["scoping", "remediation", "in_audit", "complete"]
+    framework: Literal["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr", "cis_controls", "cmmc", "csa_ccm", "dora", "iso_22301", "iso_27701", "nis2", "nist_csf", "nist_800_53"]
+    status: Literal["scoping", "remediation", "audit_ready", "in_audit", "complete"]
     opened_at: str
     target_report_date: Optional[str] = None
 
@@ -143,6 +81,13 @@ class QuoteEstimate:
     createdAt: str
 
 @dataclass
+class QuoteProblem:
+    """Bounded public error payload for quote endpoints."""
+    code: str
+    message: str
+    requestId: str
+
+@dataclass
 class QuoteStatusEvent:
     """Authenticated WebSocket progress message for one quote."""
     quoteId: str
@@ -153,13 +98,6 @@ class QuoteStatusEvent:
     occurredAt: str
     estimate: Optional[QuoteEstimate] = None
     problem: Optional[QuoteProblem] = None
-
-@dataclass
-class QuoteProblem:
-    """Bounded public error payload for quote endpoints."""
-    code: str
-    message: str
-    requestId: str
 
 @dataclass
 class QuoteSummary:
