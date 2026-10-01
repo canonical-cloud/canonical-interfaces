@@ -1,0 +1,95 @@
+name: Pre-interest contract toolchain
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - contracts/pre-interest/v1/**
+      - schema/pre-interest.schema.json
+      - schema/index.json
+      - scripts/project-pre-interest-contract.mjs
+      - scripts/project-pre-interest-contract.test.mjs
+      - generated/**
+      - route-maps/api.route-map.json
+      - generated/routes/**
+      - package.json
+      - .zpkg.toml
+      - .github/workflows/pre-interest-contract.yml
+  pull_request:
+    paths:
+      - contracts/pre-interest/v1/**
+      - schema/pre-interest.schema.json
+      - schema/index.json
+      - scripts/project-pre-interest-contract.mjs
+      - scripts/project-pre-interest-contract.test.mjs
+      - generated/**
+      - route-maps/api.route-map.json
+      - generated/routes/**
+      - package.json
+      - .zpkg.toml
+      - .github/workflows/pre-interest-contract.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pre-interest-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compile-and-conform:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Install Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: "22"
+          package-manager-cache: false
+
+      - name: Install Buf 1.72.0
+        uses: bufbuild/buf-setup-action@a47c93e0b1648d5651a065437926377d060baa99 # v1.50.0
+        with:
+          version: "1.72.0"
+          github_token: ${{ github.token }}
+
+      - name: Compile TypeSpec with the reviewed stable compiler
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/typespec" \
+            --ignore-scripts --no-audit --no-fund \
+            @typespec/compiler@1.14.0
+          "$RUNNER_TEMP/typespec/node_modules/.bin/tsp" compile \
+            contracts/pre-interest/v1/main.tsp --no-emit
+
+      - name: Format, lint, compile, and breaking-check Protobuf
+        shell: bash
+        run: |
+          set -euo pipefail
+          buf format --diff --exit-code contracts/pre-interest/v1
+          buf lint contracts/pre-interest/v1
+          buf lint contracts/pre-interest/v1/baseline
+          buf build contracts/pre-interest/v1 \
+            -o "$RUNNER_TEMP/pre_interest.descriptor.binpb"
+          buf breaking contracts/pre-interest/v1 \
+            --against contracts/pre-interest/v1/baseline
+          observed="$(sha256sum "$RUNNER_TEMP/pre_interest.descriptor.binpb" | awk '{print $1}')"
+          expected="$(awk 'NR == 1 {print $1}' contracts/pre-interest/v1/pre_interest.descriptor.sha256)"
+          test "$observed" = "$expected"
+
+      - name: Check deterministic projection and generated adapters
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test
+          python3 scripts/generate-routes.py \
+            --map route-maps/api.route-map.json \
+            --out generated/routes \
+            --check

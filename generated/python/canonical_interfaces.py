@@ -203,3 +203,37 @@ class QuoteRetryResponse:
     status: Literal["queued"]
     streamUrl: str
     updatedAt: str
+
+@dataclass
+class PreInterestRegistrationRequest:
+    """Public consented registration. The origin revalidates host/party matching and derives dedupe aliases with a dedicated server-side HMAC key."""
+    requestId: str
+    email: str
+    partyType: Literal["individual", "organization"]
+    interestAreas: List[str]
+    consentRevision: str
+    consentedAt: str
+    sourceHost: Literal["user.canonical.plus", "org.canonical.plus"]
+    registrationConsent: bool
+    marketingConsent: bool
+    organizationName: Optional[str] = None
+    locale: Optional[str] = None
+    referralCode: Optional[str] = None
+    displayName: Optional[str] = None
+    websiteUrl: Optional[str] = None
+    marketingConsentRevision: Optional[str] = None
+
+@dataclass
+class PreInterestRegistrationResponse:
+    """Uniform response for newly created, duplicate-request, and already-known email aliases."""
+    receiptId: str
+    status: Literal["accepted"]
+    acceptedAt: str
+    nextStepUrl: str
+
+@dataclass
+class PreInterestProblem:
+    """Safe bounded error that never echoes contact data."""
+    code: Literal["invalid_request", "rate_limited", "verification_required", "storage_unavailable", "internal"]
+    message: str
+    requestId: str

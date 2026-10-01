@@ -1,0 +1,18 @@
+{
+  "requestId": "9f1c7237-1f42-4c0c-95d2-8ca7c3a4de50",
+  "email": "security@example.org",
+  "partyType": "organization",
+  "organizationName": "Example Security",
+  "interestAreas": [
+    "iso_27001",
+    "nist"
+  ],
+  "consentRevision": "pre-interest-v1",
+  "consentedAt": "2026-09-01T15:31:00Z",
+  "sourceHost": "org.canonical.plus",
+  "displayName": "Security Lead",
+  "websiteUrl": "https://example.org",
+  "registrationConsent": true,
+  "marketingConsent": true,
+  "marketingConsentRevision": "marketing-v1"
+}
