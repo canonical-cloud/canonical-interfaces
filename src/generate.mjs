@@ -75,7 +75,11 @@ const nonNullSchema = (s) => {
 };
 const isStringEnum = (s) => {
   const inner = nonNullSchema(s);
-  return inner && inner.type === "string" && Array.isArray(inner.enum) && inner.enum.length > 0;
+  return inner
+    && (inner.type === undefined || inner.type === "string")
+    && Array.isArray(inner.enum)
+    && inner.enum.length > 0
+    && inner.enum.every((value) => typeof value === "string");
 };
 const enumTypeName = (typeName, fieldName) => `${typeName}${pascal(fieldName)}`;
 
