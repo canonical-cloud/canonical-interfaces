@@ -97,7 +97,7 @@ function validateProjection(family, file) {
 
 function isNamedStringEnum(schema) {
   return schema
-    && schema.type === "string"
+    && (schema.type === undefined || schema.type === "string")
     && Array.isArray(schema.enum)
     && schema.enum.length > 0
     && schema.enum.every((value) => typeof value === "string");
