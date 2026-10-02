@@ -276,6 +276,10 @@ function renderRustBody(types, { wasm }) {
   for (const t of types) {
     if (t.description) out.push(`/// ${cLine(t.description)}`);
     out.push(structDerive);
+    if (t.props.length === 0) {
+      out.push(`pub struct ${t.name} {}`, "");
+      continue;
+    }
     out.push(`pub struct ${t.name} {`);
     for (const p of t.props) {
       if (p.description) out.push(`    /// ${cLine(p.description)}`);
