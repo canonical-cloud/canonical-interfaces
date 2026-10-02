@@ -132,7 +132,7 @@ function rewriteSchemaForLegacyGenerator(value, namedEnums, location) {
   for (const [key, entry] of Object.entries(value)) {
     out[key] = rewriteSchemaForLegacyGenerator(entry, namedEnums, `${location}/${key}`);
   }
-  if (out.type === "string" && Object.hasOwn(out, "const")) {
+  if ((out.type === undefined || out.type === "string") && Object.hasOwn(out, "const")) {
     if (typeof out.const !== "string") fail(`${location}: only string const lowering is supported`);
     if (Array.isArray(out.enum) && (out.enum.length !== 1 || out.enum[0] !== out.const)) {
       fail(`${location}: const and enum disagree`);
