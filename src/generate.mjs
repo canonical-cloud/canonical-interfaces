@@ -75,7 +75,11 @@ const nonNullSchema = (s) => {
 };
 const isStringEnum = (s) => {
   const inner = nonNullSchema(s);
-  return inner && inner.type === "string" && Array.isArray(inner.enum) && inner.enum.length > 0;
+  return inner
+    && (inner.type === undefined || inner.type === "string")
+    && Array.isArray(inner.enum)
+    && inner.enum.length > 0
+    && inner.enum.every((value) => typeof value === "string");
 };
 const enumTypeName = (typeName, fieldName) => `${typeName}${pascal(fieldName)}`;
 
@@ -276,6 +280,10 @@ function renderRustBody(types, { wasm }) {
   for (const t of types) {
     if (t.description) out.push(`/// ${cLine(t.description)}`);
     out.push(structDerive);
+    if (t.props.length === 0) {
+      out.push(`pub struct ${t.name} {}`, "");
+      continue;
+    }
     out.push(`pub struct ${t.name} {`);
     for (const p of t.props) {
       if (p.description) out.push(`    /// ${cLine(p.description)}`);
