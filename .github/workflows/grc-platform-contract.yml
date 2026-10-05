@@ -113,6 +113,9 @@ jobs:
             assert.ok(entry.app_path.startsWith('/app/compliance/'));
             assert.ok(entry.persistence_tables.length > 0);
           }
+          const trustCenter = catalog.capabilities.find((entry) => entry.key === 'trust_center');
+          assert.ok(trustCenter);
+          assert.ok(trustCenter.persistence_tables.includes('trust_center_access_grants'));
           NODE
 
       - name: Upload deterministic parity receipt
