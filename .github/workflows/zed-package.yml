@@ -17,3 +17,25 @@ permissions:
 jobs:
   certify:
     uses: zed-pkg/zed-interfaces/.github/workflows/certify-zed-package.yml@996fc56e20c4bb41366377be14edfae886b84e82
+
+  admission:
+    name: admission
+    needs: certify
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Project certified admission result to protected-branch context
+        env:
+          CERTIFY_RESULT: ${{ needs.certify.result }}
+        run: test "$CERTIFY_RESULT" = "success"
+
+  publish:
+    name: publish
+    needs: certify
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Project certified package result to protected-branch context
+        env:
+          CERTIFY_RESULT: ${{ needs.certify.result }}
+        run: test "$CERTIFY_RESULT" = "success"
