@@ -38,7 +38,7 @@ jobs:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
       - name: Compare independently authored adversarial-readiness authorities
-        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        uses: ORESoftware/typespec-json-schema-validator@69337efc11ba4ecaa90b48878c942384fc74f650
         with:
           typespec: contracts/adversarial-readiness/v1/main.tsp
           schema: contracts/adversarial-readiness/v1/authored.schema.json
