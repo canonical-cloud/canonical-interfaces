@@ -105,18 +105,18 @@
         },
         "open_items": {
           "type": "integer",
-          "minimum": -2147483648,
-          "maximum": 2147483647
+          "minimum": 0,
+          "maximum": 4294967295
         },
         "overdue_items": {
           "type": "integer",
-          "minimum": -2147483648,
-          "maximum": 2147483647
+          "minimum": 0,
+          "maximum": 4294967295
         },
         "failing_automated_checks": {
           "type": "integer",
-          "minimum": -2147483648,
-          "maximum": 2147483647
+          "minimum": 0,
+          "maximum": 4294967295
         },
         "last_updated_at": {
           "type": "string"
