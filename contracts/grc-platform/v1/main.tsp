@@ -26,9 +26,9 @@ model GrcCapabilityDescriptor {
 
 model GrcModuleSnapshot {
   key: GrcCapabilityKey;
-  open_items: int32;
-  overdue_items: int32;
-  failing_automated_checks: int32;
+  open_items: uint32;
+  overdue_items: uint32;
+  failing_automated_checks: uint32;
   last_updated_at: string;
 }
 
