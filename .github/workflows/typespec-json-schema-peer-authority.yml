@@ -38,7 +38,7 @@ jobs:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
       - name: Compare peer authorities and emit Contract IR
-        uses: ORESoftware/typespec-json-schema-validator@69337efc11ba4ecaa90b48878c942384fc74f650
+        uses: ORESoftware/typespec-json-schema-validator@5fdbeaf57d582b69126c6e1a0623b43bc2a25d04
         with:
           typespec: schema-authority-canary/main.tsp
           schema: schema-authority-canary/authored.schema.json
