@@ -4,6 +4,7 @@ permissions: {contents: read}
 jobs:
   bounded-model:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     env: {MODEL: schema-publication, INITIAL: draft, TERMINAL: retired, EDGES: 'draft|validate|validated;validated|publish|published;published|retire|retired'}
     steps:
       - name: Exhaustively check state-machine invariants
