@@ -12,6 +12,12 @@
 
 Cloudflare is routing and defense in depth, not the authorization authority. Both Rust origins verify credentials and revocation independently.
 
+## Anonymous marketing estimator boundary
+
+The public estimator at `canonical.plus/quote/` is deliberately **not** a surface of this API. It calculates a non-binding planning range in browser memory without authentication and does not persist or submit estimator state. Choosing **Sign in** starts the separate authenticated workflow at `app.canonical.plus/u/quote`; the local estimator state is not automatically transferred.
+
+Do not relax the authentication or owner-isolation requirements in this contract to support the marketing estimator. If Canonical later adds persistent anonymous quote submissions, that is a separate versioned server/API contract that must define abuse controls, retention, identity/ownership semantics, idempotency, and data-handling boundaries explicitly.
+
 ## Internal web-to-API contract
 
 The trusted web tier may call the private API service with exactly:
