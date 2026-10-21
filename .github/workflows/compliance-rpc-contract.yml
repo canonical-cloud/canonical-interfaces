@@ -36,7 +36,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 
       - name: Admit independently authored compliance RPC authorities
-        uses: ORESoftware/typespec-json-schema-validator@3171025cbe03a7026a71ce94eea18c910e1431b2
+        uses: ORESoftware/typespec-json-schema-validator@5fdbeaf57d582b69126c6e1a0623b43bc2a25d04
         with:
           typespec: contracts/compliance-rpc/v1/main.tsp
           schema: contracts/compliance-rpc/v1/authored.schema.json
@@ -50,7 +50,7 @@ jobs:
 
       - name: Retain exact-head parity evidence
         if: ${{ always() }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: compliance-rpc-contract-${{ github.run_id }}
           path: .typespec-json-schema-validator/
