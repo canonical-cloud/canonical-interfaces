@@ -46,7 +46,7 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
 
       - name: Admit adversarial readiness contract
-        uses: ORESoftware/typespec-json-schema-validator@5fdbeaf57d582b69126c6e1a0623b43bc2a25d04
+        uses: ORESoftware/typespec-json-schema-validator@2d3b187aec68477cff579f2f3a9275ea5ef62f88
         with:
           typespec: contracts/adversarial-readiness/v1/main.tsp
           schema: contracts/adversarial-readiness/v1/authored.schema.json
@@ -59,7 +59,7 @@ jobs:
           max_probes: "256"
 
       - name: Admit reachability probe contract
-        uses: ORESoftware/typespec-json-schema-validator@5fdbeaf57d582b69126c6e1a0623b43bc2a25d04
+        uses: ORESoftware/typespec-json-schema-validator@2d3b187aec68477cff579f2f3a9275ea5ef62f88
         with:
           typespec: contracts/reachability-probe/v1/main.tsp
           schema: contracts/reachability-probe/v1/authored.schema.json
