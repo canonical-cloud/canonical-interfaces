@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TJSV_REVISION: e22ea206d86ebc5141127f404f2870c162a3fad0
+  TJSV_REVISION: f386c78e44c93309029e186799d926c652cb0d96
 
 jobs:
   parity:
@@ -78,7 +78,7 @@ jobs:
             --mode build \
             > .typespec-json-schema-validator/customer-1-demo.config-instance.json
       - name: Compare independently authored canonical audit config authorities
-        uses: ORESoftware/typespec-json-schema-validator@2d3b187aec68477cff579f2f3a9275ea5ef62f88
+        uses: ORESoftware/typespec-json-schema-validator@f386c78e44c93309029e186799d926c652cb0d96
         with:
           typespec: contracts/canonical-audit-config/v1/main.tsp
           schema: contracts/canonical-audit-config/v1/authored.schema.json
