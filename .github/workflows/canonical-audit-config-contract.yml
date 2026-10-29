@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TJSV_REVISION: e22ea206d86ebc5141127f404f2870c162a3fad0
+  TJSV_REVISION: f386c78e44c93309029e186799d926c652cb0d96
 
 jobs:
   parity:
@@ -36,7 +36,7 @@ jobs:
         env:
           EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v6.0.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v6.0.0
         with:
           python-version: "3.12"
       - name: Check out pinned TJSV runtime/build evaluator
@@ -78,7 +78,7 @@ jobs:
             --mode build \
             > .typespec-json-schema-validator/customer-1-demo.config-instance.json
       - name: Compare independently authored canonical audit config authorities
-        uses: ORESoftware/typespec-json-schema-validator@2d3b187aec68477cff579f2f3a9275ea5ef62f88
+        uses: ORESoftware/typespec-json-schema-validator@f386c78e44c93309029e186799d926c652cb0d96
         with:
           typespec: contracts/canonical-audit-config/v1/main.tsp
           schema: contracts/canonical-audit-config/v1/authored.schema.json
