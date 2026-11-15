@@ -19,11 +19,24 @@ export function emitAttoBounds(types) {
   for (const type of types) {
     for (const property of type.props) {
       const schema = property.schema;
+      if (!schema || typeof schema !== "object" || Array.isArray(schema)) {
+        throw new Error("AttoLang invalid property schema: " + type.name + "." + property.name);
+      }
+      const boundKeywords = [
+        "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum", "multipleOf",
+        "minLength", "maxLength", "minItems", "maxItems",
+      ].filter((key) => Object.hasOwn(schema, key));
+      if (boundKeywords.length === 0) continue;
       const kind = kindFor(schema);
-      if (!kind) continue;
+      if (!kind) {
+        throw new Error("AttoLang unsupported constrained type: " + type.name + "." + property.name);
+      }
       const lowKey = kind === "value" ? "minimum" : kind === "length" ? "minLength" : "minItems";
       const highKey = kind === "value" ? "maximum" : kind === "length" ? "maxLength" : "maxItems";
-      if (schema[lowKey] === undefined && schema[highKey] === undefined) continue;
+      const unsupported = boundKeywords.filter((key) => key !== lowKey && key !== highKey);
+      if (unsupported.length) {
+        throw new Error("AttoLang unsupported bound keyword for " + type.name + "." + property.name + ": " + unsupported.join(", "));
+      }
       const lower = schema[lowKey] === undefined ? (kind === "value" ? null : 0) : schema[lowKey];
       const upper = schema[highKey] === undefined ? null : schema[highKey];
       for (const [label, bound] of [["minimum", lower], ["maximum", upper]]) {
