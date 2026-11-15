@@ -43,7 +43,10 @@ fn validate_index(source: &str) -> Result<(usize, usize), String> {
         .filter(|name| name.ends_with("_type_name"))
         .collect();
     if type_names.len() != declared_count {
-        return Err(format!("type count mismatch: {declared_count} vs {}", type_names.len()));
+        return Err(format!(
+            "type count mismatch: {declared_count} vs {}",
+            type_names.len()
+        ));
     }
 
     let mut field_total = 0;
@@ -81,7 +84,9 @@ fn validate_index(source: &str) -> Result<(usize, usize), String> {
         .filter(|line| !line.starts_with("//"))
         .collect::<Vec<_>>()
         .join("\n");
-    for forbidden in ["fetch(", "socket(", "token(", "http://", "https://", "probe(", "exec("] {
+    for forbidden in [
+        "fetch(", "socket(", "token(", "http://", "https://", "probe(", "exec(",
+    ] {
         if executable.contains(forbidden) {
             return Err(format!("unexpected transport behavior: {forbidden}"));
         }
@@ -91,7 +96,8 @@ fn validate_index(source: &str) -> Result<(usize, usize), String> {
 
 #[test]
 fn generated_atto_metadata_is_structurally_complete() {
-    let (types, fields) = validate_index(ATTO_INDEX).expect("Atto metadata source must be complete");
+    let (types, fields) =
+        validate_index(ATTO_INDEX).expect("Atto metadata source must be complete");
     assert_eq!(types, 25);
     assert_eq!(fields, 135);
 }
@@ -105,7 +111,10 @@ fn generated_atto_metadata_rejects_mutation_and_untracked_exports() {
         format!("{ATTO_INDEX}\nfetch(\"https://example.invalid\");\n"),
     ];
     for (index, source) in mutations.iter().enumerate() {
-        assert!(validate_index(source).is_err(), "mutation {index} was accepted");
+        assert!(
+            validate_index(source).is_err(),
+            "mutation {index} was accepted"
+        );
     }
 }
 
