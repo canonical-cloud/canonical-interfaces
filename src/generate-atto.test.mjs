@@ -37,3 +37,30 @@ test("AttoLang projection fails closed on unsafe bounds and identifier collision
   ] }]), /duplicate/);
   assert.throws(() => emitAttoBounds(mk("noop", { type: "boolean" })), /silently become empty/);
 });
+
+test("AttoLang projection rejects unsupported or mismatched constraint keywords", () => {
+  const mk = (schema) => [{ name: "Fixture", props: [{ name: "size", schema }] }];
+  assert.throws(() => emitAttoBounds(mk({ type: "integer", exclusiveMinimum: 0 })), /unsupported bound keyword/);
+  assert.throws(() => emitAttoBounds(mk({ type: "integer", multipleOf: 2, maximum: 10 })), /unsupported bound keyword/);
+  assert.throws(() => emitAttoBounds(mk({ type: "string", maximum: 8 })), /unsupported bound keyword/);
+  assert.throws(() => emitAttoBounds(mk({ type: "number", maximum: 8 })), /unsupported constrained type/);
+  assert.throws(() => emitAttoBounds(mk({ type: ["string", "integer"], maxLength: 8 })), /unsupported constrained type/);
+  assert.throws(() => emitAttoBounds(mk(null)), /invalid property schema/);
+  assert.throws(() => emitAttoBounds(mk({ type: "string", maxLength: 9007199254740992 })), /safe integer/);
+});
+
+test("AttoLang integer and collection boundaries preserve their comparisons", () => {
+  const generated = emitAttoBounds([
+    { name: "Fixture", props: [
+      { name: "count", schema: { type: "integer", minimum: -2, maximum: 2 } },
+      { name: "items", schema: { type: "array", maxItems: 0 } },
+      { name: "label", schema: { type: ["string", "null"], minLength: 1 } },
+    ] },
+  ])["atto/bounds.atto"];
+  assert.match(generated, /if value < -2 then return false; fi/);
+  assert.match(generated, /if value > 2 then return false; fi/);
+  assert.match(generated, /if count < 0 then return false; fi/);
+  assert.match(generated, /if count > 0 then return false; fi/);
+  assert.match(generated, /if length < 1 then return false; fi/);
+  assert.equal((generated.match(/^pub fnc /gm) || []).length, 3);
+});
