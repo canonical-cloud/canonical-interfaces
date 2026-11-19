@@ -23,6 +23,7 @@ jobs:
     needs: certify
     if: ${{ always() }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - name: Project certified admission result to protected-branch context
         env:
@@ -34,6 +35,7 @@ jobs:
     needs: certify
     if: ${{ always() }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - name: Project certified package result to protected-branch context
         env:
