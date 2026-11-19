@@ -24,13 +24,17 @@
     "./adversarial-readiness-typespec": "./contracts/adversarial-readiness/v1/main.tsp",
     "./reachability-probe-schema": "./contracts/reachability-probe/v1/authored.schema.json",
     "./reachability-probe-typespec": "./contracts/reachability-probe/v1/main.tsp",
+    "./public-quote-estimator-schema": "./contracts/public-quote-estimator/v1/authored.schema.json",
+    "./public-quote-estimator-typespec": "./contracts/public-quote-estimator/v1/main.tsp",
+    "./public-quote-estimator-fixture": "./contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json",
     "./quote-fixtures": "./fixtures/quote-v1",
     "./sql": "./sql/schema.sql",
     "./typescript": "./generated/typescript/index.ts",
     "./rust": "./generated/rust/src/lib.rs",
     "./dart": "./generated/dart/lib/canonical_interfaces.dart",
     "./python": "./generated/python/canonical_interfaces.py",
-    "./go": "./generated/go/interfaces.go"
+    "./go": "./generated/go/interfaces.go",
+    "./atto": "./generated/atto/contract_index.atto"
   },
   "oresLint": {
     "note": "Declared, not installed. ores-lint resolves these from a global install - see .ores-lint/README.md",
