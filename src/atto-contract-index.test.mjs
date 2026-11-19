@@ -50,3 +50,23 @@ test("Atto projection remains source-only and free from executable transport", (
   assert.doesNotMatch(source, /\b(fetch|http|socket|token|probe|execute|eval)\s*\(/i);
   assert.match(source, /not a JSON validator, runtime SDK, or compiler conformance claim/);
 });
+
+
+test("Atto contract index refuses malformed enum, union and flattened reference semantics", () => {
+  const make = (schema) => [{ name: "Sample", props: [
+    { name: "field", schema, required: true },
+  ] }];
+  for (const schema of [
+    { type: ["integer", "null", "null"] },
+    { type: ["string", "string"] },
+    { type: "string", enum: [] },
+    { type: "string", enum: "unsafe" },
+    { $ref: "#/$defs/Sample", type: "string" },
+    { $ref: "#/$defs/Sample", enum: ["unexpected"] },
+  ]) {
+    assert.throws(() => emitAttoContractIndex(make(schema)),
+      /union members|nonempty enum|extra type or enum constraints/);
+  }
+  assert.match(emitAttoContractIndex(make({ type: ["integer", "null"] })),
+    /integer:nullable/);
+});
