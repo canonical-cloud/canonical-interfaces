@@ -13,11 +13,21 @@ function wireKind(schema) {
     throw new Error("Atto projection requires a field schema");
   }
   if (schema.$ref !== undefined) {
+    if (Object.hasOwn(schema, "type") || Object.hasOwn(schema, "enum")) {
+      throw new Error("Atto projection cannot flatten a reference with extra type or enum constraints");
+    }
     const match = REF_NAME.exec(schema.$ref);
     if (!match) throw new Error(`Atto projection refuses external reference ${schema.$ref}`);
     return `ref:${match[1]}`;
   }
   const types = Array.isArray(schema.type) ? schema.type : [schema.type];
+  if (types.some((kind) => typeof kind !== "string") ||
+      new Set(types).size !== types.length) {
+    throw new Error("Atto projection rejects duplicated or invalid union members");
+  }
+  if (schema.enum !== undefined && (!Array.isArray(schema.enum) || schema.enum.length === 0)) {
+    throw new Error("Atto projection requires a nonempty enum array");
+  }
   const kinds = types.filter((kind) => kind !== "null" && kind !== undefined);
   if (kinds.length !== 1) throw new Error("Atto projection cannot describe a multi-type union");
   const kind = kinds[0];
