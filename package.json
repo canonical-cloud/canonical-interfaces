@@ -33,7 +33,8 @@
     "./rust": "./generated/rust/src/lib.rs",
     "./dart": "./generated/dart/lib/canonical_interfaces.dart",
     "./python": "./generated/python/canonical_interfaces.py",
-    "./go": "./generated/go/interfaces.go"
+    "./go": "./generated/go/interfaces.go",
+    "./atto": "./generated/atto/contract_index.atto"
   },
   "oresLint": {
     "note": "Declared, not installed. ores-lint resolves these from a global install - see .ores-lint/README.md",
