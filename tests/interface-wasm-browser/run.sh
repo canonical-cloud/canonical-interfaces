@@ -191,7 +191,9 @@ setsid "$chrome_bin" "${chrome_args[@]}" about:blank \
   >"$chrome_stdout" 2>"$chrome_log" &
 chrome_pid=$!
 
-for _ in $(seq 1 100); do
+# Hosted Chromium startup may take longer than the local server. Keep a
+# bounded 30-second DevTools admission window before failing closed.
+for _ in $(seq 1 300); do
   if curl --fail --silent \
     "http://127.0.0.1:${debug_port}/json/version" >/dev/null 2>&1; then
     break
@@ -209,7 +211,7 @@ if ! curl --fail --silent --show-error \
   "http://127.0.0.1:${debug_port}/json/version" >/dev/null; then
   preserve_failure_evidence
   print_failure_evidence
-  echo "Chromium DevTools endpoint did not become ready" >&2
+  echo "Chromium DevTools endpoint did not become ready within 30 seconds" >&2
   exit 1
 fi
 
