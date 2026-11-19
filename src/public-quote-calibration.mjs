@@ -12,7 +12,7 @@ const sectors = new Set([
   'retail', 'public-sector', 'other',
 ]);
 const boundedCurrency = (x) => typeof x === 'number' && Number.isFinite(x) &&
-  x >= 0 && x <= 1_000_000_000 && Math.round(x * 100) === x * 100;
+  x >= 0 && x <= 1_000_000_000 && /^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(String(x));
 const round = (n) => Math.round(n * 10000) / 10000;
 const ratio = (numerator, denominator) => round(numerator / denominator);
 const percentile = (ordered, q) => ordered[Math.max(0, Math.ceil(q * ordered.length) - 1)];
@@ -100,8 +100,18 @@ export function evaluateQuoteCalibration(rows, {
   if (holdout.length < minHoldout) reasons.push('insufficient_holdout_sample');
   if (!chronological) reasons.push('holdout_is_not_chronologically_separate');
   if (underpoweredSegments.length) reasons.push('underpowered_segments');
-  if (overall?.medianAbsolutePercentageError > maxHoldoutMedianApe) reasons.push('median_error_above_gate');
-  if ((overall?.intervalCoverage ?? 0) < minHoldoutCoverage) reasons.push('interval_coverage_below_gate');
+  // Admission thresholds must use unrounded ratios; rounding is for reports
+  // only and can otherwise turn a narrowly failing candidate into a pass.
+  const holdoutApe = holdout.map((r) =>
+    Math.abs((r.quotedLowerUsd + r.quotedUpperUsd) / 2 - r.contractedUsd) / r.contractedUsd
+  ).sort((x, y) => x - y);
+  const rawMedianApe = holdoutApe.length ? median(holdoutApe) : Infinity;
+  const rawCoverage = holdout.length
+    ? holdout.filter((r) => r.contractedUsd >= r.quotedLowerUsd &&
+      r.contractedUsd <= r.quotedUpperUsd).length / holdout.length
+    : 0;
+  if (rawMedianApe > maxHoldoutMedianApe) reasons.push('median_error_above_gate');
+  if (rawCoverage < minHoldoutCoverage) reasons.push('interval_coverage_below_gate');
   return {
     publishable: reasons.length === 0,
     reasons,
