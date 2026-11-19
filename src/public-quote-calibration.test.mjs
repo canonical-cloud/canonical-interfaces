@@ -87,3 +87,43 @@ test('bad inputs and invented metric thresholds fail closed', () => {
   assert.throws(() => evaluateQuoteCalibration(sample(), { minSegment: -1 }), /invalid_calibration_input/);
   assert.throws(() => evaluateQuoteCalibration(sample(), { minHoldoutCoverage: 1.2 }), /invalid_calibration_input/);
 });
+
+
+test('legal two-decimal currency is accepted without floating-point multiplication drift', () => {
+  const valid = row({
+    quotedLowerUsd: 0.29,
+    quotedUpperUsd: 0.58,
+    contractedUsd: 0.29,
+    deliveredCostUsd: 0.01,
+  });
+  assert.equal(validateCalibrationRow(valid), valid);
+  for (const value of [0.291, 0.0000000001, 10.001, NaN, Infinity]) {
+    assert.throws(() => validateCalibrationRow(row({ deliveredCostUsd: value })),
+      /invalid_calibration_record/);
+  }
+});
+
+test('median-error publication guard uses unrounded ratios at the gate', () => {
+  const data = sample().map((r) => r.sample === 'holdout'
+    ? { ...r, contractedUsd: 13750.69 } : r);
+  const result = evaluateQuoteCalibration(data, { minHoldoutCoverage: 0 });
+  assert.equal(result.metrics.holdout.medianAbsolutePercentageError, 0.2);
+  assert.equal(result.publishable, false);
+  assert.ok(result.reasons.includes('median_error_above_gate'));
+});
+
+test('interval-coverage guard cannot pass by rounding 2/3 up to 0.6667', () => {
+  const data = [
+    row({ sample: 'calibration', month: '2026-09' }),
+    row(),
+    row(),
+    row({ contractedUsd: 20000 }),
+  ];
+  const result = evaluateQuoteCalibration(data, {
+    minHoldout: 3, minSegment: 1,
+    minHoldoutCoverage: 0.66668, maxHoldoutMedianApe: 1,
+  });
+  assert.equal(result.metrics.holdout.intervalCoverage, 0.6667);
+  assert.equal(result.publishable, false);
+  assert.ok(result.reasons.includes('interval_coverage_below_gate'));
+});
