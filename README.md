@@ -232,3 +232,16 @@ No generated adapter, generated comparison schema, Contract IR artifact,
 service-local struct, SDK copy, provider-specific schema, prose example, or
 reference SQL file becomes a new editable contract authority merely because it
 is convenient for a consumer.
+
+## AttoLang (.atto) bounds projection
+
+`generated/atto/bounds.atto` is a generated, schema-backed subset of the
+public interface contract: pure AttoLang functions admitting integer values,
+string scalar lengths, and array element counts. Run `npm run generate` to
+regenerate it and `npm test && npm run check` to check exact drift and negative
+generator cases. Every constrained integer/string/array property in the indexed
+schema set gets a predicate. Optional/null semantics, schemas, `enum`, wire
+serialization, browser support, and HTTP clients remain the responsibility of
+other validators/adapters; this is **not** proof of an AttoLang runtime or
+complete generated model support. Validate actual `.atto` execution on exact
+compiler and guest heads before promotion.
