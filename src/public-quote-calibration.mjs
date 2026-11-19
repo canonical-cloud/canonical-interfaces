@@ -29,7 +29,8 @@ export function validateCalibrationRow(row) {
     // Forbid names, emails, account IDs, free-text notes, or other data columns.
     throw Error('invalid_calibration_record');
   }
-  if (!sampleKinds.has(row.sample) || !/^20\d{2}-(0[1-9]|1[0-2])$/.test(row.month) ||
+  if (!sampleKinds.has(row.sample) || typeof row.month !== 'string' ||
+      !/^20\d{2}-(0[1-9]|1[0-2])$/.test(row.month) ||
       !depths.has(row.deliveryDepthId) || !bands.has(row.employeeBandId) ||
       !sectors.has(row.sectorId)) throw Error('invalid_calibration_record');
   for (const key of ['quotedLowerUsd', 'quotedUpperUsd', 'contractedUsd', 'deliveredCostUsd']) {
@@ -70,7 +71,9 @@ export function evaluateQuoteCalibration(rows, {
   if (!Array.isArray(rows) || rows.length === 0 ||
       !Number.isInteger(minHoldout) || minHoldout < 1 ||
       !Number.isInteger(minSegment) || minSegment < 1 ||
+      typeof maxHoldoutMedianApe !== 'number' ||
       !(maxHoldoutMedianApe >= 0 && maxHoldoutMedianApe <= 1) ||
+      typeof minHoldoutCoverage !== 'number' ||
       !(minHoldoutCoverage >= 0 && minHoldoutCoverage <= 1)) throw Error('invalid_calibration_input');
   rows.forEach(validateCalibrationRow);
   const calibration = rows.filter((row) => row.sample === 'calibration');
