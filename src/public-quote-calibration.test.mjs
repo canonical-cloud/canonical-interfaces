@@ -127,3 +127,29 @@ test('interval-coverage guard cannot pass by rounding 2/3 up to 0.6667', () => {
   assert.equal(result.publishable, false);
   assert.ok(result.reasons.includes('interval_coverage_below_gate'));
 });
+
+
+test('privacy-bounded monthly records reject non-string months that regex could coerce', () => {
+  for (const month of [
+    ['2026-10'],
+    { toString: () => '2026-10' },
+    new String('2026-10'),
+    202610,
+    null,
+  ]) {
+    assert.throws(() => validateCalibrationRow(row({ month })),
+      /invalid_calibration_record/);
+  }
+  assert.equal(validateCalibrationRow(row({ month: '2026-10' })).month, '2026-10');
+});
+
+test('release-gate thresholds must be real numbers, never coerced strings or booleans', () => {
+  const settings = ['0.2', true, false, null, {}, [], Infinity, NaN];
+  for (const value of settings) {
+    assert.throws(() => evaluateQuoteCalibration(sample(), { maxHoldoutMedianApe: value }),
+      /invalid_calibration_input/);
+    assert.throws(() => evaluateQuoteCalibration(sample(), { minHoldoutCoverage: value }),
+      /invalid_calibration_input/);
+  }
+  assert.equal(evaluateQuoteCalibration(sample(), { maxHoldoutMedianApe: 0.2 }).publishable, true);
+});
