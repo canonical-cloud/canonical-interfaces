@@ -76,3 +76,13 @@ test("exact reviewed package must initialize twice in Chromium", () => {
     assert.ok(workflow.includes(token), `CI must retain ${token}`);
   }
 });
+
+test("hosted Chromium startup budget is bounded and keeps DevTools readiness mandatory", () => {
+  assert.match(runner, /for _ in \$\(seq 1 100\); do/);
+  assert.match(runner, /for _ in \$\(seq 1 300\); do[\s\S]*?\/json\/version/);
+  assert.ok(runner.includes("Chromium DevTools endpoint did not become ready within 30 seconds"));
+  assert.ok(runner.includes('--user-data-dir="$work_dir/chrome-profile"'));
+  assert.ok(runner.includes("--remote-debugging-address=127.0.0.1"));
+  assert.ok(runner.includes("if ! kill -0 \"$chrome_pid\""));
+  assert.ok(runner.includes("print_failure_evidence"));
+});
