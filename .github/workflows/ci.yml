@@ -168,3 +168,24 @@ jobs:
             ${{ runner.temp }}/canonical-interface-browser
           if-no-files-found: warn
           retention-days: 3
+
+  # Pure Rust source-integrity tests for the experimental .atto projection.
+  # These do not claim compiler execution or runtime conformance.
+  atto-source-rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: "1.95"
+          components: rustfmt
+      - name: Format check Rust Atto source tests
+        run: rustfmt --edition 2021 --check tests/atto_contract_index.rs
+      - name: Compile and run Rust Atto source tests
+        run: |
+          rustc --edition=2021 --test tests/atto_contract_index.rs -o "$RUNNER_TEMP/atto_contract_index_tests"
+          "$RUNNER_TEMP/atto_contract_index_tests"
+

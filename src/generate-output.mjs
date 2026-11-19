@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { build as buildAdapters, loadTypes } from "./generate.mjs";
 import { emitAttoBounds } from "./generate-atto.mjs";
+import { emitAttoContractIndex } from "./atto-contract-index.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, "..");
@@ -18,6 +19,7 @@ const packagedLibBlock = `[lib]\npath = "../../src/rust-wasm-entry.rs"\ncrate-ty
 export function build() {
   const files = buildAdapters();
   Object.assign(files, emitAttoBounds(loadTypes()));
+  files["atto/contract_index.atto"] = emitAttoContractIndex(loadTypes());
   const manifest = files[wasmManifest];
   if (typeof manifest !== "string" || !manifest.includes(generatedLibBlock)) {
     throw new Error("generated Rust/WASM manifest no longer has the expected [lib] block");
