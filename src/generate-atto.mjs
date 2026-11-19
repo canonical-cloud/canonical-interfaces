@@ -2,7 +2,11 @@
 import { snake } from "./generate.mjs";
 
 const kindFor = (schema) => {
-  const types = Array.isArray(schema.type) ? schema.type.filter((t) => t !== "null") : [schema.type];
+  const declared = Array.isArray(schema.type) ? schema.type : [schema.type];
+  // JSON Schema type arrays must be unique. In particular, multiple "null"
+  // entries cannot silently collapse into a supported constrained type.
+  if (new Set(declared).size !== declared.length) return null;
+  const types = declared.filter((t) => t !== "null");
   if (types.length !== 1) return null;
   return { integer: "value", string: "length", array: "count" }[types[0]] || null;
 };

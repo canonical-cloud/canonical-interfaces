@@ -64,3 +64,16 @@ test("AttoLang integer and collection boundaries preserve their comparisons", ()
   assert.match(generated, /if length < 1 then return false; fi/);
   assert.equal((generated.match(/^pub fnc /gm) || []).length, 3);
 });
+
+
+test("AttoLang bounds projection rejects duplicate nullable union entries", () => {
+  const fixture = (type) => [{ name: "Fixture", props: [
+    { name: "quantity", schema: { type, maximum: 50 } },
+  ] }];
+  assert.throws(() => emitAttoBounds(fixture(["integer", "null", "null"])),
+    /unsupported constrained type/);
+  assert.throws(() => emitAttoBounds(fixture(["integer", "integer"])),
+    /unsupported constrained type/);
+  assert.match(emitAttoBounds(fixture(["integer", "null"]))["atto/bounds.atto"],
+    /within_fixture_quantity_value/);
+});
