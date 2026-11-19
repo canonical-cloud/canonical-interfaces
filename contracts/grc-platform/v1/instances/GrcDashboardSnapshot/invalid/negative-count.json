@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "tenant_id": "tenant_demo",
+  "generated_at": "2026-10-05T00:00:00Z",
+  "modules": [
+    {
+      "key": "controls_evidence",
+      "open_items": -1,
+      "overdue_items": 0,
+      "failing_automated_checks": 0,
+      "last_updated_at": "2026-10-05T00:00:00Z"
+    }
+  ]
+}

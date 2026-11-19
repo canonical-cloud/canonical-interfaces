@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "capabilities": [
+    {
+      "key": "arbitrary_sql",
+      "api_path": "/v1/grc/sql",
+      "app_path": "/app/compliance/sql",
+      "persistence_tables": ["everything"],
+      "continuous_monitoring": true,
+      "evidence_provenance": false,
+      "human_approval": false
+    }
+  ]
+}
