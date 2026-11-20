@@ -4,6 +4,12 @@ version = "0.1.0"
 edition = "2021"
 description = "Generated typed payloads for the canonical.cloud API (see canonical-interfaces)."
 
+[features]
+default = []
+# First-party sync payloads. Off by default so an external consumer never
+# compiles them, and turning them on is a visible line in their Cargo.toml.
+internal = []
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

@@ -66,6 +66,11 @@ function validateObjectType(name, value) {
       fail(`${name} has an invalid required property`);
     }
   }
+  // Audience is mandatory here for the same reason it is in src/generate.mjs: a
+  // type that forgets to declare it would default into the published SDK surface.
+  if (value["x-visibility"] !== "public" && value["x-visibility"] !== "internal") {
+    fail(`${name} must declare "x-visibility" as "public" or "internal"`);
+  }
 }
 
 export function validateContractSource(source) {
@@ -126,7 +131,13 @@ export function buildProjection(source) {
   const checked = validateContractSource(structuredClone(source));
   const definitions = {};
   for (const name of OBJECT_TYPES) {
-    definitions[name] = inlineReferences(checked.$defs[name], checked.$defs);
+    const projected = inlineReferences(checked.$defs[name], checked.$defs);
+    // Keep the marker first so the projection reads like the hand-written
+    // schemas, and so src/generate.mjs sees the audience it now requires.
+    definitions[name] = {
+      "x-visibility": checked.$defs[name]["x-visibility"],
+      ...projected,
+    };
   }
   const result = {
     $schema: "https://json-schema.org/draft/2020-12/schema",

@@ -7,29 +7,6 @@ abstract final class HealthStatusStatus {
   static const List<String> values = <String>["ok", "degraded"];
 }
 
-/// Permitted wire values for the fields typed as `DraftNoteKeyKind`.
-abstract final class DraftNoteKeyKind {
-  static const String draftNote = "draft_note";
-  static const List<String> values = <String>["draft_note"];
-}
-
-/// Permitted wire values for the fields typed as `MutationOperationAction`.
-abstract final class MutationOperationAction {
-  static const String put = "put";
-  static const String delete = "delete";
-  static const List<String> values = <String>["put", "delete"];
-}
-
-/// Permitted wire values for the fields typed as `MutationResultStatus`.
-abstract final class MutationResultStatus {
-  static const String applied = "applied";
-  static const String conflict = "conflict";
-  static const String gone = "gone";
-  static const String invalid = "invalid";
-  static const String idempotencyKeyReused = "idempotency_key_reused";
-  static const List<String> values = <String>["applied", "conflict", "gone", "invalid", "idempotency_key_reused"];
-}
-
 /// Permitted wire values for the fields typed as `AuditEngagementFramework`.
 abstract final class AuditEngagementFramework {
   static const String soc2 = "soc2";
@@ -38,16 +15,26 @@ abstract final class AuditEngagementFramework {
   static const String iso27001 = "iso_27001";
   static const String pciDss = "pci_dss";
   static const String gdpr = "gdpr";
-  static const List<String> values = <String>["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr"];
+  static const String cisControls = "cis_controls";
+  static const String cmmc = "cmmc";
+  static const String csaCcm = "csa_ccm";
+  static const String dora = "dora";
+  static const String iso22301 = "iso_22301";
+  static const String iso27701 = "iso_27701";
+  static const String nis2 = "nis2";
+  static const String nistCsf = "nist_csf";
+  static const String nist80053 = "nist_800_53";
+  static const List<String> values = <String>["soc2", "fedramp", "hipaa", "iso_27001", "pci_dss", "gdpr", "cis_controls", "cmmc", "csa_ccm", "dora", "iso_22301", "iso_27701", "nis2", "nist_csf", "nist_800_53"];
 }
 
 /// Permitted wire values for the fields typed as `AuditEngagementStatus`.
 abstract final class AuditEngagementStatus {
   static const String scoping = "scoping";
   static const String remediation = "remediation";
+  static const String auditReady = "audit_ready";
   static const String inAudit = "in_audit";
   static const String complete = "complete";
-  static const List<String> values = <String>["scoping", "remediation", "in_audit", "complete"];
+  static const List<String> values = <String>["scoping", "remediation", "audit_ready", "in_audit", "complete"];
 }
 
 /// Permitted wire values for the fields typed as `QuoteSubmissionResponseStatus`.
@@ -172,227 +159,7 @@ final class ServiceInfo {
   };
 }
 
-/// Schema-version-1 value for the only record kind accepted by the initial sync protocol.
-final class DraftNoteValue {
-  const DraftNoteValue({required this.title, required this.body});
-
-  /// Draft-note title, limited to 200 characters.
-  final String title;
-  /// Draft-note body, limited to 100,000 characters.
-  final String body;
-
-  factory DraftNoteValue.fromJson(Map<String, Object?> json) => DraftNoteValue(
-    title: json["title"] as String,
-    body: json["body"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "title": title,
-    "body": body,
-  };
-}
-
-/// Owner-scoped key for a draft-note sync record.
-final class DraftNoteKey {
-  const DraftNoteKey({required this.kind, required this.id});
-
-  /// Bounded record-kind discriminator. (one of: draft_note)
-  final String kind;
-  /// Client-generated UUID for the record.
-  final String id;
-
-  factory DraftNoteKey.fromJson(Map<String, Object?> json) => DraftNoteKey(
-    kind: json["kind"] as String,
-    id: json["id"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "kind": kind,
-    "id": id,
-  };
-}
-
-/// One idempotent compare-and-swap operation in a draft-note mutation batch.
-final class MutationOperation {
-  const MutationOperation({required this.mutationId, required this.key, required this.action, required this.baseVersion, required this.schemaVersion, this.value});
-
-  /// UUID idempotency key, unique per client and logical mutation.
-  final String mutationId;
-  /// Record targeted by the operation.
-  final DraftNoteKey key;
-  /// Mutation action. (one of: put, delete)
-  final String action;
-  /// Unsigned decimal-string version used for compare-and-swap, or null for a create.
-  final String? baseVersion;
-  /// Draft-note payload schema version; only version 1 is accepted.
-  final int schemaVersion;
-  /// Required for put and omitted for delete.
-  final DraftNoteValue? value;
-
-  factory MutationOperation.fromJson(Map<String, Object?> json) => MutationOperation(
-    mutationId: json["mutationId"] as String,
-    key: DraftNoteKey.fromJson((json["key"] as Map).cast<String, Object?>()),
-    action: json["action"] as String,
-    baseVersion: json["baseVersion"] == null ? null : json["baseVersion"] as String,
-    schemaVersion: json["schemaVersion"] as int,
-    value: json["value"] == null ? null : DraftNoteValue.fromJson((json["value"] as Map).cast<String, Object?>()),
-  );
-
-  Map<String, Object?> toJson() => {
-    "mutationId": mutationId,
-    "key": key.toJson(),
-    "action": action,
-    "baseVersion": baseVersion,
-    "schemaVersion": schemaVersion,
-    if (value != null) "value": value?.toJson(),
-  };
-}
-
-/// Body of POST /api/v1/sync/mutations.
-final class MutationRequest {
-  const MutationRequest({required this.protocolVersion, required this.clientId, required this.operations});
-
-  /// Sync protocol version; only version 1 is accepted.
-  final int protocolVersion;
-  /// Stable UUID for this browser installation or API client.
-  final String clientId;
-  /// Bounded mutation batch containing between 1 and 50 operations.
-  final List<MutationOperation> operations;
-
-  factory MutationRequest.fromJson(Map<String, Object?> json) => MutationRequest(
-    protocolVersion: json["protocolVersion"] as int,
-    clientId: json["clientId"] as String,
-    operations: (json["operations"] as List).map((value) => MutationOperation.fromJson((value as Map).cast<String, Object?>())).toList(growable: false),
-  );
-
-  Map<String, Object?> toJson() => {
-    "protocolVersion": protocolVersion,
-    "clientId": clientId,
-    "operations": operations.map((value) => value.toJson()).toList(growable: false),
-  };
-}
-
-/// Authoritative server snapshot of a draft-note record or tombstone.
-final class WireRecord {
-  const WireRecord({required this.key, required this.version, required this.schemaVersion, required this.deleted, this.value});
-
-  /// Owner-scoped record key.
-  final DraftNoteKey key;
-  /// Authoritative record version encoded as an unsigned decimal string.
-  final String version;
-  /// Draft-note payload schema version.
-  final int schemaVersion;
-  /// True when the snapshot is a permanent tombstone.
-  final bool deleted;
-  /// Present for live records and omitted for tombstones.
-  final DraftNoteValue? value;
-
-  factory WireRecord.fromJson(Map<String, Object?> json) => WireRecord(
-    key: DraftNoteKey.fromJson((json["key"] as Map).cast<String, Object?>()),
-    version: json["version"] as String,
-    schemaVersion: json["schemaVersion"] as int,
-    deleted: json["deleted"] as bool,
-    value: json["value"] == null ? null : DraftNoteValue.fromJson((json["value"] as Map).cast<String, Object?>()),
-  );
-
-  Map<String, Object?> toJson() => {
-    "key": key.toJson(),
-    "version": version,
-    "schemaVersion": schemaVersion,
-    "deleted": deleted,
-    if (value != null) "value": value?.toJson(),
-  };
-}
-
-/// Per-operation result returned in the same order as the mutation request.
-final class MutationResult {
-  const MutationResult({required this.mutationId, required this.status, this.record, this.message});
-
-  /// Idempotency key copied from the operation.
-  final String mutationId;
-  /// Outcome of the compare-and-swap operation. (one of: applied, conflict, gone, invalid, idempotency_key_reused)
-  final String status;
-  /// Applied or authoritative conflicting snapshot when available.
-  final WireRecord? record;
-  /// Optional human-readable failure detail; clients must branch on status.
-  final String? message;
-
-  factory MutationResult.fromJson(Map<String, Object?> json) => MutationResult(
-    mutationId: json["mutationId"] as String,
-    status: json["status"] as String,
-    record: json["record"] == null ? null : WireRecord.fromJson((json["record"] as Map).cast<String, Object?>()),
-    message: json["message"] == null ? null : json["message"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "mutationId": mutationId,
-    "status": status,
-    if (record != null) "record": record?.toJson(),
-    if (message != null) "message": message,
-  };
-}
-
-/// Response of POST /api/v1/sync/mutations.
-final class MutationResponse {
-  const MutationResponse({required this.results});
-
-  /// One result for every submitted operation, in request order.
-  final List<MutationResult> results;
-
-  factory MutationResponse.fromJson(Map<String, Object?> json) => MutationResponse(
-    results: (json["results"] as List).map((value) => MutationResult.fromJson((value as Map).cast<String, Object?>())).toList(growable: false),
-  );
-
-  Map<String, Object?> toJson() => {
-    "results": results.map((value) => value.toJson()).toList(growable: false),
-  };
-}
-
-/// Query parameters accepted by GET /api/v1/sync/changes.
-final class ChangesQuery {
-  const ChangesQuery({this.cursor, this.limit});
-
-  /// Opaque, encrypted, owner-bound cursor returned by the previous pull.
-  final String? cursor;
-  /// Requested page size; the server clamps values to 1 through 500.
-  final int? limit;
-
-  factory ChangesQuery.fromJson(Map<String, Object?> json) => ChangesQuery(
-    cursor: json["cursor"] == null ? null : json["cursor"] as String,
-    limit: json["limit"] == null ? null : json["limit"] as int,
-  );
-
-  Map<String, Object?> toJson() => {
-    if (cursor != null) "cursor": cursor,
-    if (limit != null) "limit": limit,
-  };
-}
-
-/// Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints.
-final class ChangesResponse {
-  const ChangesResponse({required this.changes, required this.nextCursor, required this.caughtUp});
-
-  /// Commit-ordered authoritative snapshots and tombstones.
-  final List<WireRecord> changes;
-  /// Opaque cursor to persist and send on the next pull.
-  final String nextCursor;
-  /// True when the response reached the pull's stable high-water mark.
-  final bool caughtUp;
-
-  factory ChangesResponse.fromJson(Map<String, Object?> json) => ChangesResponse(
-    changes: (json["changes"] as List).map((value) => WireRecord.fromJson((value as Map).cast<String, Object?>())).toList(growable: false),
-    nextCursor: json["nextCursor"] as String,
-    caughtUp: json["caughtUp"] as bool,
-  );
-
-  Map<String, Object?> toJson() => {
-    "changes": changes.map((value) => value.toJson()).toList(growable: false),
-    "nextCursor": nextCursor,
-    "caughtUp": caughtUp,
-  };
-}
-
-/// A single compliance-audit engagement for a customer company.
+/// A single readiness engagement preparing a customer company for independent review against a framework.
 final class AuditEngagement {
   const AuditEngagement({required this.id, required this.company, required this.framework, required this.status, required this.openedAt, this.targetReportDate});
 
@@ -400,13 +167,13 @@ final class AuditEngagement {
   final String id;
   /// Customer company name.
   final String company;
-  /// Compliance framework being audited. (one of: soc2, fedramp, hipaa, iso_27001, pci_dss, gdpr)
+  /// Framework the readiness engagement prepares the client for. (one of: soc2, fedramp, hipaa, iso_27001, pci_dss, gdpr, cis_controls, cmmc, csa_ccm, dora, iso_22301, iso_27701, nis2, nist_csf, nist_800_53)
   final String framework;
-  /// Lifecycle stage of the engagement. (one of: scoping, remediation, in_audit, complete)
+  /// Lifecycle stage of the readiness engagement. audit_ready means preparation is complete and the client is ready to enter independent review; in_audit means the independent auditor's review is underway. (one of: scoping, remediation, audit_ready, in_audit, complete)
   final String status;
   /// RFC 3339 timestamp the engagement was opened.
   final String openedAt;
-  /// Optional RFC 3339 date the attestation report is targeted for.
+  /// Optional RFC 3339 date the client targets for the independent auditor's report.
   final String? targetReportDate;
 
   factory AuditEngagement.fromJson(Map<String, Object?> json) => AuditEngagement(
@@ -620,6 +387,30 @@ final class QuoteEstimate {
   };
 }
 
+/// Bounded public error payload for quote endpoints.
+final class QuoteProblem {
+  const QuoteProblem({required this.code, required this.message, required this.requestId});
+
+  /// Stable machine-readable error code.
+  final String code;
+  /// Safe human-readable error detail.
+  final String message;
+  /// Request correlation identifier.
+  final String requestId;
+
+  factory QuoteProblem.fromJson(Map<String, Object?> json) => QuoteProblem(
+    code: json["code"] as String,
+    message: json["message"] as String,
+    requestId: json["requestId"] as String,
+  );
+
+  Map<String, Object?> toJson() => {
+    "code": code,
+    "message": message,
+    "requestId": requestId,
+  };
+}
+
 /// Authenticated WebSocket progress message for one quote.
 final class QuoteStatusEvent {
   const QuoteStatusEvent({required this.quoteId, required this.sequence, required this.stage, required this.message, required this.terminal, this.estimate, required this.occurredAt, this.problem});
@@ -661,30 +452,6 @@ final class QuoteStatusEvent {
     if (estimate != null) "estimate": estimate?.toJson(),
     "occurredAt": occurredAt,
     if (problem != null) "problem": problem?.toJson(),
-  };
-}
-
-/// Bounded public error payload for quote endpoints.
-final class QuoteProblem {
-  const QuoteProblem({required this.code, required this.message, required this.requestId});
-
-  /// Stable machine-readable error code.
-  final String code;
-  /// Safe human-readable error detail.
-  final String message;
-  /// Request correlation identifier.
-  final String requestId;
-
-  factory QuoteProblem.fromJson(Map<String, Object?> json) => QuoteProblem(
-    code: json["code"] as String,
-    message: json["message"] as String,
-    requestId: json["requestId"] as String,
-  );
-
-  Map<String, Object?> toJson() => {
-    "code": code,
-    "message": message,
-    "requestId": requestId,
   };
 }
 

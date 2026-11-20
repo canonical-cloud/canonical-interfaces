@@ -22,111 +22,19 @@ type ServiceInfo struct {
 	Stack []string `json:"stack"`
 }
 
-// DraftNoteValue: Schema-version-1 value for the only record kind accepted by the initial sync protocol.
-type DraftNoteValue struct {
-	// Draft-note title, limited to 200 characters.
-	Title string `json:"title"`
-	// Draft-note body, limited to 100,000 characters.
-	Body string `json:"body"`
-}
-
-// DraftNoteKey: Owner-scoped key for a draft-note sync record.
-type DraftNoteKey struct {
-	// Bounded record-kind discriminator. (one of: draft_note)
-	Kind string `json:"kind"`
-	// Client-generated UUID for the record.
-	Id string `json:"id"`
-}
-
-// MutationOperation: One idempotent compare-and-swap operation in a draft-note mutation batch.
-type MutationOperation struct {
-	// UUID idempotency key, unique per client and logical mutation.
-	MutationId string `json:"mutationId"`
-	// Record targeted by the operation.
-	Key DraftNoteKey `json:"key"`
-	// Mutation action. (one of: put, delete)
-	Action string `json:"action"`
-	// Unsigned decimal-string version used for compare-and-swap, or null for a create.
-	BaseVersion *string `json:"baseVersion"`
-	// Draft-note payload schema version; only version 1 is accepted.
-	SchemaVersion int64 `json:"schemaVersion"`
-	// Required for put and omitted for delete.
-	Value *DraftNoteValue `json:"value,omitempty"`
-}
-
-// MutationRequest: Body of POST /api/v1/sync/mutations.
-type MutationRequest struct {
-	// Sync protocol version; only version 1 is accepted.
-	ProtocolVersion int64 `json:"protocolVersion"`
-	// Stable UUID for this browser installation or API client.
-	ClientId string `json:"clientId"`
-	// Bounded mutation batch containing between 1 and 50 operations.
-	Operations []MutationOperation `json:"operations"`
-}
-
-// WireRecord: Authoritative server snapshot of a draft-note record or tombstone.
-type WireRecord struct {
-	// Owner-scoped record key.
-	Key DraftNoteKey `json:"key"`
-	// Authoritative record version encoded as an unsigned decimal string.
-	Version string `json:"version"`
-	// Draft-note payload schema version.
-	SchemaVersion int64 `json:"schemaVersion"`
-	// True when the snapshot is a permanent tombstone.
-	Deleted bool `json:"deleted"`
-	// Present for live records and omitted for tombstones.
-	Value *DraftNoteValue `json:"value,omitempty"`
-}
-
-// MutationResult: Per-operation result returned in the same order as the mutation request.
-type MutationResult struct {
-	// Idempotency key copied from the operation.
-	MutationId string `json:"mutationId"`
-	// Outcome of the compare-and-swap operation. (one of: applied, conflict, gone, invalid, idempotency_key_reused)
-	Status string `json:"status"`
-	// Applied or authoritative conflicting snapshot when available.
-	Record *WireRecord `json:"record,omitempty"`
-	// Optional human-readable failure detail; clients must branch on status.
-	Message *string `json:"message,omitempty"`
-}
-
-// MutationResponse: Response of POST /api/v1/sync/mutations.
-type MutationResponse struct {
-	// One result for every submitted operation, in request order.
-	Results []MutationResult `json:"results"`
-}
-
-// ChangesQuery: Query parameters accepted by GET /api/v1/sync/changes.
-type ChangesQuery struct {
-	// Opaque, encrypted, owner-bound cursor returned by the previous pull.
-	Cursor *string `json:"cursor,omitempty"`
-	// Requested page size; the server clamps values to 1 through 500.
-	Limit *int64 `json:"limit,omitempty"`
-}
-
-// ChangesResponse: Response of GET /api/v1/sync/changes; REST pull is authoritative over WebSocket hints.
-type ChangesResponse struct {
-	// Commit-ordered authoritative snapshots and tombstones.
-	Changes []WireRecord `json:"changes"`
-	// Opaque cursor to persist and send on the next pull.
-	NextCursor string `json:"nextCursor"`
-	// True when the response reached the pull's stable high-water mark.
-	CaughtUp bool `json:"caughtUp"`
-}
-
-// AuditEngagement: A single compliance-audit engagement for a customer company.
+// AuditEngagement: A single readiness engagement preparing a customer company for independent review against a framework.
 type AuditEngagement struct {
 	// Opaque engagement identifier (UUID).
 	Id string `json:"id"`
 	// Customer company name.
 	Company string `json:"company"`
-	// Compliance framework being audited. (one of: soc2, fedramp, hipaa, iso_27001, pci_dss, gdpr)
+	// Framework the readiness engagement prepares the client for. (one of: soc2, fedramp, hipaa, iso_27001, pci_dss, gdpr, cis_controls, cmmc, csa_ccm, dora, iso_22301, iso_27701, nis2, nist_csf, nist_800_53)
 	Framework string `json:"framework"`
-	// Lifecycle stage of the engagement. (one of: scoping, remediation, in_audit, complete)
+	// Lifecycle stage of the readiness engagement. audit_ready means preparation is complete and the client is ready to enter independent review; in_audit means the independent auditor's review is underway. (one of: scoping, remediation, audit_ready, in_audit, complete)
 	Status string `json:"status"`
 	// RFC 3339 timestamp the engagement was opened.
 	OpenedAt string `json:"opened_at"`
-	// Optional RFC 3339 date the attestation report is targeted for.
+	// Optional RFC 3339 date the client targets for the independent auditor's report.
 	TargetReportDate *string `json:"target_report_date,omitempty"`
 }
 
@@ -220,6 +128,16 @@ type QuoteEstimate struct {
 	CreatedAt string `json:"createdAt"`
 }
 
+// QuoteProblem: Bounded public error payload for quote endpoints.
+type QuoteProblem struct {
+	// Stable machine-readable error code.
+	Code string `json:"code"`
+	// Safe human-readable error detail.
+	Message string `json:"message"`
+	// Request correlation identifier.
+	RequestId string `json:"requestId"`
+}
+
 // QuoteStatusEvent: Authenticated WebSocket progress message for one quote.
 type QuoteStatusEvent struct {
 	// Quote identifier.
@@ -238,16 +156,6 @@ type QuoteStatusEvent struct {
 	OccurredAt string `json:"occurredAt"`
 	// Present only when the event reports a safe public failure.
 	Problem *QuoteProblem `json:"problem,omitempty"`
-}
-
-// QuoteProblem: Bounded public error payload for quote endpoints.
-type QuoteProblem struct {
-	// Stable machine-readable error code.
-	Code string `json:"code"`
-	// Safe human-readable error detail.
-	Message string `json:"message"`
-	// Request correlation identifier.
-	RequestId string `json:"requestId"`
 }
 
 // QuoteSummary: Owner-scoped list item for a compliance quote.
